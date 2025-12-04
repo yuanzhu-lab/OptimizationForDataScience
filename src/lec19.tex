@@ -1,0 +1,391 @@
+\section{Lec 19}
+
+\subsection{Kernel Ridge Regression}
+
+\subsubsection{Ridge Regression}
+
+Given $\bm A\in\R^{m\times n}$, consider
+\[
+\min_{\bm x}\; \frac12\|\bm A\bm x-\bm y\|^2 + \frac12\gamma\|\bm x\|^2.
+\]
+
+\subsubsection{Kernel Ridge Regression}
+
+Now “lift” to a higher-dimensional feature matrix
+$\tilde{\bm A}\in\R^{m\times N}$ with $N\gg \max(m,n)$ and solve
+\[
+\tilde{\bm x}
+\defeq
+(\tilde{\bm A}^\top \tilde{\bm A}+\gamma \bm I_N)^{-1}\tilde{\bm A}^\top \bm y.
+\]
+
+\subsection{Kernel Trick}
+
+\subsubsection{Part 1}
+
+\begin{theorembox}
+\[
+\bigl(\underbrace{\tilde{\bm A}^\top \tilde{\bm A}+\gamma \bm I_N}_{N\times N}\bigr)^{-1}\tilde{\bm A}^\top
+=
+\tilde{\bm A}^\top\bigl(\underbrace{\tilde{\bm A}\tilde{\bm A}^\top+\gamma \bm I_m}_{m\times m}\bigr)^{-1}.
+\]
+\end{theorembox}
+
+\begin{proofbox}
+\[
+\begin{aligned}
+(\tilde{\bm A}^\top \tilde{\bm A}+\gamma \bm I_N)\,\tilde{\bm A}^\top
+(\tilde{\bm A}\tilde{\bm A}^\top+\gamma \bm I_m)^{-1}
+&=
+(\tilde{\bm A}^\top \tilde{\bm A}\tilde{\bm A}^\top+\gamma \tilde{\bm A}^\top)
+(\tilde{\bm A} \tilde{\bm A}^\top+\gamma \bm I_m)^{-1}\\
+&=
+\tilde{\bm A}^\top(\tilde{\bm A} \tilde{\bm A}^\top+\gamma \bm I_m)
+(\tilde{\bm A} \tilde{\bm A}^\top+\gamma \bm I_m)^{-1}\\
+&=\tilde{\bm A}^\top.
+\end{aligned}
+\]
+Thus the claimed identity holds.
+\end{proofbox}
+
+\subsubsection{Part 2}
+
+We do not need to store $\tilde{\bm x}\in\R^N$ explicitly. By the theorem,
+\[
+\tilde{\bm x}
+=
+\tilde{\bm A}^\top(\tilde{\bm A}\tilde{\bm A}^\top+\gamma \bm I_m)^{-1}\bm y
+=
+\tilde{\bm A}^\top \bm w,
+\]
+where
+\[
+\bm w \defeq (\tilde{\bm A}\tilde{\bm A}^\top+\gamma \bm I_m)^{-1}\bm y\in\R^m.
+\]
+
+So we store only $\bm w$. For a new instance
+$\tilde{\bm a}\in\R^N$,
+\[
+\tilde{\bm a}^\top \tilde{\bm x}
+=
+\tilde{\bm a}^\top \tilde{\bm A}^\top \bm w,
+\]
+so classification can be done using matrix–vector products involving
+$\tilde{\bm A}$ and the new $\tilde{\bm a}$, and $\bm w$.
+
+\subsubsection{Part 3}
+
+A \textbf{kernel} is the matrix
+\[
+\bm K \defeq \tilde{\bm A}\tilde{\bm A}^\top\in\mathbb S^m,
+\]
+often called the Gram matrix or inner-product matrix.
+
+For some feature families it is possible to compute
+an approximation $\hat{\bm K}$ much faster than explicitly forming
+$\tilde{\bm A}$ and then $\tilde{\bm A}\tilde{\bm A}^\top$.
+
+Example: all monomials up to degree $d$ in the original features.
+
+\begin{examplebox}
+\textbf{(Polynomial features.)}
+
+Let $n=2$, degree $d=2$. Then $N=6$ features:
+\[
+1,\; x,\; y,\; x^2,\; y^2,\; xy.
+\]
+
+For $\bm K(i,j)$, suppose row $i$ of $\bm A$ is $(v_1,v_2)$ and row $j$ is
+$(w_1,w_2)$. Then the corresponding rows of $\tilde{\bm A}$ are
+\[
+\begin{aligned}
+\text{row }i &\mapsto (1,\; v_1,\; v_2,\; v_1^2,\; v_1v_2,\; v_2^2),\\
+\text{row }j &\mapsto (1,\; w_1,\; w_2,\; w_1^2,\; w_1w_2,\; w_2^2).
+\end{aligned}
+\]
+Then $\bm K(i,j)$ is the inner product of these two $6$-vectors.
+
+For a more convenient kernel, consider
+\[
+(1+v_1w_1+v_2w_2)^2.
+\]
+Expanding gives
+\[
+1 + 2v_1w_1 + 2v_2w_2
++ v_1^2w_1^2 + v_2^2w_2^2
++ 2v_1w_1v_2w_2,
+\]
+which is the inner product of
+\[
+(1,\; \sqrt2 v_1,\; \sqrt2 v_2,\; v_1^2,\; \sqrt2 v_1v_2,\; v_2^2)
+\]
+and
+\[
+(1,\; \sqrt2 w_1,\; \sqrt2 w_2,\; w_1^2,\; \sqrt2 w_1w_2,\; w_2^2).
+\]
+
+Call this inner product $\hat{\bm K}(i,j)$. Then $\hat{\bm K}$ behaves like $\bm K$
+(up to scaling factors of $\sqrt2$, which only rescale $\tilde{\bm x}$)
+but can be computed without explicitly forming the rows of $\tilde{\bm A}$.
+
+\medskip
+
+\emph{Conclusion.} The kernel trick lets us effectively add many
+columns (features) without working explicitly with an $m\times N$ matrix.
+\end{examplebox}
+
+Part 3 also applies to forming $\tilde{\bm A}\tilde{\bm a}$ for a new
+data point $\tilde{\bm a}$: kernels can be defined for many feature
+families beyond polynomials.
+
+\subsection{Kernel Machines}
+
+Let the $i$-th row of $\bm A$ be $\bm\xi_i^\top\in\R^n$. After lifting by
+a feature map
+\[
+\bm\Phi:\R^n\to\R^N,\quad
+\bm\Phi(\bm\xi_i)
+=
+\begin{bmatrix}
+\Phi_1(\bm\xi_i)\\
+\vdots\\
+\Phi_N(\bm\xi_i)
+\end{bmatrix},
+\]
+we have
+\[
+\bm A =
+\begin{bmatrix}
+\bm\xi_1^\top\\
+\vdots\\
+\bm\xi_m^\top
+\end{bmatrix}
+\quad\xrightarrow{\text{Map}}\quad
+\tilde{\bm A} =
+\begin{bmatrix}
+\bm\Phi^\top(\bm\xi_1)\\
+\vdots\\
+\bm\Phi^\top(\bm\xi_m)
+\end{bmatrix}
+=
+\begin{bmatrix}
+\Phi_1(\bm\xi_1) & \cdots & \Phi_N(\bm\xi_1)\\
+\vdots & \ddots & \vdots\\
+\Phi_1(\bm\xi_m) & \cdots & \Phi_N(\bm\xi_m)
+\end{bmatrix}.
+\]
+
+Then the kernel (Gram matrix) $\bm K$ is
+\[
+\bm K =
+\begin{bmatrix}
+\bm\Phi^\top(\bm\xi_1)\bm\Phi(\bm\xi_1) & \cdots & \bm\Phi^\top(\bm\xi_1)\bm\Phi(\bm\xi_m)\\
+\vdots & \ddots & \vdots\\
+\bm\Phi^\top(\bm\xi_m)\bm\Phi(\bm\xi_1) & \cdots & \bm\Phi^\top(\bm\xi_m)\bm\Phi(\bm\xi_m)
+\end{bmatrix}
+\in\mathbb S^m.
+\]
+
+$\bm K$ is also called a \emph{Gram matrix} or \emph{inner-product matrix}.
+
+\begin{examplebox}
+\textbf{(Nonlinear separator via kernel SVM.)}
+\end{examplebox}
+
+Recall soft-margin SVM (SVM-7):
+\[
+\min_{\bm x,\xi,\bm s}
+\frac12\|\bm x\|^2 + \gamma\sum_{i=1}^m s_i
+\quad\text{S.T.}\quad
+\begin{cases}
+\bm a_i^\top \bm x + \xi \ge 1-s_i, & y_i=1,\\
+\bm a_i^\top \bm x + \xi \le -1+s_i, & y_i=-1,\\
+\bm s\ge \bm 0,
+\end{cases}
+\]
+with $\bm a_i\in\R^n$.
+
+After mapping $\bm a_i\mapsto\bm\Phi(\bm a_i)\in\R^N$, the \emph{kernel
+SVM} seeks $\tilde{\bm x}\in\R^N$, $\xi\in\R$, $\bm s\in\R^m$ solving
+\[
+\min_{\tilde{\bm x},\xi,\bm s}
+\frac12\|\tilde{\bm x}\|^2 + \gamma\sum_{i=1}^m s_i
+\quad\text{S.T.}\quad
+\begin{cases}
+\bm\Phi^\top(\bm a_i)\tilde{\bm x} + \xi \ge 1-s_i, & y_i=1,\\
+\bm\Phi^\top(\bm a_i)\tilde{\bm x} + \xi \le -1+s_i, & y_i=-1,\\[0.25em]
+\bm s\ge \bm 0.
+\end{cases}
+\]
+
+\begin{theorembox}[title={}]
+\textbf{Lagrangian formulation.}
+
+Introduce multipliers $\bm\lambda\ge \bm 0$ for $y_i=1$ constraints,
+$\bm\lambda'\ge \bm 0$ for $y_i=-1$ constraints, and $\bm\pi\ge \bm 0$
+for $s_i\ge 0$. The Lagrangian is
+\[
+\min_{\tilde{\bm x},\xi,\bm s}
+\;\max_{\substack{\bm\lambda\ge \bm 0\\\bm\lambda'\ge \bm 0\\\bm\pi\ge \bm 0}}
+\mathcal L(\tilde{\bm x},\xi,\bm s;\bm\lambda,\bm\lambda',\bm\pi),
+\]
+where
+\[
+\begin{aligned}
+\mathcal L(\tilde{\bm x},\xi,\bm s;\bm\lambda,\bm\lambda',\bm\pi)
+={}&
+\underbrace{\frac12\|\tilde{\bm x}\|^2
++ \gamma\sum_{i=1}^m s_i}_{f_0(\tilde{\bm x},\bm s)}\\
+&+\sum_{y_i=1}\lambda_i\bigl(1-s_i-\bm\Phi^\top(\bm a_i)\tilde{\bm x}-\xi\bigr)\\
+&+\sum_{y_i=-1}\lambda_i'\bigl(1-s_i+\bm\Phi^\top(\bm a_i)\tilde{\bm x}+\xi\bigr)
++ \sum_{i=1}^m (-s_i)\pi_i.
+\end{aligned}
+\]
+\end{theorembox}
+
+\textbf{Quadratic programming (QP).}
+
+A QP is an optimization problem of the form
+\[
+\min_{\bm x} q(\bm x)
+\quad\text{S.T.}\quad
+A_1\bm x=\bm b_1,\quad
+A_2\bm x\le \bm b_2,
+\]
+where $q$ is quadratic with positive semidefinite Hessian.
+Soft-margin SVM (SVM-7) and $\ell_1$-LS are QPs.
+
+\begin{factbox}
+If a QP has at least one feasible point and is bounded below, then it
+has an optimizer and strong duality holds.
+\end{factbox}
+
+For SVM-7 the objective is bounded below by $0$, and there is an obvious
+feasible point (e.g.\ $\tilde{\bm x}=\bm 0$, $\xi=0$, $\bm s=\bm e$), so
+strong duality applies.
+
+Thus the dual problem is
+\[
+\max_{\substack{\bm\lambda\ge \bm 0\\\bm\lambda'\ge \bm 0\\\bm\pi\ge \bm 0}}
+\;\min_{\tilde{\bm x},\xi,\bm s}
+\mathcal L(\tilde{\bm x},\xi,\bm s;\bm\lambda,\bm\lambda',\bm\pi).
+\]
+
+The inner minimization in each $s_i$ is
+\[
+\min_{s_i}\;
+\gamma s_i
+-
+\begin{cases}
+\lambda_i s_i, & y_i=1,\\
+\lambda_i' s_i, & y_i=-1
+\end{cases}
+- \pi_i s_i,
+\]
+which is $-\infty$ unless
+\[
+\gamma -
+\begin{cases}
+\lambda_i,\\
+\lambda_i'
+\end{cases}
+- \pi_i = 0.
+\]
+These are \textbf{hidden constraints} on dual variables; they must hold
+at any optimal dual solution. Under these, the $s_i$ disappear.
+
+We then minimize over $\xi$; the Lagrangian is linear in $\xi$, so the
+minimum is finite only if
+\[
+\sum_{y_i=1}\lambda_i = \sum_{y_i=-1}\lambda_i',
+\]
+another hidden constraint. With both hidden constraints satisfied, the
+inner problem reduces to
+\[
+\min_{\tilde{\bm x}}
+\;\frac12\|\tilde{\bm x}\|^2 + \bm p^\top\tilde{\bm x} + c,
+\]
+where
+\[
+\bm p
+=
+\sum_{y_i=-1}\lambda_i'\bm\Phi(\bm a_i)
+-
+\sum_{y_i=1}\lambda_i\bm\Phi(\bm a_i),
+\qquad
+c
+=
+\sum_{y_i=1}\lambda_i
++
+\sum_{y_i=-1}\lambda_i'.
+\]
+
+The minimizer is
+\[
+\tilde{\bm x}^* = -\bm p,
+\]
+and the optimal inner value is
+\[
+-\frac12\|\bm p\|^2 + c.
+\]
+
+Thus the dual becomes
+\[
+\begin{aligned}
+\max_{\substack{\bm\lambda\ge \bm 0\\\bm\lambda'\ge \bm 0\\\bm\pi\ge \bm 0}}
+&\quad
+-\frac12\Bigl\|
+\sum_{y_i=1}\lambda_i\bm\Phi(\bm a_i)
+-
+\sum_{y_i=-1}\lambda_i'\bm\Phi(\bm a_i)
+\Bigr\|^2
++
+\sum_{y_i=1}\lambda_i
++
+\sum_{y_i=-1}\lambda_i'\\
+\text{s.t. }&
+\begin{cases}
+\bm\lambda\ge \bm 0,\;\bm\lambda'\ge \bm 0,\;\bm\pi\ge \bm 0,\\
+\lambda_i+\pi_i=\gamma,\quad\lambda_i'+\pi_i=\gamma,\ \forall i,\\
+\displaystyle\sum_{y_i=1}\lambda_i = \sum_{y_i=-1}\lambda_i'.
+\end{cases}
+\end{aligned}
+\]
+
+Eliminating $\bm\pi$ via $\pi_i = \gamma-\lambda_i = \gamma-\lambda_i'$
+gives the simpler dual:
+\[
+\begin{aligned}
+\max_{\bm\lambda,\bm\lambda'}\quad
+&-\frac12\Bigl\|
+\sum_{y_i=1}\lambda_i\bm\Phi(\bm a_i)
+-
+\sum_{y_i=-1}\lambda_i'\bm\Phi(\bm a_i)
+\Bigr\|^2
++
+\sum_{y_i=1}\lambda_i
++
+\sum_{y_i=-1}\lambda_i'\\[0.3em]
+\text{s.t.}\quad
+&\bm\lambda\ge \bm 0,\quad
+\bm\lambda'\ge \bm 0,\quad
+\bm\lambda\le \gamma\bm e,\quad
+\bm\lambda'\le \gamma\bm e,\\
+&\displaystyle\sum_{y_i=1}\lambda_i
+=
+\sum_{y_i=-1}\lambda_i'.
+\end{aligned}
+\]
+
+Let $\bm K$ denote the quadratic coefficients in $(\bm\lambda,\bm\lambda')$
+in the dual objective. In terms of feature vectors,
+\[
+\bm K =
+\begin{bmatrix}
+\bm\Phi^\top(\bm a_1)\bm\Phi(\bm a_1) & \cdots & \pm\,\bm\Phi^\top(\bm a_1)\bm\Phi(\bm a_m)\\
+\vdots & \ddots & \vdots\\
+\pm\,\bm\Phi^\top(\bm a_m)\bm\Phi(\bm a_1) & \cdots & \bm\Phi^\top(\bm a_m)\bm\Phi(\bm a_m)
+\end{bmatrix},
+\]
+with signs depending on the labels $y_i$ (same labels $\Rightarrow$ $+$,
+different labels $\Rightarrow$ $-$).

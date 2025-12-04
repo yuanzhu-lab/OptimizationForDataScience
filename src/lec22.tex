@@ -1,0 +1,177 @@
+\section{Lec 22}
+
+\subsection{CVX}
+
+\subsubsection{Semidefinite Programming}
+
+\textbf{CVX} is a modeling language for convex optimization.
+
+It accepts a high-level description of an optimization problem, and translates it to an input suitable for a solver; invokes solver; returns optimal values to user's code.
+
+The solvers in CVX are for \textbf{semidefinite programming (SDP)}.
+
+\textbf{SDP}
+\[
+\min \langle \bm C,\bm X\rangle\quad\text{S.T.}\quad \langle \bm A_1,\bm X\rangle=b_1,\dots,\langle \bm A_m,\bm X\rangle=b_m,\; \bm X\succeq 0
+\]
+where $\bm X\in\mathbb S^n$, given $\bm C,\bm A_1,\dots,\bm A_m\in\mathbb S^n$, $b_1,\dots,b_m\in\mathbb R$.
+
+\begin{factbox}
+\textbf{Fact.} All of the convex programs considered this semester ($\ell_1$ LS, SVM, Huber, Candès-Recht, Rank-Sparsity) are special cases of SDP.
+\end{factbox}
+
+CVX is equipped with rules for translating many convex problems to SDP.
+
+\subsubsection{Examples}
+
+\begin{examplebox}
+
+(Setting up Candès-Recht relaxation of matrix completion in CVX.)
+
+Assume we have $\bm M\in\mathbb R^{m\times n}$, say $\bm M(i,j)=\text{NaN}$ for missing entries. So $\bm M,m,n$ are already program variables.
+\end{examplebox}
+
+\[
+\begin{aligned}
+&\texttt{cvx\_begin}\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\\
+&\texttt{variable}\;\;\texttt{X(m, n)}\\
+&\texttt{minimize}\;\;\texttt{norm\_nuc(X)}\\
+&\texttt{subject to}\\
+&\texttt{for}\;\;\texttt{i = 1 : m}\\
+&\quad\texttt{for}\;\;\texttt{j = 1 : n}\\
+&\quad\quad\texttt{if}\;\;\sim\texttt{ isnan(M(i, j))}\\
+&\quad\quad\quad \texttt{X(i, j) == M(i, j)}\\
+&\quad\quad\texttt{end}\\
+&\quad\texttt{end}\\
+&\texttt{end}\\
+&\texttt{cvx\_end}
+\end{aligned}
+\]
+
+This code segment is inserted inside a MATLAB function. The variables $\bm M$, $m$, and $n$ are defined before the segment. The variable $\bm X$ will be defined upon completion.
+
+\begin{examplebox}
+
+(Noisy C-R relaxation.)
+
+$\bm M,m,n$ as above, \texttt{gamma} also defined.
+\end{examplebox}
+
+\[
+\begin{aligned}
+&\texttt{[is, js] = find(} \sim\texttt{isnan(M))}\\
+&\texttt{nk = length(is)}\\
+&\texttt{cvx\_begin}\\
+&\texttt{variable}\;\;\texttt{X(m, n)}\\
+&\texttt{variable}\;\;\texttt{z(nk)}\\
+&\texttt{minimize}\;\texttt{(quad\_form(z, eye(nk)) / 2 + gamma * norm\_nuc(X))}\\
+&\texttt{subject to}\\
+&\texttt{for}\;\;\texttt{k = 1 : nk}\\
+&\quad \texttt{z(k) == X(is(k), js(k)) - M(is(k), js(k))}\\
+&\texttt{end}\\
+&\texttt{cvx\_end}
+\end{aligned}
+\]
+
+CVX formulation of $\displaystyle \min \frac12\|\bm z\|^2+\gamma\|\bm X\|_*$ subject to $\displaystyle z[s(i,j)]=\bm X(i,j)-\bm M(i,j),\ \forall (i,j)\in\Omega$, where $s(i,j)$ is sequential numbering $(i,j)\in\Omega$.
+
+CVX implements \textbf{Disciplined Convex Programming (DCP)}. CVX determines convexity using syntactic rules.
+
+\begin{examplebox}
+
+Consider
+\[
+\min\;\langle\text{some function}\rangle+\gamma\sum_{i=1}^n t_i\quad\text{S.T.}\quad t_i\geq x_i,\;t_i\geq-x_i,\;\forall i=1:n.
+\]
+
+OK in CVX: write as above.
+
+NOT OK in CVX: $t_i==\text{abs}(x_i)$.
+\end{examplebox}
+
+\subsubsection{Second-order Methods}
+
+CVX standard solvers are \textbf{Interior-point Methods} (CO 663 / CO 666).
+
+Interior-point methods are second-order methods. On each iteration, solve large system of linear equations. Obtain high accuracy, fast convergence, but each iteration is costly in terms of space and time.
+
+The methods in this class are all first-order methods, that is, \textbf{gradient-based}, no matrices (except matrices native to problem like C-R relaxation). First-order methods have slower convergence, lower accuracy, but much faster iterations.
+
+\subsection{Nonconvex Optimization}
+
+\subsubsection{Solvers}
+
+\paragraph{1. Convex relaxation}
+
+\begin{enumerate}
+  \item C-R relaxation of matrix completion
+  \item Relaxation of rank-sparsity
+  \item Compressive sensing
+\end{enumerate}
+
+Nonconvex problem:
+\[
+\min\;\; \text{nnz}(\bm x)\quad\text{S.T.}\quad \bm A\bm x=\bm b
+\]
+where $\text{nnz}(\cdot)$ is the function of the number of nonzero entries. This is NP-hard.
+
+Convex relaxation:
+\[
+\min\;\; \|\bm x\|_1\quad\text{S.T.}\quad \bm A\bm x=\bm b.
+\]
+
+\paragraph{2. Alternating algorithms}
+
+Regression: given $\bm A\in\mathbb R^{m\times n}$, $\bm y\in\mathbb R^m$, want
+\[
+\bm x:=\argmin\{\|\bm A\bm x-\bm y\|\}.
+\]
+
+Robust Regression: $\ell$ entries of $\bm y$ are arbitrarily corrupted. Still want $\bm x$ fits the noncorrupted entries.
+
+\textbf{AMRR-Alternating Minimization} for robust regression.
+
+Initialize: guess $\ell$ corrupted entries randomly, for example. Let $S^0$ be the guess of uncorrupted entries, so
+\[
+S^0\subseteq\{1,\dots,m\},\;|S^0|=m-\ell.
+\]
+
+Now solve:
+\[
+\bm x^0:=\argmin \|\bm A(S^0,:)\bm x-\bm y(S^0)\|.
+\]
+
+Let $S^1:=\text{indices of the }m-\ell\text{ smallest entries of }|r_1^0|,\dots,|r_m^0|$ where $\bm r^0=\bm A\bm x^0-\bm y$.
+
+Continue alternating: find $\bm x^0,S^1,\bm x^1,S^2,\bm x^2,\dots$ until convergence.
+
+
+\begin{theorembox}
+
+(Bhatia, Jain, Kar)
+AMRR yields an $\bm x^k$ such that
+\[
+\|\bm x^k-\bm x^*\|\leq\varepsilon
+\]
+in $\mathcal O(\log\|\bm q^*\|/\varepsilon)$ iterations under some fairly strong assumptions on $\bm A$. Here $\bm q^*$ is the residual vector of $\bm x^*$.
+\end{theorembox}
+
+From experience, AMRR performs well for a problem arising in an image application, where assumptions on $\bm A$ may not hold.
+
+\textbf{Nonnegative Matrix Factorization (NMF)}:
+
+(Gillis Book)
+Given $\bm A\in\mathbb R^{m\times n}$, $\bm A\geq 0$ (entrywise), given $r\leq \min(m,n)$. Seek $\bm W,\bm H$ such that $\bm W\in\mathbb R^{m\times r},\bm H\in\mathbb R^{r\times n}$, $\bm W\geq 0,\bm H\geq 0,\bm A\approx \bm W\bm H$.
+
+\begin{examplebox}
+
+(A term-doc matrix.)
+Interpretation: each document is a nonnegative sum of topics, so more interpretable than SVD.
+
+Other applications of NMF: \textbf{Blind Sound Source Separation, Hyperspectral Imaging, Microarray Experiments}.
+
+\end{examplebox}
+
+\paragraph{3. \emph{GD} / \emph{SGD} / Conjugate Gradient}
+
+(Gradient Descent / Stochastic Gradient Descent / Conjugate Gradient.)

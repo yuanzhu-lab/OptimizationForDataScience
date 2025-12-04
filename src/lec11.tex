@@ -1,0 +1,411 @@
+\section{Lec 11}
+
+\subsection{Stochastic Gradient Descent}
+
+Given a dataset $(\bm a_i,y_i)$ for $i=1,\dots,N$, we seek $\bm x$ such that
+\[
+\bm a_i^\top \bm x>0\quad\text{when }y_i=1,
+\qquad
+\bm a_i^\top \bm x<0\quad\text{when }y_i=-1.
+\]
+
+Consider the regularized empirical risk
+\[
+F(\bm x)
+= \frac1N\sum_{i=1}^N \ell(\bm a_i,y_i,\bm x)
+  + \frac{\gamma}{2}\|\bm x\|^2.
+\]
+
+\paragraph{\emph{SGD} algorithm (logistic regression setting).}
+\[
+\begin{aligned}
+&\bm x^0 \text{ arbitrary},\\
+&\text{for }k=0,1,2,\dots\\
+&\quad\text{Choose }i_k\in\{1,\dots,N\}\text{ uniformly at random},\\
+&\quad \bm x^{k+1}
+:= \bm x^k - \alpha_k \nabla_{\bm x}
+    \Bigl(\ell(\bm a_{i_k},y_{i_k},\bm x)
+           + \dfrac{\gamma}{2}\|\bm x\|^2\Bigr)\big|_{\bm x=\bm x^k}.
+\end{aligned}
+\]
+
+
+\paragraph{Finite-sum \emph{SGD} viewpoint.}
+
+Suppose
+\[
+F(\bm x)
+= \frac1N \sum_{i=1}^N f(\bm x;\bm\xi_i),
+\qquad
+\bm\xi_i \defeq (\bm a_i,y_i).
+\]
+Let
+\[
+g(\bm x;\bm\xi_i) \defeq \nabla_{\bm x} f(\bm x;\bm\xi_i).
+\]
+Then
+\[
+\nabla F(\bm x)
+= \frac1N \sum_{i=1}^N g(\bm x;\bm\xi_i).
+\]
+
+\textbf{\emph{SGD} algorithm.}
+\[
+\begin{aligned}
+&\bm x^0 \text{ arbitrary},\\
+&\text{for }k=0,1,2,\dots\\
+&\quad\text{Choose }i_k\in\{1,\dots,N\}\text{ uniformly at random},\\
+&\quad \bm x^{k+1}
+:= \bm x^k - \alpha_k\, g(\bm x^k;\bm\xi_{i_k}).
+\end{aligned}
+\]
+
+\paragraph{Fully general expectation form.}
+
+In the most general setting,
+\[
+F(\bm x)
+= \mathbb E\bigl[f(\bm x;\bm\xi)\bigr],
+\]
+where $\bm\xi$ is drawn from some distribution. On each iteration, we sample $\bm\xi$ from this distribution and define
+\[
+g(\bm x;\bm\xi) \defeq \nabla_{\bm x} f(\bm x;\bm\xi).
+\]
+Then
+\[
+\nabla F(\bm x)
+= \mathbb E\bigl[g(\bm x;\bm\xi)\bigr].
+\]
+Here $g(\bm x;\bm\xi)$ is called a \textbf{stochastic gradient}.
+
+\subsubsection{Convergence Theorem for \emph{SGD}}
+
+\begin{theorembox}
+\textbf{(Bubeck, Theorem~6.3, special case.)}
+
+Let $F:\R^n\to\R$ be convex and $L$-smooth (with $F$ the expectation or sum of the $f(\cdot;\bm\xi)$). Assume:
+\begin{itemize}
+  \item \textbf{Unbiasedness:}
+  \[
+  \mathbb E\bigl[g(\bm x;\bm\xi)\bigr] = \nabla F(\bm x),\quad \forall \bm x.
+  \]
+  \item \textbf{Variance bound:}
+  \[
+  \mathbb E\bigl[\|g(\bm x;\bm\xi)-\nabla F(\bm x)\|^2\bigr] \le \sigma^2,
+  \quad \forall \bm x.
+  \]
+\end{itemize}
+Let $\bm x^*$ be a minimizer of $F$, and let
+\[
+R \defeq \|\bm x^0-\bm x^*\|,
+\qquad
+\eta \defeq \frac{R}{\sigma\sqrt{\ell}}.
+\]
+Run \emph{SGD} for $k=0,1,\dots,\ell-1$ with the constant step size
+\[
+\alpha_k \equiv \frac1{L+\tfrac1\eta}.
+\]
+Then
+\[
+\mathbb E\!\left[
+F\!\left(\frac1\ell\sum_{k=1}^\ell \bm x^k\right)
+\right] - F(\bm x^*)
+\le
+\underbrace{\frac{R\sigma}{\sqrt{\ell}}}_{\text{stochastic part}}
++
+\underbrace{\frac{L R^2}{2\ell}}_{\text{\emph{GD}-like part (decays faster in }\ell\text{)}} ,
+\qquad \forall\ \ell=1,2,\dots.
+\]
+\end{theorembox}
+
+\textbf{Note.}  
+The step size $\alpha_k$ depends on the total number of iterations $\ell$.
+
+\newpage
+
+\subsubsection{Jensen's Inequality}
+
+\begin{factbox}
+Let $F:\R^n\to \R\cup\{\infty\}$ be convex. Suppose
+$\bm x_1,\dots,\bm x_k\in\R^n$ and $\lambda_1,\dots,\lambda_k\in\R$ satisfy
+\[
+\lambda_i\ge 0,\quad
+\sum_{i=1}^k \lambda_i=1.
+\]
+Then
+\[
+F\!\left(\sum_{i=1}^k \lambda_i \bm x_i\right)
+\le \sum_{i=1}^k \lambda_i F(\bm x_i).
+\]
+This can be proved by induction on $k$; the case $k=2$ is exactly the definition of convexity.
+\end{factbox}
+
+
+\subsubsection{Proof of the \emph{SGD} Theorem}
+
+\begin{proofbox}
+We start from $L$-smoothness of $F$, which gives
+\[
+\begin{aligned}
+F(\bm x^{k+1}) - F(\bm x^k)
+&\le \nabla F(\bm x^k)^{\top}(\bm x^{k+1}-\bm x^k)
+   + \frac{L}{2}\|\bm x^{k+1}-\bm x^k\|^2.
+\end{aligned}
+\]
+
+Introduce the notation
+\[
+\bm g_k \defeq g(\bm x^k;\bm\xi_{i_k}),
+\qquad
+\bm x^{k+1}-\bm x^k = -\frac{1}{L+\tfrac1\eta}\,\bm g_k.
+\]
+Then
+\[
+\begin{aligned}
+F(\bm x^{k+1}) - F(\bm x^k)
+&= \nabla F(\bm x^k)^{\top}(\bm x^{k+1}-\bm x^k)
+ + \frac{L}{2}\left(\frac{1}{L+\tfrac1\eta}\right)^{\!2}\|\bm g_k\|^2\\[0.3em]
+&= \bm g_k^{\top}(\bm x^{k+1}-\bm x^k)
+ + \bigl(\nabla F(\bm x^k)-\bm g_k\bigr)^{\top}(\bm x^{k+1}-\bm x^k)\\
+&\qquad + \frac{L}{2}\left(\frac{1}{L+\tfrac1\eta}\right)^{\!2}\|\bm g_k\|^2.
+\end{aligned}
+\]
+
+Applying Cauchy--Schwarz gives
+\[
+\begin{aligned}
+F(\bm x^{k+1}) - F(\bm x^k)
+&\le \bm g_k^{\top}(\bm x^{k+1}-\bm x^k)
+ + \|\nabla F(\bm x^k)-\bm g_k\|\;\|\bm x^{k+1}-\bm x^k\|\\
+&\qquad + \frac{L}{2}\left(\frac{1}{L+\tfrac1\eta}\right)^{\!2}\|\bm g_k\|^2.
+\end{aligned}
+\]
+
+For any $\eta>0$ and $a,b\in\R$ we have
+\[
+\frac12\bigl(\sqrt\eta\,a - \tfrac1{\sqrt\eta}b\bigr)^2 \ge 0
+\quad\Rightarrow\quad
+ab \le \frac{\eta}{2}a^2 + \frac{1}{2\eta}b^2.
+\]
+Applying this to
+\(
+a = \|\nabla F(\bm x^k)-\bm g_k\|
+\)
+and
+\(
+b = \|\bm x^{k+1}-\bm x^k\|
+\),
+we obtain
+\[
+\begin{aligned}
+F(\bm x^{k+1}) - F(\bm x^k)
+&\le \bm g_k^{\top}(\bm x^{k+1}-\bm x^k)
+ + \frac{\eta}{2}\|\nabla F(\bm x^k)-\bm g_k\|^2
+ + \frac{1}{2\eta}\|\bm x^{k+1}-\bm x^k\|^2\\
+&\qquad + \frac{L}{2}\left(\frac{1}{L+\tfrac1\eta}\right)^{\!2}\|\bm g_k\|^2\\[0.3em]
+&= \bm g_k^{\top}(\bm x^{k+1}-\bm x^k)
+ + \frac{\eta}{2}\|\nabla F(\bm x^k)-\bm g_k\|^2\\
+&\qquad + \frac12\Bigl(L+\tfrac1\eta\Bigr)
+           \left(\frac{1}{L+\tfrac1\eta}\right)^{\!2}\|\bm g_k\|^2\\[0.3em]
+&= \bm g_k^{\top}(\bm x^{k+1}-\bm x^k)
+ + \frac{\eta}{2}\|\nabla F(\bm x^k)-\bm g_k\|^2
+ + \frac{1}{2\bigl(L+\tfrac1\eta\bigr)}\|\bm g_k\|^2.
+\end{aligned}
+\]
+
+\paragraph{Identity step.}
+Use the vector identity
+\[
+2(b-a)^{\top}(a-c)
+= \|b-c\|^2 - \|a-c\|^2 - \|b-a\|^2.
+\]
+Take
+\[
+b := \bm x^k,\quad
+a := \bm x^{k+1},\quad
+c := \bm x^*,
+\]
+so that
+\[
+\bm x^k - \bm x^{k+1}
+= \frac{1}{L+\tfrac1\eta}\,\bm g_k.
+\]
+Then the left-hand side is
+\[
+2\cdot\frac{1}{L+\tfrac1\eta}\,\bm g_k^{\top}(\bm x^{k+1}-\bm x^*),
+\]
+while the right-hand side is
+\[
+\|\bm x^k-\bm x^*\|^2
+ - \|\bm x^{k+1}-\bm x^*\|^2
+ - \left(\frac{1}{L+\tfrac1\eta}\right)^{\!2}\|\bm g_k\|^2.
+\]
+Multiplying both sides by $\tfrac{L+\tfrac1\eta}{2}$ and rearranging yields
+\[
+\frac{1}{2\bigl(L+\tfrac1\eta\bigr)}\|\bm g_k\|^2
+= -\bm g_k^{\top}(\bm x^{k+1}-\bm x^*)
+ + \frac{L+\tfrac1\eta}{2}
+   \Bigl(\|\bm x^k-\bm x^*\|^2 - \|\bm x^{k+1}-\bm x^*\|^2\Bigr).
+\]
+
+Substitute this into the previous inequality to eliminate the quadratic term:
+\[
+\begin{aligned}
+F(\bm x^{k+1}) - F(\bm x^k)
+&\le \bm g_k^{\top}(\bm x^{k+1}-\bm x^k)
+ + \frac{\eta}{2}\|\nabla F(\bm x^k)-\bm g_k\|^2\\
+&\quad - \bm g_k^{\top}(\bm x^{k+1}-\bm x^*)
+ + \frac{L+\tfrac1\eta}{2}
+   \Bigl(\|\bm x^k-\bm x^*\|^2 - \|\bm x^{k+1}-\bm x^*\|^2\Bigr)\\[0.3em]
+&= \bm g_k^{\top}(\bm x^*-\bm x^k)
+ + \frac{\eta}{2}\|\nabla F(\bm x^k)-\bm g_k\|^2\\
+&\quad + \frac{L+\tfrac1\eta}{2}
+   \Bigl(\|\bm x^k-\bm x^*\|^2 - \|\bm x^{k+1}-\bm x^*\|^2\Bigr).
+\end{aligned}
+\]
+
+Write
+\[
+\bm g_k^{\top}(\bm x^*-\bm x^k)
+= \nabla F(\bm x^k)^{\top}(\bm x^*-\bm x^k)
+ + (\bm g_k-\nabla F(\bm x^k))^{\top}(\bm x^*-\bm x^k),
+\]
+so that
+\[
+\begin{aligned}
+F(\bm x^{k+1}) - F(\bm x^k)
+&\le \nabla F(\bm x^k)^{\top}(\bm x^*-\bm x^k)
+ + (\bm g_k-\nabla F(\bm x^k))^{\top}(\bm x^*-\bm x^k)\\
+&\quad + \frac{\eta}{2}\|\nabla F(\bm x^k)-\bm g_k\|^2\\
+&\quad + \frac{L+\tfrac1\eta}{2}
+   \Bigl(\|\bm x^k-\bm x^*\|^2 - \|\bm x^{k+1}-\bm x^*\|^2\Bigr).
+\end{aligned}
+\]
+
+By convexity of $F$,
+\[
+\nabla F(\bm x^k)^{\top}(\bm x^*-\bm x^k)
+\le F(\bm x^*) - F(\bm x^k),
+\]
+so
+\[
+\begin{aligned}
+F(\bm x^{k+1}) - F(\bm x^k)
+&\le F(\bm x^*) - F(\bm x^k)
+ + (\bm g_k-\nabla F(\bm x^k))^{\top}(\bm x^*-\bm x^k)\\
+&\quad + \frac{\eta}{2}\|\nabla F(\bm x^k)-\bm g_k\|^2\\
+&\quad + \frac{L+\tfrac1\eta}{2}
+   \Bigl(\|\bm x^k-\bm x^*\|^2 - \|\bm x^{k+1}-\bm x^*\|^2\Bigr).
+\end{aligned}
+\]
+
+Rearranging,
+\[
+\begin{aligned}
+F(\bm x^{k+1}) - F(\bm x^*)
+&\le (\bm g_k-\nabla F(\bm x^k))^{\top}(\bm x^*-\bm x^k)
+ + \frac{\eta}{2}\|\nabla F(\bm x^k)-\bm g_k\|^2\\
+&\quad + \frac{L+\tfrac1\eta}{2}
+   \Bigl(\|\bm x^k-\bm x^*\|^2 - \|\bm x^{k+1}-\bm x^*\|^2\Bigr).
+\end{aligned}
+\]
+
+\paragraph{Taking expectations.}
+
+Take conditional expectation with respect to the randomness at step $k$, conditioning on the history so that $\bm x^k$ is fixed. By the unbiasedness and variance assumptions,
+\[
+\mathbb E[\bm g_k\mid \text{history}] = \nabla F(\bm x^k),
+\qquad
+\mathbb E\bigl[\|\nabla F(\bm x^k)-\bm g_k\|^2\mid \text{history}\bigr] \le \sigma^2.
+\]
+Thus
+\[
+\mathbb E\bigl[(\bm g_k-\nabla F(\bm x^k))^{\top}(\bm x^*-\bm x^k)\mid\text{history}\bigr] = 0,
+\]
+and we obtain
+\[
+\mathbb E\bigl[F(\bm x^{k+1})\mid \text{history}\bigr] - F(\bm x^*)
+\le \frac{\eta}{2}\sigma^2
+ + \frac{L+\tfrac1\eta}{2}
+   \Bigl(\|\bm x^k-\bm x^*\|^2
+       - \mathbb E\bigl[\|\bm x^{k+1}-\bm x^*\|^2\mid\text{history}\bigr]\Bigr).
+\]
+
+Now take full expectation and let
+\(
+R^2 \defeq \|\bm x^0-\bm x^*\|^2
+\):
+\[
+\mathbb E[F(\bm x^{k+1})] - F(\bm x^*)
+\le \frac{\eta}{2}\sigma^2
+ + \frac{L+\tfrac1\eta}{2}
+   \Bigl(\mathbb E\|\bm x^k-\bm x^*\|^2
+       - \mathbb E\|\bm x^{k+1}-\bm x^*\|^2\Bigr).
+\]
+
+Average this inequality over $k=0,1,\dots,\ell-1$:
+\[
+\begin{aligned}
+\frac1\ell \sum_{k=0}^{\ell-1}
+ \bigl(\mathbb E[F(\bm x^{k+1})] - F(\bm x^*)\bigr)
+&\le \frac{\eta}{2}\sigma^2
+ + \frac{L+\tfrac1\eta}{2\ell}
+   \Bigl(\mathbb E\|\bm x^0-\bm x^*\|^2
+       - \mathbb E\|\bm x^{\ell}-\bm x^*\|^2\Bigr)\\[0.3em]
+&\le \frac{\eta}{2}\sigma^2
+ + \frac{L+\tfrac1\eta}{2\ell}R^2.
+\end{aligned}
+\]
+
+By convexity of $F$ and Jensen's inequality,
+\[
+\mathbb E\!\left[
+F\!\left(\frac1\ell\sum_{k=1}^{\ell}\bm x^k\right)
+\right]
+\le \frac1\ell \sum_{k=1}^{\ell}
+   \mathbb E[F(\bm x^k)],
+\]
+so
+\[
+\mathbb E\!\left[
+F\!\left(\frac1\ell\sum_{k=1}^{\ell}\bm x^k\right)
+\right] - F(\bm x^*)
+\le \frac{\eta}{2}\sigma^2
+ + \frac{L+\tfrac1\eta}{2\ell}R^2.
+\]
+
+Finally, substitute $\eta = \dfrac{R}{\sigma\sqrt{\ell}}$:
+\[
+\begin{aligned}
+\frac{\eta}{2}\sigma^2 + \frac{L+\tfrac1\eta}{2\ell}R^2
+&= \frac12\cdot\frac{R}{\sigma\sqrt{\ell}}\sigma^2
+ + \frac1{2\ell}\Bigl(L + \frac{\sigma\sqrt{\ell}}{R}\Bigr)R^2\\[0.3em]
+&= \frac{R\sigma}{2\sqrt{\ell}}
+ + \frac{L R^2}{2\ell}
+ + \frac{R\sigma}{2\sqrt{\ell}}\\[0.3em]
+&= \frac{R\sigma}{\sqrt{\ell}} + \frac{L R^2}{2\ell},
+\end{aligned}
+\]
+which gives the desired bound.
+\end{proofbox}
+
+
+\textbf{Remarks.}
+\begin{itemize}
+  \item The step size $\alpha_k$ depends on $\ell$, the total number of iterations.  
+        Why not keep going after iteration $\ell$? The convergence effectively
+        \emph{stalls} after $\ell$ because each new step introduces a stochastic
+        error of size on the order of
+        \[
+        \frac{\eta}{2}\sigma^2
+        = \frac12\cdot \frac{R}{\sigma\sqrt{\ell}}\sigma^2
+        = \frac{R\sigma}{2\sqrt{\ell}}.
+        \]
+  \item This is an \emph{ergodic} bound (on the average iterate
+        $\displaystyle\frac1\ell\sum_{k=1}^{\ell}\bm x^k$), rather than a
+        \emph{last-iterate} bound. In practice, people often just keep the last
+        iterate, but averaging is important for the theoretical guarantee.
+  \item By increasing $\ell$, we can make the bound smaller; however, the
+        variance term decays only as $1/\sqrt{\ell}$, unlike the $1/\ell$ decay
+        seen in deterministic gradient descent.
+\end{itemize}

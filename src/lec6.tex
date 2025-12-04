@@ -1,0 +1,377 @@
+\section{Lec 6}
+
+\subsection{Convex Functions}
+
+\subsubsection{Definitions}
+
+Let $f:\Omega\to \R$, $\Omega\subseteq \R^n$, and $\Omega = \operatorname{dom}(f)$. Assume $\Omega$ is convex.  
+We say $f$ is a \textbf{convex function} if
+\[
+\forall \bm x,\bm y\in\Omega,\ \forall \lambda\in[0,1],\quad
+f\big((1-\lambda)\bm x+\lambda \bm y\big)
+\le (1-\lambda)f(\bm x) + \lambda f(\bm y).
+\]
+
+\paragraph{Extended-value notation.}
+If $f:\Omega\to \R$ is convex, we extend it by setting
+\[
+f(\bm x) = \infty \quad \text{for } \bm x\notin \Omega.
+\]
+Thus we can regard
+\[
+f:\R^n\to \R\cup\{\infty\},
+\]
+and define
+\[
+\operatorname{dom}(f) = \{\bm x\in \R^n : f(\bm x)<\infty\}.
+\]
+The convexity inequality above is then interpreted for all $\bm x,\bm y\in \R^n$; it enforces that $\operatorname{dom}(f)$ is convex.
+
+\subsubsection{Examples}
+
+\begin{examplebox}
+\[
+\begin{aligned}
+1.\quad &f(\bm x)
+= \frac12 \bm x^{\top} \bm H\bm x
+  + \bm g^{\top}\bm x + d,
+\quad  \bm H\succeq \0.\\[0.3em]
+2.\quad &f(\bm x) = \|\bm x\|_\square
+\quad\text{(any norm)}.\\[0.3em]
+3.\quad &f(x) = \mathrm e^x.\\[0.3em]
+4.\quad &f(x) =
+\begin{cases}
+-\ln x, & x>0,\\
+\infty, & x\le 0,
+\end{cases}\\[0.5em]
+5.\quad &f(x) =
+\begin{cases}
+\dfrac1x, & x>0,\\[0.2em]
+\infty, & x\le 0,
+\end{cases}\\[0.5em]
+6.\quad &\text{If } g_1,\dots,g_m:\R^n\to\R\cup\{\infty\}
+\text{ are convex and } \alpha_1,\dots,\alpha_m\ge 0,\\
+&\quad\text{then } \alpha_1 g_1 + \cdots + \alpha_m g_m \text{ is convex}.\\[0.3em]
+7.\quad &\text{Under the same assumption as in 6, }
+\max\{\alpha_1 g_1,\dots,\alpha_m g_m\} \text{ is convex.}\\
+&\quad\text{Example: } f(x) = \max(x,-x) = |x|\text{ is convex.}
+\end{aligned}
+\]
+\end{examplebox}
+
+\begin{theorembox}
+If $f:\R^n\to \R\cup\{\infty\}$ is convex and $\bm x^*\in \operatorname{dom}(f)$ is a local minimizer, then $\bm x^*$ is a global minimizer.
+\end{theorembox}
+
+\begin{proofbox}
+Assume $\bm x^*$ is a local minimizer and let $\bm y\in \R^n$ be arbitrary. Define
+\[
+\bm y_i := \left(1-\frac1i\right)\bm x^* + \frac1i\,\bm y,
+\quad i=1,2,3,\dots
+\]
+Then $\bm y_i \to \bm x^*$ as $i\to\infty$. Since $\bm x^*$ is a local minimizer, there exists $k$ such that
+\[
+f(\bm y_i) \ge f(\bm x^*),\quad \forall i\ge k.
+\]
+In particular,
+\[
+f\!\left(\left(1-\frac1k\right)\bm x^* + \frac1k\,\bm y\right)
+\ge f(\bm x^*).
+\]
+
+By convexity,
+\[
+f\!\left(\left(1-\frac1k\right)\bm x^* + \frac1k\,\bm y\right)
+\le \left(1-\frac1k\right)f(\bm x^*) + \frac1k f(\bm y).
+\]
+Combining,
+\[
+\left(1-\frac1k\right)f(\bm x^*) + \frac1k f(\bm y)
+\ge f(\bm x^*).
+\]
+Rearranging gives
+\[
+f(\bm y) \ge f(\bm x^*).
+\]
+Since $\bm y$ was arbitrary, $\bm x^*$ is a global minimizer.
+\end{proofbox}
+
+\subsection{Differentiable Convex Functions}
+
+Suppose $f:\R^n\to \R\cup\{\infty\}$ is convex and differentiable at $\bm x\in \intdom(f)$. Then for all $\bm y\in \R^n$ and all $\alpha\in[0,1]$,
+\[
+f((1-\alpha)\bm x + \alpha \bm y)
+\le (1-\alpha)f(\bm x) + \alpha f(\bm y).
+\]
+
+Write the left-hand side using differentiability at $\bm x$:
+\[
+\begin{aligned}
+f((1-\alpha)\bm x + \alpha \bm y)
+&= f(\bm x + \alpha(\bm y-\bm x))\\
+&= f(\bm x)
+ + \alpha\,\nabla f(\bm x)^{\top}(\bm y-\bm x)
+ + \phi(\alpha(\bm y-\bm x)),
+\end{aligned}
+\]
+for some remainder term $\phi$ with
+\[
+\lim_{\bm h\to \bm0,\ \bm h\ne \bm0}
+\frac{\phi(\bm h)}{\|\bm h\|} = 0.
+\]
+
+Combining with convexity,
+\[
+f(\bm x)
++ \alpha\,\nabla f(\bm x)^{\top}(\bm y-\bm x)
++ \phi(\alpha(\bm y-\bm x))
+\le (1-\alpha)f(\bm x) + \alpha f(\bm y).
+\]
+Assuming $\alpha>0$, subtract $f(\bm x)$ and divide by $\alpha$:
+\[
+\nabla f(\bm x)^{\top}(\bm y-\bm x)
++ \frac{\phi(\alpha(\bm y-\bm x))}{\alpha}
+\le f(\bm y) - f(\bm x).
+\]
+Taking the limit $\alpha\downarrow 0$, the remainder term vanishes and we obtain the
+
+\begin{factbox}
+\textbf{Subgradient Inequality.} For convex differentiable $f$ and any $\bm x\in \intdom(f)$,
+\[
+f(\bm y)
+\ge f(\bm x) + \nabla f(\bm x)^{\top}(\bm y-\bm x),
+\quad \forall \bm y\in \R^n.
+\]
+\end{factbox}
+
+The converse also holds: if this inequality is satisfied for all $\bm x,\bm y$, then $f$ is convex.
+
+\begin{theorembox}
+Let $f:\R^n\to \R\cup\{\infty\}$ be convex. Suppose $\bm x^*\in \intdom(f)$, $f$ is differentiable at $\bm x^*$, and $\nabla f(\bm x^*) = \0$. Then $\bm x^*$ is a global minimizer of $f$.
+\end{theorembox}
+
+\begin{proofbox}
+Applying the subgradient inequality at $\bm x^*$,
+\[
+f(\bm y)
+\ge f(\bm x^*) + \nabla f(\bm x^*)^{\top}(\bm y-\bm x^*)
+= f(\bm x^*),
+\quad \forall \bm y\in \R^n,
+\]
+since $\nabla f(\bm x^*)=\0$. Hence $\bm x^*$ is a global minimizer.
+\end{proofbox}
+
+\subsection{Descent Methods}
+
+\subsubsection{Descent Directions}
+
+Let $f:\Omega\to \R$, $\Omega\subseteq \R^n$, and $\bm x\in\Omega$.  
+We say $\bm d\in \R^n$ is a \textbf{descent direction} at $\bm x$ if there exists $\bar t>0$ such that
+\[
+\bm x + t\bm d \in \Omega,\ \forall t\in[0,\bar t],
+\quad \text{and}\quad
+f(\bm x + t\bm d) < f(\bm x),
+\ \forall t\in(0,\bar t].
+\]
+
+\begin{theorembox}
+Let $f:\Omega\to \R$ with $\Omega\subseteq \R^n$. Assume $\bm x\in \operatorname{int}(\Omega)$ and $f$ is differentiable at $\bm x$. Then any $\bm d$ satisfying
+\[
+\bm d^{\top}\nabla f(\bm x) < 0
+\]
+is a descent direction at $\bm x$.
+\end{theorembox}
+
+\begin{proofbox}
+Assume $\nabla f(\bm x)\neq \0$ and $\bm d\neq \0$ (otherwise the statement is vacuous). Differentiability at $\bm x$ means
+\[
+\lim_{\bm h\to \bm0,\ \bm h\ne \bm0}
+\frac{f(\bm x+\bm h) - f(\bm x)
+      - \nabla f(\bm x)^{\top}\bm h}
+     {\|\bm h\|}
+= 0.
+\]
+Take $\bm h = t\bm d$ with $t\downarrow 0$:
+\[
+\lim_{t\downarrow 0}
+\frac{f(\bm x+t\bm d) - f(\bm x)
+      - t\,\nabla f(\bm x)^{\top}\bm d}{t}
+= 0,
+\]
+or equivalently,
+\[
+\lim_{t\downarrow 0}
+\left(
+\frac{f(\bm x+t\bm d) - f(\bm x)}{t}
+- \nabla f(\bm x)^{\top}\bm d
+\right) = 0.
+\]
+
+By assumption, $\nabla f(\bm x)^{\top}\bm d < 0$. Therefore, for sufficiently small $t>0$,
+\[
+\frac{f(\bm x+t\bm d) - f(\bm x)}{t} < 0,
+\]
+which implies $f(\bm x+t\bm d) < f(\bm x)$ for all sufficiently small $t>0$. Thus $\bm d$ is a descent direction.
+\end{proofbox}
+
+\paragraph{Steepest descent direction.}
+Assume $\nabla f(\bm x)\neq \0$. Among all unit vectors, the direction that minimizes the directional derivative is
+\[
+\arg\min\{\bm d^{\top}\nabla f(\bm x) : \|\bm d\|=1\}
+= -\frac{\nabla f(\bm x)}{\|\nabla f(\bm x)\|}.
+\]
+
+This follows from the strong form of the Cauchy–Schwarz inequality:
+\[
+\bm u^{\top}\bm v \le \|\bm u\|\,\|\bm v\|
+\]
+with equality if and only if either $\bm u = \0$ or $\bm v = \0$, or there exists $\lambda\ge 0$ such that $\bm u = \lambda \bm v$.
+
+\subsubsection{Gradient Descent Algorithm (Steepest Descent)}
+
+Let $f:\R^n\to \R$ be differentiable, and choose an initial point $\bm x^0\in \R^n$.
+
+\medskip
+For $k=0,1,2,\dots$:
+\begin{itemize}
+  \item select a step size $\alpha_k>0$,
+  \item update
+  \[
+  \bm x^{k+1} := \bm x^k - \alpha_k \nabla f(\bm x^k).
+  \]
+\end{itemize}
+End.
+
+\medskip
+Here $\alpha_k$ is the \textbf{step size} (learning rate). The procedure used to choose $\alpha_k$ is called a \textbf{line search}.
+
+If $f$ is $L$-smooth, then the constant choice $\alpha_k\equiv \dfrac1L$ always works.  
+Any fixed $\alpha_k\in (0,\dfrac1L)$ also leads to convergence but typically more slowly.  
+A common stopping rule is $\|\nabla f(\bm x^k)\|\le \text{tolerance}$.
+
+\begin{theorembox}
+(\textbf{Convex case of Gradient Descent})  
+Let $f:\R^n\to \R$ be convex and $L$-smooth. Suppose there exists $\bm x^*$ such that
+\[
+\nabla f(\bm x^*) = \0.
+\]
+Run gradient descent from $\bm x^0$ with step sizes $\alpha_k \equiv \dfrac1L$. Then
+\[
+f(\bm x^k) - f(\bm x^*)
+\le \frac{L\|\bm x^0 - \bm x^*\|^2}{2k},
+\quad \forall k=1,2,\dots
+\]
+\end{theorembox}
+
+\begin{proofbox}
+From $L$-smoothness,
+\[
+\begin{aligned}
+f(\bm x^{k+1})
+&\le f(\bm x^k)
+  + \nabla f(\bm x^k)^{\top}(\bm x^{k+1}-\bm x^k)
+  + \frac{L}{2}\|\bm x^{k+1}-\bm x^k\|^2\\[0.3em]
+&= f(\bm x^k)
+  + \nabla f(\bm x^k)^{\top}\Bigl(-\frac1L\nabla f(\bm x^k)\Bigr)
+  + \frac{L}{2}\Bigl\|-\frac1L\nabla f(\bm x^k)\Bigr\|^2\\[0.3em]
+&= f(\bm x^k)
+  - \frac1L\|\nabla f(\bm x^k)\|^2
+  + \frac1{2L}\|\nabla f(\bm x^k)\|^2\\[0.3em]
+&= f(\bm x^k) - \frac1{2L}\|\nabla f(\bm x^k)\|^2.
+\end{aligned}
+\]
+
+From the subgradient inequality for convex differentiable $f$,
+\[
+f(\bm x^*)
+\ge f(\bm x^k)
+ + \nabla f(\bm x^k)^{\top}(\bm x^*-\bm x^k),
+\]
+so
+\[
+f(\bm x^k)
+\le f(\bm x^*)
+ + \nabla f(\bm x^k)^{\top}(\bm x^k-\bm x^*).
+\]
+
+Combining,
+\[
+f(\bm x^{k+1})
+\le f(\bm x^*)
+ + \nabla f(\bm x^k)^{\top}(\bm x^k-\bm x^*)
+ - \frac1{2L}\|\nabla f(\bm x^k)\|^2.
+\]
+
+Using the update
+\(
+\bm x^{k+1}
+= \bm x^k - \dfrac1L\nabla f(\bm x^k),
+\)
+we compute
+\[
+\begin{aligned}
+\|\bm x^{k+1}-\bm x^*\|^2
+&= \left\|\bm x^k - \frac1L\nabla f(\bm x^k) - \bm x^*\right\|^2\\
+&= \|\bm x^k-\bm x^*\|^2
+  - \frac2L\,\nabla f(\bm x^k)^{\top}(\bm x^k-\bm x^*)
+  + \frac1{L^2}\|\nabla f(\bm x^k)\|^2.
+\end{aligned}
+\]
+
+Rearranging,
+\[
+\nabla f(\bm x^k)^{\top}(\bm x^k-\bm x^*)
+= \frac{L}{2}\bigl(\|\bm x^k-\bm x^*\|^2
+                 - \|\bm x^{k+1}-\bm x^*\|^2\bigr)
+  + \frac1{2L}\|\nabla f(\bm x^k)\|^2.
+\]
+
+Substitute into the bound for $f(\bm x^{k+1})$:
+\[
+\begin{aligned}
+f(\bm x^{k+1})
+&\le f(\bm x^*)
+ + \frac{L}{2}\bigl(\|\bm x^k-\bm x^*\|^2
+                 - \|\bm x^{k+1}-\bm x^*\|^2\bigr)
+ + \frac1{2L}\|\nabla f(\bm x^k)\|^2
+ - \frac1{2L}\|\nabla f(\bm x^k)\|^2\\[0.3em]
+&= f(\bm x^*)
+ + \frac{L}{2}\bigl(\|\bm x^k-\bm x^*\|^2
+                 - \|\bm x^{k+1}-\bm x^*\|^2\bigr).
+\end{aligned}
+\]
+
+Thus
+\[
+f(\bm x^{k+1}) - f(\bm x^*)
+\le \frac{L}{2}\bigl(\|\bm x^k-\bm x^*\|^2
+                 - \|\bm x^{k+1}-\bm x^*\|^2\bigr).
+\]
+
+Summing from $k=0$ to $k=\ell-1$,
+\[
+\sum_{k=0}^{\ell-1}\bigl(f(\bm x^{k+1}) - f(\bm x^*)\bigr)
+\le \frac{L}{2}\bigl(\|\bm x^0-\bm x^*\|^2
+                 - \|\bm x^\ell-\bm x^*\|^2\bigr)
+\le \frac{L}{2}\|\bm x^0-\bm x^*\|^2.
+\]
+
+Since $f(\bm x^{k+1}) - f(\bm x^*)\ge 0$ and is nonincreasing, we have
+\[
+\sum_{k=0}^{\ell-1}\bigl(f(\bm x^{k+1}) - f(\bm x^*)\bigr)
+\ge \ell\bigl(f(\bm x^\ell) - f(\bm x^*)\bigr).
+\]
+
+Therefore,
+\[
+\ell\bigl(f(\bm x^\ell) - f(\bm x^*)\bigr)
+\le \frac{L}{2}\|\bm x^0-\bm x^*\|^2,
+\]
+which gives
+\[
+f(\bm x^\ell) - f(\bm x^*)
+\le \frac{L\|\bm x^0-\bm x^*\|^2}{2\ell}.
+\]
+
+Renaming $\ell$ as $k$ yields the stated result.
+\end{proofbox}

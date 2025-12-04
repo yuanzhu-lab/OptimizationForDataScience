@@ -1,0 +1,369 @@
+\section{Lec 17}
+
+\subsection{Proximal Gradient}
+
+\subsubsection{Set-up}
+
+Recall the composite problem
+\[
+\min_{\bm x} F(\bm x), \qquad F(\bm x) = f(\bm x) + \psi(\bm x),
+\]
+where
+\begin{itemize}
+  \item $f:\R^n\to\R$ is convex and $L$-smooth,
+  \item $\psi:\R^n\to\R\cup\{\infty\}$ is convex, closed, proper, and proximable.
+\end{itemize}
+
+The \emph{proximal gradient} is defined as
+\[
+\text G_L(\bm x)
+\defeq
+L\left(
+  \bm x - \operatorname{prox}_{\psi/L}\!\left(\bm x - \frac1L\nabla f(\bm x)\right)
+\right).
+\]
+
+\begin{theorembox}
+For $F$ and $\text G_L$ as above,
+\[
+\bm x\in\argmin F
+\quad\Longleftrightarrow\quad
+\text G_L(\bm x)=\bm 0.
+\]
+\end{theorembox}
+
+\begin{proofbox}
+\[
+\begin{aligned}
+\text G_L(\bm x)=\bm 0
+&\Longleftrightarrow
+\bm x = \operatorname{prox}_{\psi/L}\!\left(\bm x - \frac1L\nabla f(\bm x)\right)\\
+&\Longleftrightarrow
+\bm x = \argmin_{\bm z}\left\{
+    \frac1L\psi(\bm z)
+    + \frac12\Bigl\|\bm z - \bm x + \frac1L\nabla f(\bm x)\Bigr\|^2
+  \right\}\\
+&\Longleftrightarrow
+\bm 0\in\left[
+    \frac1L\partial\psi(\bm z)
+    + \Bigl\{\bm z - \bm x + \tfrac1L\nabla f(\bm x)\Bigr\}
+  \right]_{\bm z=\bm x}\\
+&\Longleftrightarrow
+\bm 0 \in \frac1L\partial\psi(\bm x) + \frac1L\{\nabla f(\bm x)\}\\
+&\Longleftrightarrow
+\bm 0\in\frac1L\bigl(\partial\psi(\bm x) + \{\nabla f(\bm x)\}\bigr)\\
+&\Longleftrightarrow
+\bm 0\in \partial\psi(\bm x) + \{\nabla f(\bm x)\} = \partial F(\bm x)\\
+&\Longleftrightarrow
+\bm x\in\argmin F.
+\end{aligned}
+\]
+\end{proofbox}
+
+\subsubsection{Proximal Gradient Descent}
+
+The \textbf{Proximal Gradient Descent (\emph{PGD})} algorithm is
+\[
+\begin{aligned}
+\bm x^0 &= \text{arbitrary},\\
+\bm x^{k+1} &= \bm x^k - \frac1L \text G_L(\bm x^k).
+\end{aligned}
+\]
+
+Under our assumptions, this iteration converges to a minimizer of $F$ (assuming a minimizer exists). The proof is omitted in class.
+
+\medskip
+
+\textbf{Accelerated Proximal Gradient Descent (\emph{APGD}).}
+
+\begin{itemize}
+  \item Nesterov (2004),
+  \item Beck \& Teboulle (2013): \textbf{FISTA}.
+\end{itemize}
+
+\emph{APGD} is obtained from \emph{AGD}by replacing the gradient with the proximal gradient operator.
+
+\begin{itemize}
+  \item \emph{AGD}update:
+  \[
+    \bm x^{k+1} = \bm y^k - \frac1L\nabla f(\bm y^k).
+  \]
+  \item \emph{APGD} update:
+  \[
+    \bm x^{k+1} = \bm y^k - \frac1L \text G_L(\bm y^k).
+  \]
+\end{itemize}
+
+More explicitly,
+\[
+\begin{aligned}
+\bm x^{k+1}
+&= \bm y^k - \frac1L \text G_L(\bm y^k)\\
+&= \bm y^k - \frac1L \left[
+    L\left(\bm y^k - \operatorname{prox}_{\psi/L}\!\left(\bm y^k - \frac1L\nabla f(\bm y^k)\right)\right)
+  \right]\\
+&= \bm y^k - \bm y^k
+  + \operatorname{prox}_{\psi/L}\!\left(\bm y^k - \frac1L\nabla f(\bm y^k)\right)\\
+&= \operatorname{prox}_{\psi/L}\!\left(\bm y^k - \frac1L\nabla f(\bm y^k)\right).
+\end{aligned}
+\]
+
+This view is called \textbf{operator splitting}, or a
+\textbf{forward–backward step}:
+\begin{itemize}
+  \item forward step: $\bm y^k - \tfrac1L\nabla f(\bm y^k)$ (gradient step on $f$),
+  \item backward step: $\operatorname{prox}_{\psi/L}(\cdot)$ (prox step on $\psi$).
+\end{itemize}
+
+The terminology comes from an analogy with forward/backward Euler methods in ODEs.
+
+\begin{theorembox}
+\textbf{Convergence rates for \emph{PGD} \& \emph{APGD}.}
+
+Let $F = f + \psi$ with $f$ convex and $L$-smooth, and $\psi$ convex,
+closed, proper.
+
+\begin{itemize}
+  \item \textbf{\emph{PGD} (sublinear rate).} For a minimizer $\bm x^*$ of $F$,
+  \[
+  F(\bm x^k) - F(\bm x^*)
+  \;\le\;
+  \frac{L\|\bm x^0 - \bm x^*\|^2}{2k}.
+  \]
+
+  \item If $f$ is additionally $m$-strongly convex with $m>0$ (so
+  $\bm x^*$ is unique), then \emph{PGD} has a \textbf{linear} rate:
+  \[
+  \|\bm x^k - \bm x^*\|
+  \;\le\;
+  \left(\frac{L - m}{L + m}\right)^k
+  \|\bm x^0 - \bm x^*\|.
+  \]
+
+  \item \textbf{\emph{APGD} (accelerated rate).} Without strong convexity,
+  \emph{APGD} attains
+  \[
+  F(\bm x^k) - F(\bm x^*)
+  = \mathcal O\!\left(\frac{1}{k^2}\right).
+  \]
+
+  \item If $f$ is also $m$-strongly convex, \emph{APGD} enjoys a linear rate
+  with factor
+  \[
+  \left(\frac{\sqrt L - \sqrt m}{\sqrt L + \sqrt m}\right)^k.
+  \]
+\end{itemize}
+
+For details, see Beck, \emph{First-Order Methods in Optimization} (2017).
+\end{theorembox}
+
+A common termination criterion for \emph{PGD} / \emph{APGD} is
+\[
+\|\text G_L(\bm x^k)\| \le \text{tol}.
+\]
+
+\medskip
+
+\textbf{Alternative view of one \emph{PGD} step.}
+
+We can write
+\[
+\begin{aligned}
+\bm x^{k+1}
+&= \operatorname{prox}_{\psi/L}\!\left(\bm x^k - \frac1L\nabla f(\bm x^k)\right)\\
+&= \argmin_{\bm z}
+\left\{
+  \frac1L\psi(\bm z)
+  + \frac12\left\|\bm x^k - \frac1L\nabla f(\bm x^k) - \bm z\right\|^2
+\right\}.
+\end{aligned}
+\]
+Expanding the square,
+\[
+\begin{aligned}
+\bm x^{k+1}
+&= \argmin_{\bm z}
+\left\{
+  \frac1L\psi(\bm z)
+  + \frac12\|\bm x^k - \bm z\|^2
+  - \frac1L\nabla f(\bm x^k)^\top(\bm x^k - \bm z)
+  + \frac1{2L^2}\|\nabla f(\bm x^k)\|^2
+\right\}\\
+&= \argmin_{\bm z}
+\left\{
+  \psi(\bm z)
+  + \frac{L}{2}\|\bm x^k - \bm z\|^2
+  - \nabla f(\bm x^k)^\top(\bm x^k - \bm z)
+\right\}\\
+&= \argmin_{\bm z}
+\left\{
+  \psi(\bm z)
+  + \underbrace{
+      f(\bm x^k)
+      + \nabla f(\bm x^k)^\top(\bm z - \bm x^k)
+      + \frac{L}{2}\|\bm z - \bm x^k\|^2
+    }_{\displaystyle\tilde f(\bm z)}
+\right\}.
+\end{aligned}
+\]
+
+Here $\tilde f(\bm z)$ is a quadratic upper model of $f$ at $\bm x^k$:
+we replace $f(\bm z)$ by its first-order Taylor expansion at $\bm x^k$
+plus a quadratic term $\dfrac{L}{2}\|\bm z-\bm x^k\|^2$.
+
+\begin{theorembox}
+For all $\bm z\in\R^n$,
+\[
+\tilde f(\bm z) \;\ge\; f(\bm z).
+\]
+\end{theorembox}
+
+This inequality is simply the $L$-smoothness (descent lemma) of $f$.
+
+\medskip
+
+Why not use the \emph{true} Hessian $\nabla^2 f(\bm x^k)$ as the
+quadratic term? In general, the resulting subproblem
+\[
+\min_{\bm z} \psi(\bm z)
+ + f(\bm x^k)
+ + \nabla f(\bm x^k)^\top(\bm z-\bm x^k)
+ + \tfrac12(\bm z-\bm x^k)^\top\nabla^2 f(\bm x^k)(\bm z-\bm x^k)
+\]
+does not admit an efficient closed-form solution, whereas the
+$\tfrac{L}{2}\|\bm z-\bm x^k\|^2$ model does for many popular
+regularizers $\psi$.
+
+\subsection{Projected Gradient}
+
+\subsubsection{Definition}
+
+Projected Gradient is the special case of \emph{PGD} where we enforce a simple
+constraint $\bm x\in\Omega$ via an indicator function.
+
+Let $\Omega\subseteq\R^n$ be closed, convex, nonempty, and define
+\[
+\psi(\bm x) = \mathbb I_{\Omega}(\bm x)
+=
+\begin{cases}
+0, & \bm x\in\Omega,\\
+\infty, & \bm x\notin\Omega.
+\end{cases}
+\]
+Then
+\[
+\operatorname{prox}_{t\mathbb I_{\Omega}}(\bm x)
+= \argmin_{\bm z}
+\left\{ t\mathbb I_{\Omega}(\bm z) + \frac12\|\bm z-\bm x\|^2 \right\}
+= \argmin_{\bm z\in\Omega} \frac12\|\bm z-\bm x\|^2.
+\]
+
+\begin{factbox}[title={}]
+The \emph{projection} onto $\Omega$ is
+\[
+\operatorname{proj}_{\Omega}(\bm x)
+\defeq
+\argmin_{\bm z\in\Omega} \|\bm z - \bm x\|.
+\]
+\end{factbox}
+
+In this setting, \emph{PGD} is simply gradient descent followed by projection,
+and \emph{APGD} also applies provided we can compute $\operatorname{proj}_{\Omega}$ efficiently.
+
+\subsubsection{Examples}
+
+\begin{examplebox}
+\textbf{Example 1: Projection onto a ball.}
+
+Let $\overline{\mathbb B}(\bm 0,r) = \{\bm x\in\R^n : \|\bm x\|\le r\}$.
+Then
+\[
+\operatorname{proj}_{\overline{\mathbb B}(\bm 0,r)}(\bm x)
+=
+\begin{cases}
+\bm x, & \|\bm x\|\le r,\\[0.2em]
+r\,\dfrac{\bm x}{\|\bm x\|}, & \|\bm x\|>r.
+\end{cases}
+\]
+\end{examplebox}
+
+\begin{examplebox}
+\textbf{Example 2: Projection onto an affine subspace.}
+
+Let
+\[
+\Omega = \{\bm x\in\R^n : \bm A\bm x = \bm b\},\quad \bm A\in\R^{m\times n},\ \bm b\in\R^m.
+\]
+
+\textbf{Precomputation.}
+\begin{itemize}
+  \item Find some $\bm x_0$ such that $\bm A\bm x_0 = \bm b$.
+  \item Compute a matrix $\bm U\in\R^{n\times p}$ whose columns form an orthonormal
+        basis of $\operatorname{Null}(\bm A)$, so $\bm U^\top \bm U = I_p$.
+\end{itemize}
+
+If $\operatorname{rank}(\bm A)=m$ (full row rank), we may use a
+\textbf{QR factorization} of $\bm A^\top$; then $p=n-m$ by the
+rank–nullity theorem. If $\operatorname{rank}(\bm A)<m$, one can use an
+\textbf{SVD} of $\bm A$; then $p>n-m$. We assume $\bm b\in\operatorname{Range}(\bm A)$
+so that $\Omega\ne\varnothing$.
+
+Note that
+\[
+\bm A\bm x = \bm b
+\;\Longleftrightarrow\;
+\bm A\bm x = \bm A\bm x_0
+\;\Longleftrightarrow\;
+\bm A(\bm x-\bm x_0) = \bm 0
+\;\Longleftrightarrow\;
+\bm x-\bm x_0 \in \operatorname{Null}(\bm A)
+\;\Longleftrightarrow\;
+\bm x-\bm x_0 = \bm U\bm w
+\]
+for some $\bm w\in\R^p$.
+
+\begin{theorembox}
+With $\Omega,\bm A,\bm b,\bm U,\bm x_0$ as above,
+\[
+\operatorname{proj}_{\Omega}(\bm y)
+= \bm x_0 + \bm U\bm U^\top(\bm y-\bm x_0).
+\]
+\end{theorembox}
+
+\begin{proofbox}
+We want
+\[
+\min_{\bm x}\left\{\frac12\|\bm x-\bm y\|^2 : \bm A\bm x = \bm b\right\}.
+\]
+Using the parameterization $\bm x = \bm x_0 + \bm U\bm w$, this is
+equivalent to
+\[
+\min_{\bm w}\frac12\|\bm x_0 + \bm U\bm w - \bm y\|^2.
+\]
+Expanding,
+\[
+\begin{aligned}
+\frac12\|\bm x_0 + \bm U\bm w - \bm y\|^2
+&= \frac12\bm w^\top \bm U^\top \bm U\bm w
+   + (\bm x_0 - \bm y)^\top \bm U\bm w
+   + C_1\\
+&= \frac12\bm w^\top \bm w
+   + (\bm x_0 - \bm y)^\top \bm U\bm w
+   + C_1\\
+&= \frac12\bigl\|\bm w + \bm U^\top(\bm x_0 - \bm y)\bigr\|^2 + C_2,
+\end{aligned}
+\]
+where $C_1,C_2$ are constants independent of $\bm w$.
+
+This is minimized by
+\[
+\bm w^* = \bm U^\top(\bm y - \bm x_0).
+\]
+Hence
+\[
+\bm x^* = \bm x_0 + \bm U\bm w^*
+= \bm x_0 + \bm U \bm U^\top(\bm y - \bm x_0),
+\]
+which is exactly $\operatorname{proj}_{\Omega}(\bm y)$.
+\end{proofbox}
+\end{examplebox}

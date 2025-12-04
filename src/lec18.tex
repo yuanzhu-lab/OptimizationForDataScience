@@ -1,0 +1,392 @@
+\section{Lec 18}
+
+\subsection{Nonlinear Programming}
+
+Consider general nonlinear programming (NLP):
+\[
+\min_{\bm x} f_0(\bm x)
+\quad\text{S.T.}\quad
+f_1(\bm x)\le 0,\dots,f_m(\bm x)\le 0,\;
+h_1(\bm x)=0,\dots,h_p(\bm x)=0,
+\]
+where $f_0,\dots,f_m,h_1,\dots,h_p:\R^n\to\R$.
+
+Let the \textbf{feasible region} be
+\[
+\Omega \defeq
+\bigl\{\bm x :
+  f_i(\bm x)\le 0,\ i=1,\dots,m;\;
+  h_i(\bm x)=0,\ i=1,\dots,p
+\bigr\}.
+\]
+
+Define the \textbf{Lagrangian}
+\[
+\mathcal L(\bm x,\bm\lambda,\bm\mu)
+=
+f_0(\bm x)
++ \sum_{i=1}^m \lambda_i f_i(\bm x)
++ \sum_{i=1}^p \mu_i h_i(\bm x),
+\]
+where $\bm\lambda\in\R^m$, $\bm\mu\in\R^p$ are the \textbf{multipliers}.
+
+\begin{theorembox}
+\[
+\inf_{\bm x}\{f_0(\bm x):\bm x\in\Omega\}
+=
+\inf_{\bm x}\;
+\sup_{\bm\lambda\ge \bm 0,\;\bm\mu}
+\mathcal L(\bm x,\bm\lambda,\bm\mu).
+\]
+\end{theorembox}
+
+\textbf{Note.}
+$\inf$ is like $\min$, except the minimum need not be attained  
+(e.g.\ $\inf\{\mathrm e^x:x\in\R\}=0$, and $\inf\varnothing=\infty$).  
+Similarly, $\sup$ is analogous to $\max$.
+
+\begin{proofbox}
+
+Fix $\bm x\in\R^n$.
+
+\textbf{Case 1: $\bm x\notin\Omega$ (infeasible).}
+
+Then either $f_i(\bm x)>0$ for some $i$, or $h_i(\bm x)\neq 0$ for some $i$ (or both).
+
+If $f_i(\bm x)>0$ for some $i$, set all multipliers to $0$ except
+$\lambda_i\to\infty$. Then
+\[
+\mathcal L(\bm x,\bm\lambda,\bm\mu)\to\infty,
+\]
+so
+\[
+\sup_{\bm\lambda\ge \bm 0,\;\bm\mu}\mathcal L(\bm x,\bm\lambda,\bm\mu)=\infty,
+\]
+which can never be the value of the outer infimum.
+
+Similarly, if $h_i(\bm x)\neq 0$ for some $i$, fix all multipliers at
+$0$ except $\mu_i = t\cdot \mathrm{sgn}(h_i(\bm x))$, $t\to\infty$.
+Again $\sup_{\bm\lambda\ge \bm 0,\bm\mu}\mathcal L(\bm x,\bm\lambda,\bm\mu)=\infty$.
+
+So for $\bm x\notin\Omega$, the inner $\sup$ is $\infty$ and cannot
+contribute to the outer $\inf$.
+
+\medskip
+
+\textbf{Case 2: $\bm x\in\Omega$ (feasible).}
+
+Then $f_i(\bm x)\le 0$ for all $i=1,\dots,m$ and $h_i(\bm x)=0$ for
+all $i=1,\dots,p$. For any $\bm\lambda\ge \bm 0$, any $\bm\mu$,
+\[
+\mathcal L(\bm x,\bm\lambda,\bm\mu)
+= f_0(\bm x)
++ \sum_{i=1}^m \lambda_i f_i(\bm x)
++ \sum_{i=1}^p \mu_i h_i(\bm x)
+\le f_0(\bm x),
+\]
+since $\sum \lambda_i f_i(\bm x)\le 0$ and $\sum \mu_i h_i(\bm x)=0$.
+In fact,
+\[
+\sup_{\bm\lambda\ge \bm 0,\;\bm\mu} \mathcal L(\bm x,\bm\lambda,\bm\mu)
+= f_0(\bm x),
+\]
+attained by taking $\bm\lambda=\bm 0$ (and any $\bm\mu$).
+
+\medskip
+
+Therefore, when we take the outer infimum over $\bm x$, we see:
+\[
+\sup_{\bm\lambda,\bm\mu}\mathcal L(\bm x,\bm\lambda,\bm\mu)
+=
+\begin{cases}
+\infty, & \bm x\notin\Omega,\\
+f_0(\bm x), & \bm x\in\Omega.
+\end{cases}
+\]
+Thus
+\[
+\inf_{\bm x}\sup_{\bm\lambda\ge \bm 0,\bm\mu}\mathcal L(\bm x,\bm\lambda,\bm\mu)
+=
+\inf_{\bm x\in\Omega} f_0(\bm x),
+\]
+as claimed.
+\end{proofbox}
+
+\begin{theorembox}
+\textbf{(Weak Duality.)}
+\[
+\inf_{\bm x}\sup_{\bm\lambda\ge \bm 0,\bm\mu}
+\mathcal L(\bm x,\bm\lambda,\bm\mu)
+\;\ge\;
+\sup_{\bm\lambda\ge \bm 0,\bm\mu}
+\inf_{\bm x}
+\mathcal L(\bm x,\bm\lambda,\bm\mu).
+\]
+\end{theorembox}
+
+\begin{proofbox}
+
+Fix $\bm x_1\in\R^n$ and $\bm\lambda_1\ge \bm 0$, $\bm\mu_1$.
+Then
+\[
+\mathcal L(\bm x_1,\bm\lambda_1,\bm\mu_1)
+\;\ge\;
+\inf_{\bm x}\mathcal L(\bm x,\bm\lambda_1,\bm\mu_1).
+\]
+Since $\bm\lambda_1,\bm\mu_1$ are arbitrary, we can take $\sup$ over
+them:
+\[
+\sup_{\bm\lambda_1\ge \bm 0,\bm\mu_1}
+\mathcal L(\bm x_1,\bm\lambda_1,\bm\mu_1)
+\;\ge\;
+\sup_{\bm\lambda_1\ge \bm 0,\bm\mu_1}
+\inf_{\bm x}
+\mathcal L(\bm x,\bm\lambda_1,\bm\mu_1).
+\]
+The left-hand side holds for all $\bm x_1$, so taking $\inf$ over
+$\bm x_1$ preserves the inequality:
+\[
+\inf_{\bm x_1}
+\sup_{\bm\lambda_1\ge \bm 0,\bm\mu_1}
+\mathcal L(\bm x_1,\bm\lambda_1,\bm\mu_1)
+\;\ge\;
+\sup_{\bm\lambda_1\ge \bm 0,\bm\mu_1}
+\inf_{\bm x}
+\mathcal L(\bm x,\bm\lambda_1,\bm\mu_1).
+\]
+\end{proofbox}
+
+\textbf{Game interpretation.}
+Think of a two-player game:
+\begin{itemize}
+  \item the $\inf$-player chooses $\bm x$ (tries to minimize the payoff),
+  \item the $\sup$-player chooses $(\bm\lambda,\bm\mu)$ (tries to maximize the payoff).
+\end{itemize}
+Weak duality says: it is better for the $\inf$-player (i.e.\ lower cost)
+if the $\sup$-player must announce their strategy first.
+
+\subsubsection{Dual Objective and Dual Problem}
+
+Define the \textbf{dual objective}
+\[
+g(\bm\lambda,\bm\mu)
+\defeq
+\inf_{\bm x}\mathcal L(\bm x,\bm\lambda,\bm\mu).
+\]
+
+The \textbf{dual optimization problem} is
+\[
+\max_{\bm\lambda,\bm\mu}\; g(\bm\lambda,\bm\mu)
+\quad\text{S.T.}\quad \bm\lambda\ge \bm 0.
+\]
+
+Weak duality can be rewritten as
+\[
+\sup_{\bm\lambda\ge \bm 0,\bm\mu} g(\bm\lambda,\bm\mu)
+\;\le\;
+\inf_{\bm x}\{f_0(\bm x):\bm x\in\Omega\}.
+\]
+
+Equivalently:
+\begin{itemize}
+  \item For any primal feasible $\bm x\in\Omega$,
+  \[
+  \sup_{\bm\lambda\ge \bm 0,\bm\mu} g(\bm\lambda,\bm\mu)
+  \;\le\; f_0(\bm x).
+  \]
+  \item For any dual feasible $(\bm\lambda,\bm\mu)$ with $\bm\lambda\ge \bm 0$,
+  \[
+  \inf_{\bm x}\{f_0(\bm x):\bm x\in\Omega\}
+  \;\ge\; g(\bm\lambda,\bm\mu).
+  \]
+\end{itemize}
+
+Weak duality requires no assumptions, so it is very general but often
+too weak by itself.
+
+\begin{theorembox}
+\textbf{(Strong Duality.)}
+\[
+\sup_{\bm\lambda\ge \bm 0,\bm\mu} g(\bm\lambda,\bm\mu)
+\;=\;
+\inf_{\bm x}\{f_0(\bm x):\bm x\in\Omega\}.
+\]
+Equivalently,
+\[
+\inf_{\bm x}\sup_{\bm\lambda\ge \bm 0,\bm\mu}
+\mathcal L(\bm x,\bm\lambda,\bm\mu)
+\;=\;
+\sup_{\bm\lambda\ge \bm 0,\bm\mu}
+\inf_{\bm x}
+\mathcal L(\bm x,\bm\lambda,\bm\mu).
+\]
+\end{theorembox}
+
+\textbf{Note.}
+The equality above does \emph{not} require that the infimum/supremum
+are attained. Some authors define strong duality to include the
+existence of optimizers:
+\[
+\exists\,\bm x^*\in\Omega,\ \bm\lambda^*\ge \bm 0,\ \bm\mu^*
+\quad\text{s.t.}\quad
+g(\bm\lambda^*,\bm\mu^*) = f_0(\bm x^*).
+\]
+
+\begin{theorembox}
+\textbf{(KKT-type characterization.)}
+
+Strong duality is attained at some
+$\bm x^*\in\Omega$, $\bm\lambda^*\ge \bm 0$, $\bm\mu^*$  
+\textbf{if and only if} all four conditions hold:
+\begin{enumerate}
+  \item \textbf{Primal feasibility:} $\bm x^*\in\Omega$;
+  \item \textbf{Dual feasibility:} $\bm\lambda^*\ge \bm 0$;
+  \item \textbf{Complementarity:}
+  \[
+    \lambda_i^*\,f_i(\bm x^*) = 0,\quad i=1,\dots,m;
+  \]
+  \item \textbf{Stationarity:}
+  \[
+    \bm x^*\in \argmin_{\bm x} \mathcal L(\bm x,\bm\lambda^*,\bm\mu^*).
+  \]
+\end{enumerate}
+These are exactly the (convex) KKT conditions.
+\end{theorembox}
+
+\begin{proofbox}
+
+\textbf{($\Leftarrow$)} Assume (1)--(4) hold.
+
+Using (1) and (3),
+\[
+\sum_{i=1}^m \lambda_i^* f_i(\bm x^*) = 0,
+\quad
+\sum_{i=1}^p \mu_i^* h_i(\bm x^*) = 0.
+\]
+Thus
+\[
+\mathcal L(\bm x^*,\bm\lambda^*,\bm\mu^*)
+=
+f_0(\bm x^*) + 0 + 0
+= f_0(\bm x^*).
+\]
+By (4),
+\[
+\mathcal L(\bm x^*,\bm\lambda^*,\bm\mu^*)
+= \min_{\bm x}\mathcal L(\bm x,\bm\lambda^*,\bm\mu^*)
+= g(\bm\lambda^*,\bm\mu^*).
+\]
+Hence $g(\bm\lambda^*,\bm\mu^*) = f_0(\bm x^*)$, so strong duality holds
+and is attained at $(\bm x^*,\bm\lambda^*,\bm\mu^*)$.
+
+\medskip
+
+\textbf{($\Rightarrow$)} Suppose strong duality holds and is attained at
+$\bm x^*,\bm\lambda^*,\bm\mu^*$, i.e.
+\[
+g(\bm\lambda^*,\bm\mu^*) = f_0(\bm x^*),
+\quad
+\bm x^*\in\Omega,\;
+\bm\lambda^*\ge \bm 0.
+\]
+Then (1) and (2) hold by assumption.
+
+From the strong duality equality and weak duality chain,
+\[
+\begin{aligned}
+f_0(\bm x^*)
+&= \inf_{\bm x}\sup_{\bm\lambda\ge \bm 0,\bm\mu}\mathcal L(\bm x,\bm\lambda,\bm\mu)\\
+&\ge \sup_{\bm\lambda\ge \bm 0,\bm\mu}\inf_{\bm x}\mathcal L(\bm x,\bm\lambda,\bm\mu)\\
+&= g(\bm\lambda^*,\bm\mu^*)\\
+&\le \mathcal L(\bm x^*,\bm\lambda^*,\bm\mu^*)\\
+&\le \sup_{\bm\lambda\ge \bm 0,\bm\mu}\mathcal L(\bm x^*,\bm\lambda,\bm\mu)\\
+&\le f_0(\bm x^*),
+\end{aligned}
+\]
+so all inequalities are in fact equalities. In particular,
+\[
+f_0(\bm x^*)
+= \mathcal L(\bm x^*,\bm\lambda^*,\bm\mu^*)
+= f_0(\bm x^*) + \sum_{i=1}^m \lambda_i^* f_i(\bm x^*) + \sum_{i=1}^p \mu_i^* h_i(\bm x^*).
+\]
+Hence
+\[
+\sum_{i=1}^m \lambda_i^* f_i(\bm x^*) + \sum_{i=1}^p \mu_i^* h_i(\bm x^*) = 0.
+\]
+But $f_i(\bm x^*)\le 0$ and $\lambda_i^*\ge 0$; therefore each term
+$\lambda_i^* f_i(\bm x^*)\le 0$, and the sum being zero forces
+\[
+\lambda_i^* f_i(\bm x^*) = 0,\quad i=1,\dots,m
+\]
+(complementarity, (3)). Also,
+\[
+f_0(\bm x^*) = \inf_{\bm x}\mathcal L(\bm x,\bm\lambda^*,\bm\mu^*),
+\]
+so $\bm x^*$ is a minimizer of $\mathcal L(\cdot,\bm\lambda^*,\bm\mu^*)$,
+i.e.\ (4) holds.
+\end{proofbox}
+
+\newpage
+
+\textbf{Convex specialization.}
+
+Suppose $f_0,\dots,f_m$ are convex, and the equality constraints are
+affine:
+\[
+\begin{pmatrix}
+h_1(\bm x)\\
+\vdots\\
+h_p(\bm x)
+\end{pmatrix}
+= \bm A\bm x - \bm b.
+\]
+Then for fixed $(\bm\lambda^*,\bm\mu^*)$ with $\bm\lambda^*\ge \bm 0$,
+the Lagrangian $\mathcal L(\bm x,\bm\lambda^*,\bm\mu^*)$ is convex in
+$\bm x$.
+
+Condition (4) is equivalent to
+\[
+\bm 0\in \partial_{\bm x}\mathcal L(\bm x^*,\bm\lambda^*,\bm\mu^*).
+\]
+
+If moreover $f_0,\dots,f_m$ are differentiable, then
+\[
+\nabla_{\bm x}\mathcal L(\bm x^*,\bm\lambda^*,\bm\mu^*)
+=
+\nabla f_0(\bm x^*)
++ \sum_{i=1}^m \lambda_i^* \nabla f_i(\bm x^*)
++ \bm A^\top\bm\mu^*,
+\]
+since
+\[
+\nabla_{\bm x}\bigl(\bm\mu^\top(\bm A\bm x-\bm b)\bigr)=\bm A^\top\bm\mu.
+\]
+
+In earlier KKT formulations, the sum over $i$ was only over \emph{active}
+constraints. Here we have a multiplier $\lambda_i^*$ for every
+inequality constraint, but complementarity (3) gives $\lambda_i^* = 0$
+whenever $f_i(\bm x^*)<0$ (inactive).
+
+\subsection{Kernel Machines}
+
+Consider \textbf{ridge regression}:
+\[
+\min_{\bm x}
+\frac12\|\bm A\bm x - \bm y\|^2 + \frac12\gamma\|\bm x\|^2,
+\]
+with $\bm A\in\R^{m\times n}$, $\gamma>0$.
+
+The closed-form solution is
+\[
+\bm x^* = (\bm A^\top \bm A + \gamma \bm I)^{-1}\bm A^\top\bm y.
+\]
+
+Often one wants to enrich the feature set: a linear model may not fit
+well (e.g.\ a parabola is needed). Starting from $p$ original features,
+including all quadratic monomials would yield
+$\frac{p(p+1)}{2}$ additional feature columns.
+
+In general, we might want $N$ new features with $N\gg m$. This leads
+naturally to kernel methods, where the feature space can be extremely
+high-dimensional (or infinite), but the optimization is done via
+inner products (kernels) rather than explicit feature vectors.

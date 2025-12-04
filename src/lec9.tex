@@ -1,0 +1,411 @@
+\section{Lec 9}
+
+\subsection{Algorithm}
+
+An $L$-smooth convex function can be minimized with accuracy
+\[
+\mathcal{O}\!\left(\dfrac{1}{k^2}\right)
+\]
+after $k$ iterations.
+
+Choose an initial point $\bm y^0 \in \R^n$ arbitrarily.  
+For $k = 0, 1, 2, \dots$, update as follows:
+\[
+\begin{aligned}
+\bm x^{k+1} &= \bm y^k - \alpha_k \nabla f(\bm y^k), \\[0.4em]
+\bm y^{k+1} &= \bm x^{k+1}
++ \beta_{k+1}\bigl(\bm x^{k+1} - \bm x^k\bigr).
+\end{aligned}
+\]
+
+Here we fix $\alpha_k \equiv \dfrac{1}{L}$, while $\{\beta_k\}$ is a sequence to be determined.
+
+\subsection{Convergence Analysis}
+
+Assume $f$ is $L$-smooth and convex, and that $f$ has a minimizer $\bm x^*$.  
+Denote $f_{\min} \defeq f(\bm x^*)$. Define
+\[
+v_k \defeq f(\bm x^k) - f_{\min}
++ \dfrac{L}{2}\bigg\| \bm x^k - \bm x^*
+- \rho_{k-1}^2 \bigl(\bm x^{k-1} - \bm x^*\bigr)\bigg\|^2.
+\]
+The sequence $\{\rho_k\}$ is to be determined. We take $\bm x^0 \defeq \bm y^0$.
+
+Observe that $v_k \geq 0$; moreover, if $v_k = 0$ then $\bm x^k$ is optimal.
+
+From the definition of $v_k$,
+\[
+v_{k+1} = f(\bm x^{k+1}) - f_{\min}
++ \dfrac{L}{2}\bigg\|\bm x^{k+1} - \bm x^*
+- \rho_k^2 \bigl(\bm x^k - \bm x^*\bigr)\bigg\|^2.
+\]
+
+\begin{factbox}
+\textbf{Recall.} For gradient descent with step size $1/L$ applied at $\bm y^k$,
+\[
+f(\bm x^{k+1})\leq f(\bm y^k)-\dfrac1{2L}\bigl\|\nabla f(\bm y^k)\bigr\|^2.
+\]
+
+\textbf{Reason.}
+\[
+\begin{aligned}
+\color{orange}{f(\bm x^{k+1})}
+&\;\color{orange}{\leq
+f(\bm y^k) + \nabla f(\bm y^k)^\top(\bm x^{k+1}-\bm y^k)
++ \dfrac{L}{2}\bigl\|\bm x^{k+1}-\bm y^k\bigr\|^2} \\[0.4em]
+&= f(\bm y^k) - \dfrac{1}{L}\bigl\|\nabla f(\bm y^k)\bigr\|^2
++ \dfrac{L}{2}\Bigl\|\dfrac{1}{L}\nabla f(\bm y^k)\Bigr\|^2 \\[0.4em]
+&= f(\bm y^k) - \dfrac{1}{2L}\bigl\|\nabla f(\bm y^k)\bigr\|^2 .
+\end{aligned}
+\]
+The $\color{orange}{\text{orange}}$ inequality is exactly the $L$-smoothness condition, which is equivalent to the gradient Lipschitz property
+\[
+\bigl\|\nabla f(\bm y)-\nabla f(\bm x)\bigr\|\leq L\|\bm y-\bm x\|.
+\]
+Intuitively, this restricts the second-order growth of $f$.  
+If $f$ is twice differentiable, it corresponds to bounding the Hessian $\nabla^2 f$ in operator norm, and the inequality can be seen as a Taylor expansion with a quadratic remainder controlled by $L$.
+\end{factbox}
+
+Substituting this into $v_{k+1}$, we obtain
+\[
+\begin{aligned}
+v_{k+1}
+\;\leq\;& f(\bm y^k) - f_{\min}
+- \underbrace{\dfrac{1}{2L}\bigl\|\nabla f(\bm y^k)\bigr\|^2}_{\mathcal A}
++ \underbrace{\dfrac{L}{2}\bigg\|\bm x^{k+1} - \bm x^*
+- \rho_k^2(\bm x^k - \bm x^*)\bigg\|^2}_{\mathcal B} \\[0.4em]
+=\;& f(\bm y^k) - f_{\min} - \mathcal A + \mathcal B.
+\end{aligned}
+\]
+
+We use an uncommon splitting trick:
+\[
+f(\bm y^k) - f_{\min}
+= \rho_k^2\bigl(f(\bm y^k) - f_{\min}\bigr)
++ (1 - \rho_k^2)\bigl(f(\bm y^k) - f_{\min}\bigr).
+\]
+
+Substituting back,
+\[
+v_{k+1} \le
+\rho_k^2\bigl(f(\bm y^k) - f_{\min}\bigr)
++ (1 - \rho_k^2)\bigl(f(\bm y^k) - f_{\min}\bigr)
+- \mathcal{A} + \mathcal{B}.
+\]
+
+\begin{factbox}
+\textbf{Recall (subgradient inequality).}  
+For convex differentiable $f$,
+\[
+f(\bm y)\geq f(\bm x)+\nabla f(\bm x)^\top (\bm y-\bm x).
+\]
+
+\textbf{Reason.}  
+By convexity, from a geometric point of view the graph of $f$ lies above all its tangents.
+\end{factbox}
+
+Assume $0 \leq \rho_k \leq 1$ for all $k$. By the subgradient inequality, we have
+\[
+\begin{aligned}
+f(\bm x^k) &\geq f(\bm y^k) + \nabla f(\bm y^k)^\top (\bm x^k-\bm y^k), \\[0.3em]
+f_{\min} = f(\bm x^*) &\geq f(\bm y^k) + \nabla f(\bm y^k)^\top (\bm x^*-\bm y^k).
+\end{aligned}
+\]
+
+Plugging these inequalities into the previous relation yields
+\[
+\begin{aligned}
+v_{k+1}
+\leq\;& \rho_k^2\Bigl(f(\bm x^k)-f_{\min}
+- \nabla f(\bm y^k)^\top (\bm x^k-\bm y^k)\Bigr)
++ (1-\rho_k^2)\bigl(\nabla f(\bm y^k)^\top (\bm y^k-\bm x^*)\bigr)
+- \mathcal A + \mathcal B \\[0.4em]
+=\;& \rho_k^2\Bigl(\underbrace{f(\bm x^k)-f_{\min}
++ \dfrac{L}{2}\big\|\bm x^k-\bm x^*
+- \rho_{k-1}^2(\bm x^{k-1}-\bm x^*)\big\|^2}_{v_k}\Bigr)
+- \rho_k^2 \nabla f(\bm y^k)^\top(\bm x^k-\bm y^k)\\
+&\quad +(1-\rho_k^2)\bigl(\nabla f(\bm y^k)^\top (\bm y^k-\bm x^*)\bigr)
+- \rho_k^2\cdot\dfrac{L}{2}\big\|\bm x^k-\bm x^*
+- \rho_{k-1}^2(\bm x^{k-1}-\bm x^*)\big\|^2 - \mathcal A+\mathcal B \\[0.4em]
+=\;& \rho_k^2 v_k
+- \rho_k^2\nabla f(\bm y^k)^\top(\bm x^k-\bm y^k)
++ (1-\rho_k^2)\bigl(\nabla f(\bm y^k)^\top (\bm y^k-\bm x^*)\bigr)\\
+&\quad - \rho_k^2\cdot\dfrac{L}{2}\big\|\bm x^k-\bm x^*
+- \rho_{k-1}^2(\bm x^{k-1}-\bm x^*)\big\|^2 - \mathcal A+\mathcal B \\[0.4em]
+=\;& \rho_k^2 v_k
++ \underbrace{\nabla f(\bm y^k)^\top\bigl(\bm y^k-\rho_k^2\bm x^k
+- (1-\rho_k^2)\bm x^*\bigr)}_{\mathcal C}\\
+&\quad - \rho_k^2\cdot\dfrac{L}{2}\big\|\bm x^k-\bm x^*
+- \rho_{k-1}^2(\bm x^{k-1}-\bm x^*)\big\|^2 - \mathcal A+\mathcal B\\[0.4em]
+=\;& \rho_k^2 v_k
+- \rho_k^2\cdot\dfrac{L}{2}\big\|\bm x^k-\bm x^*
+- \rho_{k-1}^2(\bm x^{k-1}-\bm x^*)\big\|^2
+- \mathcal A+\mathcal B+\mathcal C.
+\end{aligned}
+\]
+
+Here
+\[
+\mathcal{A} = \dfrac{1}{2L}\bigl\|\nabla f(\bm y^k)\bigr\|^2,\qquad
+\mathcal{B} = \dfrac{L}{2}\bigg\|\bm x^{k+1} - \bm x^*
+- \rho_k^2(\bm x^k - \bm x^*)\bigg\|^2,
+\]
+\[
+\mathcal{C} = \nabla f(\bm y^k)^\top\bigl(\bm y^k - \rho_k^2\bm x^k
+- (1 - \rho_k^2)\bm x^*\bigr).
+\]
+
+Using the update
+\[
+\bm x^{k+1} \defeq \bm y^k - \dfrac{1}{L}\nabla f(\bm y^k),
+\]
+and the identity $\|\bm a - \bm b\|^2 = \|\bm a\|^2 - 2\bm a^\top\bm b + \|\bm b\|^2$, we have
+\[
+\begin{aligned}
+\underbrace{\dfrac{L}{2}\bigg\| \bm x^{k+1} - \bm x^*
+- \rho_k^2(\bm x^k - \bm x^*)\bigg\|^2}_{\mathcal{B}}
+&= \dfrac{L}{2}\bigg\|\bm y^k - \dfrac{1}{L}\nabla f(\bm y^k)
+- \bm x^* - \rho_k^2(\bm x^k - \bm x^*)\bigg\|^2 \\[0.4em]
+&= \dfrac{L}{2}\bigg\|\bm y^k - \bm x^*
+- \rho_k^2(\bm x^k - \bm x^*)\bigg\|^2 \\
+&\quad - \underbrace{\nabla f(\bm y^k)^\top\bigl(\bm y^k - \bm x^*
+- \rho_k^2(\bm x^k - \bm x^*)\bigr)}_{\mathcal{C}}
++ \underbrace{\dfrac{1}{2L}\bigl\|\nabla f(\bm y^k)\bigr\|^2}_{\mathcal{A}}.
+\end{aligned}
+\]
+
+Thus
+\[
+-\mathcal{A} + \mathcal{B} + \mathcal{C}
+= \dfrac{L}{2}\bigg\|\bm y^k - \bm x^*
+- \rho_k^2(\bm x^k - \bm x^*)\bigg\|^2.
+\]
+
+Therefore,
+\[
+\begin{aligned}
+v_{k+1}
+\leq\;& \rho_k^2 v_k
++ \dfrac{L}{2}\bigg\|\bm y^k - \bm x^*
+- \rho_k^2(\bm x^k - \bm x^*)\bigg\|^2\\
+&\quad - \rho_k^2 \cdot \dfrac{L}{2}\big\|\bm x^k - \bm x^*
+- \rho_{k-1}^2(\bm x^{k-1} - \bm x^*)\big\|^2 \\[0.4em]
+=\;& \rho_k^2 v_k
++ \dfrac{L}{2}\bigl(\underbrace{\big\|\bm y^k - \bm x^*
+- \rho_k^2(\bm x^k - \bm x^*)\big\|^2
+- \rho_k^2 \big\|\bm x^k - \bm x^*
+- \rho_{k-1}^2(\bm x^{k-1} - \bm x^*)\big\|^2}_{\mathcal S}\bigr).
+\end{aligned}
+\]
+
+We force $\mathcal S = 0$ to specify $\rho_k$. Then $v_{k+1} \leq \rho_k^2 v_k$, and
+\[
+\bm y^k - \bm x^* - \rho_k^2 (\bm x^k - \bm x^*)
+= \rho_k \big( \bm x^k - \bm x^*
+- \rho_{k-1}^2 (\bm x^{k-1} - \bm x^*) \big).
+\]
+
+Recalling $\bm y^k = (1 + \beta_k)\bm x^k - \beta_k \bm x^{k-1}$, we obtain
+\[
+(1 + \beta_k)\bm x^k - \beta_k \bm x^{k-1} - \bm x^*
+- \rho_k^2 (\bm x^k - \bm x^*)
+= \rho_k (\bm x^k - \bm x^*) - \rho_k \rho_{k-1}^2 (\bm x^{k-1} - \bm x^*).
+\]
+
+Rearranging,
+\[
+(1 + \beta_k - \rho_k^2)(\bm x^k - \bm x^*)
+- \beta_k (\bm x^{k-1} - \bm x^*)
+= \rho_k (\bm x^k - \bm x^*) - \rho_k \rho_{k-1}^2 (\bm x^{k-1} - \bm x^*).
+\]
+
+Comparing coefficients, we deduce
+\[
+1 + \beta_k - \rho_k^2 = \rho_k,
+\qquad
+\beta_k = \rho_k \rho_{k-1}^2.
+\]
+
+Substituting $\beta_k$,
+\[
+1 + \rho_k \rho_{k-1}^2 - \rho_k^2 = \rho_k,
+\]
+so $\rho_k$ is a root of the quadratic
+\[
+\rho_k^2 + (1 - \rho_{k-1}^2)\rho_k - 1 = 0.
+\]
+
+Hence the two roots satisfy
+\[
+\rho_{k_1} + \rho_{k_2} = - (1 - \rho_{k-1}^2),
+\qquad
+\rho_{k_1}\rho_{k_2} = -1.
+\]
+
+Since $v_{k+1} \leq \rho_k^2 v_k$, by induction we may assume $\rho_{k-1} \in [0,1]$.  
+Thus the positive root lies in $[0,1]$, while the negative root is $\leq -1$.  
+Therefore, choosing $\rho_k$ as the positive root gives $\rho_k \in [0,1]$.
+
+An equivalent way to rewrite the recursion is
+\[
+(1 - \rho_{k-1}^2)\rho_k = 1 - \rho_k^2,
+\]
+that is,
+\[
+\rho_k = \dfrac{1 - \rho_k^2}{1 - \rho_{k-1}^2}.
+\]
+
+Since $v_{k+1} \leq \rho_k^2 v_k$, by induction
+\[
+v_k \leq \rho_{k-1}^2 \rho_{k-2}^2 \cdots \rho_1^2 \, v_1.
+\]
+
+A telescoping argument on the right-hand side yields
+\[
+v_k \leq \dfrac{(1 - \rho_{k-1}^2)^2}{(1 - \rho_0^2)^2} \, v_1.
+\]
+
+Setting $\rho_0 \defeq 0$ gives
+\[
+v_k \leq (1 - \rho_{k-1}^2)^2 v_1.
+\]
+
+\begin{claimbox}
+\[
+1 - \rho_k^2 \leq \dfrac{2}{k+2}.
+\]
+\end{claimbox}
+
+\begin{proofbox}
+We proceed by induction on $k$.
+
+\emph{Base case ($k=0$).}  
+The inequality holds trivially.
+
+\emph{Induction step ($k \ge 1$).}  
+From the recurrence relation,
+\[
+\rho_k = \dfrac{1 - \rho_k^2}{1 - \rho_{k-1}^2}
+\;\geq\;
+\dfrac{1 - \rho_k^2}{\dfrac{2}{k+1}}
+= \dfrac{k+1}{2}\,(1 - \rho_k^2).
+\]
+Therefore
+\[
+1 - \rho_k^2 \leq \dfrac{2}{k+1}\,\rho_k.
+\]
+
+Let $x \defeq 1 - \rho_k^2$. Then
+\[
+x - \dfrac{2}{k+1}\sqrt{1-x} \leq 0,
+\]
+and the left-hand side is an increasing function of $x$.
+
+Test $x = \dfrac{2}{k+2}$:
+\[
+\dfrac{2}{k+2} \;\overset{?}{\leq}\; \dfrac{2}{k+1}\sqrt{1 - \dfrac{2}{k+2}}.
+\]
+
+Squaring both sides and dividing by $4$ gives
+\[
+\dfrac{1}{(k+2)^2} \;\overset{?}{\leq}\;
+\dfrac{1}{(k+1)^2}\left(1 - \dfrac{2}{k+2}\right),
+\]
+equivalently,
+\[
+(k+1)^2 \;\overset{?}{\leq}\; (k+2)k.
+\]
+
+This inequality does not hold, so the condition implies
+\[
+x < \dfrac{2}{k+2}.
+\]
+
+Thus
+\[
+1 - \rho_k^2 < \dfrac{2}{k+2},
+\]
+which completes the induction.
+\end{proofbox}
+
+Since $v_k \leq (1 - \rho_{k-1}^2)^2 v_1$, the claim implies
+\[
+v_k \leq \dfrac{4}{(k+1)^2} v_1.
+\]
+
+Because $v_k \geq f(\bm x^k) - f_{\min}$, we obtain
+\[
+f(\bm x^k) - f_{\min} \leq \dfrac{4}{(k+1)^2} v_1,
+\]
+which is the $\mathcal O\!\left(\dfrac{1}{k^2}\right)$ convergence rate.
+
+It remains to bound $v_1$ in terms of the initial point:
+\[
+v_1 = f(\bm x^1) - f(\bm x^*)
++ \dfrac{L}{2}\bigl\|\bm x^1 - \bm x^*\bigr\|^2.
+\]
+
+Note that $\bm x^1$ is obtained from $\bm x^0$ by a plain gradient descent step.
+
+\begin{factbox}
+\textbf{Recall.} For gradient descent with step size $1/L$,
+\[
+f(\bm x^{k+1})\leq f(\bm x^*)
++ \dfrac{L}{2}\bigl(\|\bm x^k-\bm x^*\|^2
+- \|\bm x^{k+1}-\bm x^*\|^2\bigr).
+\]
+
+\textbf{Reason.}
+\[
+\begin{aligned}
+f(\bm x^k)&\leq f(\bm x^*)+\nabla f(\bm x^k)^\top (\bm x^k-\bm x^*)\\
+\color{purple}{f(\bm x^{k+1})}
+&\leq f(\bm x^*)+\nabla f(\bm x^k)^\top (\bm x^k-\bm x^*)
+-\dfrac{1}{2L}\bigl\|\nabla f(\bm x^k)\bigr\|^2\\
+&\leq f(\bm x^*)+\dfrac{L}{2}\bigl(
+2(\bm x^k-\bm x^*)^\top\dfrac{1}{L}\nabla f(\bm x^k)
+- \bigl\|\dfrac1L\nabla f(\bm x^k)\bigr\|^2\bigr)\\
+&\color{purple}{\leq f(\bm x^*)+\dfrac{L}{2}\bigl(
+2(\bm x^k-\bm x^*)^\top(\bm x^{k+1}-\bm x^k)
+- \|\bm x^{k+1}-\bm x^k\|^2\bigr)}.
+\end{aligned}
+\]
+The $\color{purple}{\text{purple}}$ inequality is in the form of the law of cosines
+\[
+\|\bm b-\bm c\|^2 = \|\bm b\|^2 + \|\bm c\|^2 - 2\bm b^\top \bm c.
+\]
+Rearranging yields
+\[
+f(\bm x^{k+1})\leq f(\bm x^*)
++ \dfrac{L}{2}\bigl(\|\bm x^k-\bm x^*\|^2
+- \|\bm x^{k+1}-\bm x^*\|^2\bigr).
+\]
+\end{factbox}
+
+Substituting $k=0$ and rearranging, we obtain
+\[
+v_1 \leq \dfrac{L}{2}\,\bigl\|\bm x^0 - \bm x^*\bigr\|^2.
+\]
+
+Therefore,
+\[
+f(\bm x^k) - f_{\min}
+\leq \dfrac{2L}{(k+1)^2}\,\bigl\|\bm x^0 - \bm x^*\bigr\|^2,
+\]
+which is the standard bound for Accelerated Gradient Descent $\emph{AGD}$.
+
+\subsection{Implementation}
+
+A practical implementation of $\emph{AGD}$ is:
+\[
+\begin{aligned}
+&\rho_0 = 0,\\
+&\bm y^0 = \text{arbitrary},\\
+&\text{for }k=0,1,2,\dots\text{ do}\\
+&\quad \bm x^{k+1} := \bm y^k - \dfrac{1}{L}\nabla f(\bm y^k),\\
+&\quad \rho_{k+1} := \text{positive root of }
+\rho_{k+1}^2 + (1-\rho_k^2)\rho_{k+1} - 1 = 0,\\
+&\quad \beta_{k+1} := \rho_{k+1}\rho_k^2,\\
+&\quad \bm y^{k+1} := \bm x^{k+1}+\beta_{k+1}\bigl(\bm x^{k+1}-\bm x^k\bigr).
+\end{aligned}
+\]

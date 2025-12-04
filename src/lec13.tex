@@ -1,0 +1,290 @@
+\section{Lec 13}
+
+\subsection{Constrained and Nonsmooth Analysis}
+
+\subsubsection{SVM Example}
+
+Binary classification: given $(\bm a_1,y_1),\dots,(\bm a_N,y_N)$ with
+\[
+\bm a_i\in\R^n,\quad y_i\in\{1,-1\},
+\]
+seek $\bm x\in\R^n$, $\xi\in\R$ such that
+\[
+\begin{aligned}
+\bm a_i^\top \bm x+\xi>0 &\quad \text{if } y_i=1,\\
+\bm a_i^\top \bm x+\xi<0 &\quad \text{if } y_i=-1.
+\end{aligned}
+\]
+
+\[
+(\text{SVM-1})\quad
+\max_{\bm x,\xi}\; \min_{i=1,\dots,N}\bigl|\bm a_i^\top \bm x+\xi\bigr|
+\quad\text{s.t.}\quad
+\bm a_i^\top \bm x+\xi\geq 0\ (y_i=1),\
+\bm a_i^\top \bm x+\xi\leq 0\ (y_i=-1),\
+\|\bm x\|=1.
+\]
+
+\[
+(\text{SVM-2})\quad
+\max_{\bm x,\xi,\bm t}\; \min_{i=1,\dots,N} t_i
+\quad\text{s.t.}\quad
+\bm a_i^\top \bm x+\xi = t_i\ (y_i=1),\
+\bm a_i^\top \bm x+\xi = -t_i\ (y_i=-1),\
+\|\bm x\|=1,\ \bm t\geq \bm 0.
+\]
+
+\[
+(\text{SVM-3})\quad
+\max_{\bm x,\xi,\bm t}\; \min_{i=1,\dots,N} t_i
+\quad\text{s.t.}\quad
+\bm a_i^\top \bm x+\xi = t_i\ (y_i=1),\
+\bm a_i^\top \bm x+\xi = -t_i\ (y_i=-1),\
+\|\bm x\|\leq 1,\ \bm t\geq \bm 0.
+\]
+
+SVM-2 is nonconvex; SVM-3 is convex.
+
+\medskip
+
+Note: $\min(x,y)$ is not differentiable when $x=y$.
+
+Let $\tilde t = \min(t_1,\dots,t_N)$. Then we can write
+\[
+(\text{SVM-4})\quad
+\max_{\bm x,\xi,\tilde t}\; \tilde t
+\quad\text{s.t.}\quad
+\bm a_i^\top \bm x+\xi \geq \tilde t\ (y_i=1),\
+\bm a_i^\top \bm x+\xi \leq -\tilde t\ (y_i=-1),\
+\|\bm x\|\leq 1,\ \tilde t\geq 0.
+\]
+
+This is equivalent to SVM-3: given a feasible point for SVM-4, define
+\[
+t_i =
+\begin{cases}
+\bm a_i^\top \bm x+\xi, & y_i=1,\\[0.25em]
+-\bm a_i^\top \bm x-\xi, & y_i=-1.
+\end{cases}
+\]
+Any $\tilde t \leq \min(t_1,\dots,t_N)$ is feasible for SVM-4. Among these choices of $\tilde t$, SVM-4 selects the largest one, i.e.\ $\tilde t = \min(t_1,\dots,t_N)$.
+
+\medskip
+
+Move the quadratic constraint into the objective: change variables
+\[
+\tilde{\bm x} := \frac{\bm x}{\tilde t},\qquad
+\tilde\xi := \frac{\xi}{\tilde t},
+\]
+which is valid since $\tilde t>0$ at the minimizer of SVM-4. Divide all constraints by $\tilde t$ to obtain SVM-5:
+\[
+(\text{SVM-5})\quad
+\max_{\tilde{\bm x},\tilde\xi,\tilde t}\; \tilde t
+\quad\text{s.t.}\quad
+\bm a_i^\top \tilde{\bm x}+\tilde\xi \geq 1\ (y_i=1),\
+\bm a_i^\top \tilde{\bm x}+\tilde\xi \leq -1\ (y_i=-1),\
+\|\tilde t\,\tilde{\bm x}\|\leq 1,\ \tilde t\geq 0.
+\]
+
+Observe that
+\[
+\max \tilde t\ \text{s.t.}\ \|\tilde t\,\tilde{\bm x}\|\leq 1,\ \tilde t\geq 0
+\]
+has the same optimizer (in $\tilde{\bm x}$) as
+\[
+\min \|\tilde{\bm x}\|\ \text{s.t.}\ \|\tilde t\,\tilde{\bm x}\|\leq 1,\ \tilde t\geq 0.
+\]
+
+Thus we arrive at
+\[
+(\text{SVM-6})\quad
+\min_{\tilde{\bm x},\tilde\xi}\; \|\tilde{\bm x}\|^2
+\quad\text{s.t.}\quad
+\bm a_i^\top \tilde{\bm x}+\tilde\xi \geq 1\ (y_i=1),\
+\bm a_i^\top \tilde{\bm x}+\tilde\xi \leq -1\ (y_i=-1).
+\]
+
+Both SVM-6 and the smooth reformulation of $\ell_1\text{LS}$ (with constraints) are examples of \emph{quadratic programming} (QP).
+
+\begin{factbox}
+QP refers to minimizing a quadratic objective function subject to linear equality and/or inequality constraints.
+\end{factbox}
+
+SVM-6 is called \textbf{hard-margin SVM}; it requires that the data have an affine linear separator (otherwise the problem is infeasible).
+
+For nonseparable data, we use SVM-7, the \textbf{soft-margin SVM}, where $\gamma>0$ is a penalty parameter:
+\[
+(\text{SVM-7})\quad
+\min_{\bm x,\xi,\bm s}\;
+\frac12\|\tilde{\bm x}\|^2 + \gamma\sum_{i=1}^N s_i
+\]
+\[
+\text{s.t.}\quad
+\bm a_i^\top \bm x+\xi \geq 1 - s_i\ (y_i=1),\quad
+\bm a_i^\top \bm x+\xi \leq -1 + s_i\ (y_i=-1),\quad
+\bm s\geq \bm 0.
+\]
+
+If $\bm s=\bm 0$, we recover SVM-6. If $s_i>0$ for some $i$, then $\bm a_i$ is misclassified. Thus the second term of the objective penalizes misclassification; $\gamma\to\infty$ forces $s_i=0$ and recovers SVM-6. When $\gamma\to 0$, misclassifications are penalized very little, so the solution prioritizes a wider margin.
+
+Many of the $s_i$ are expected to be exactly zero at a typical solution. We can eliminate the $s_i$ to obtain a nonsmooth equivalent problem.
+
+If $\bm x,\xi$ are fixed, the best choice for $s_i$ when $y_i=1$ is either
+\[
+s_i = 1 - \bm a_i^\top \bm x - \xi
+\quad\text{or}\quad
+s_i = 0,
+\]
+so the optimal choice is
+\[
+s_i = \max\bigl(0,\,1 - \bm a_i^\top \bm x - \xi\bigr).
+\]
+Write this as $s_i = \Phi(\bm a_i^\top \bm x+\xi)$ where
+\[
+\Phi(t) = \max(0,1-t).
+\]
+
+For $y_i=-1$, the best choice is $s_i = \Phi\bigl(-(\bm a_i^\top \bm x+\xi)\bigr)$. With this notation we obtain SVM-8:
+\[
+(\text{SVM-8})\quad
+\min_{\bm x,\xi}\;
+\frac12\|\tilde{\bm x}\|^2
++ \gamma\sum_{y_i=1} \Phi(\bm a_i^\top \bm x+\xi)
++ \gamma\sum_{y_i=-1} \Phi\bigl(-(\bm a_i^\top \bm x+\xi)\bigr).
+\]
+
+Observe that $\Phi$ is convex, so SVM-8 is a convex, nonsmooth, unconstrained problem. The function $\Phi$ is called the \emph{hinge loss}.
+
+\begin{factbox}
+The logistic loss $\ln\bigl(1+e^{-t}\bigr)$ from logistic regression is a smooth approximation of the hinge loss.
+\end{factbox}
+
+Differences between SVM-8 and logistic regression with $\ell_2$ regularization:
+\begin{enumerate}[leftmargin=1.4em]
+  \item In logistic regression the penalty parameter multiplies the quadratic term (a notational difference).
+  \item Logistic regression uses a smooth loss; the hinge loss is nonsmooth.
+  \item The quadratic term in logistic regression is $\dfrac12\gamma\bigl\|(\bm x,\xi)\bigr\|^2$, whereas in SVM-8 the quadratic term is independent of $\xi$.
+\end{enumerate}
+
+\subsubsection{General Case}
+
+Consider the constrained optimization problem
+\[
+\min f(\bm x)
+\quad\text{s.t.}\quad
+\bm x\in\Omega,\ \Omega\subseteq\R^n.
+\]
+Assume $\Omega$ is closed and convex.
+
+The \textbf{normal cone} to $\Omega$ at $\bm x\in\Omega$ is
+\[
+N_{\Omega}(\bm x)
+= \left\{ \bm v\in\R^n : \bm v^\top(\bm y-\bm x)\leq 0,\ \forall \bm y\in\Omega \right\}.
+\]
+
+Geometrically, if $\bm x$ lies on the boundary $\partial\Omega$, the normal cone $N_{\Omega}(\bm x)$ consists of all vectors that point ``outward'' and are normal to $\Omega$ at $\bm x$. For an interior point, $N_{\Omega}(\bm x)=\{\bm 0\}$. For a nonsmooth boundary point, the normal cone is generated by all limiting normals coming from adjacent smooth patches.
+
+A \textbf{closed convex cone} $C\subseteq\R^n$ satisfies:
+\begin{itemize}[leftmargin=1.2em]
+  \item $C$ is closed;
+  \item $\bm 0\in C$;
+  \item if $\bm x\in C$ and $\lambda\geq 0$, then $\lambda\bm x\in C$;
+  \item if $\bm x,\bm y\in C$, then $\bm x+\bm y\in C$.
+\end{itemize}
+
+\begin{factbox}
+\begin{itemize}[leftmargin=1.2em]
+  \item Any closed convex cone is a convex set.
+  \item If $\Omega$ is a closed convex set and $\bm x\in\Omega$, then $N_{\Omega}(\bm x)$ is a closed convex cone.
+\end{itemize}
+\end{factbox}
+
+\begin{theorembox}
+Suppose $\Omega\subseteq\R^n$ is closed, nonempty, and convex, and
+$f:\R^n\to\R\cup\{\infty\}$ is convex and differentiable, with
+$\Omega\subseteq\operatorname{int}(\operatorname{dom} f)$. Then
+\[
+\bm x^* \in \arg\min\{f(\bm x): \bm x\in\Omega\}
+\quad\Longleftrightarrow\quad
+\bm x^*\in\Omega\ \text{and}\ -\nabla f(\bm x^*)\in N_{\Omega}(\bm x^*).
+\]
+\end{theorembox}
+
+\begin{proofbox}
+\textbf{Backward direction $(\Leftarrow)$.}
+
+Assume $\bm x^*\in\Omega$ and $-\nabla f(\bm x^*)\in N_{\Omega}(\bm x^*)$.
+For any $\bm z\in\Omega$, the subgradient (gradient) inequality for convex $f$ gives
+\[
+f(\bm z)
+\geq f(\bm x^*) + \nabla f(\bm x^*)^\top(\bm z-\bm x^*).
+\]
+Since $-\nabla f(\bm x^*)\in N_{\Omega}(\bm x^*)$ and $\bm z\in\Omega$, we have
+\[
+-\nabla f(\bm x^*)^\top(\bm z-\bm x^*) \le 0,
+\]
+so
+\[
+f(\bm z)\geq f(\bm x^*).
+\]
+Thus $\bm x^*$ is a minimizer over $\Omega$.
+
+\medskip
+
+\textbf{Forward direction $(\Rightarrow)$.}
+
+Assume $\bm x^*$ is a minimizer. Take any $\bm z\in\Omega$. For all $\alpha\in[0,1]$,
+convexity of $\Omega$ implies $(1-\alpha)\bm x^*+\alpha\bm z\in\Omega$, and by optimality,
+\[
+f(\bm x^*)
+\leq f\bigl((1-\alpha)\bm x^*+\alpha\bm z\bigr)
+= f\bigl(\bm x^*+\alpha(\bm z-\bm x^*)\bigr).
+\]
+
+By differentiability, write a first-order expansion with remainder:
+\[
+f\bigl(\bm x^*+\alpha(\bm z-\bm x^*)\bigr)
+= f(\bm x^*) + \alpha\nabla f(\bm x^*)^\top(\bm z-\bm x^*)
+  + \phi\bigl(\alpha(\bm z-\bm x^*)\bigr),
+\]
+where
+\[
+\frac{\phi\bigl(\alpha(\bm z-\bm x^*)\bigr)}{\|\alpha(\bm z-\bm x^*)\|}
+\to 0\quad\text{as }\alpha\to 0.
+\]
+
+Thus
+\[
+0
+\leq \alpha\nabla f(\bm x^*)^\top(\bm z-\bm x^*)
+   + \phi\bigl(\alpha(\bm z-\bm x^*)\bigr).
+\]
+Divide by $\alpha>0$:
+\[
+0
+\leq \nabla f(\bm x^*)^\top(\bm z-\bm x^*)
+   + \frac{\phi\bigl(\alpha(\bm z-\bm x^*)\bigr)}{\alpha}.
+\]
+Let $\alpha\downarrow 0$; the second term tends to $0$, so
+\[
+\nabla f(\bm x^*)^\top(\bm z-\bm x^*)\geq 0,\quad \forall \bm z\in\Omega.
+\]
+Equivalently,
+\[
+-\nabla f(\bm x^*)^\top(\bm z-\bm x^*)\leq 0,\quad \forall \bm z\in\Omega,
+\]
+which means $-\nabla f(\bm x^*)\in N_{\Omega}(\bm x^*)$.
+
+Moreover, if $\lambda\ge 0$, then $-\lambda\nabla f(\bm x^*)\in N_{\Omega}(\bm x^*)$ as well, showing that
+$N_{\Omega}(\bm x^*)$ is a cone.
+\end{proofbox}
+
+\newpage
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\textwidth]{src/img/example.png}
+  \caption*{}
+\end{figure}
+
+\emph{(This has a nice geometric interpretation and explains why the Lagrange multiplier method makes sense.)}

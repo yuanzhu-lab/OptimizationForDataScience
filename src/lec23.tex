@@ -1,0 +1,176 @@
+\section{Lec 23}
+
+\subsection{Alternating algorithms}
+
+\subsubsection{Nonnegative Matrix Factorization}
+
+\begin{theorembox}
+Given $\bm A\in\mathbb R^{m\times n}$, given $r\leq\min(m,n)$ (some variants: NMF figures out $r$), want $\bm W\in\mathbb R^{m\times r},\bm H\in\mathbb R^{r\times n}, \bm W\geq \bm 0,\bm H\geq \bm 0, \bm A\approx \bm W\bm H$.
+\end{theorembox}
+
+\begin{claimbox}
+Geometry of NMF: \\
+Say each column of $\bm A$ normalized in $1$-norm (sum of entries of each column equals $1$) \\
+In this case, we can assume that columns of $\bm W,\bm H$ are similarly normalized. \\
+Why? \\
+Say $\bm A\approx \bm W\bm H$. \\
+Rescale columns of $\bm W$ to have $1$-norm to $1$, that is, define $\bar{\bm W}=\bm W\bm D$, $\bm D$ is diagonal, $\bm D\succ\bm 0$, entries chosen so that $\underbrace{\bm e^\top}_{\mathbb R^m} \bar{\bm W}=\underbrace{\bm e^\top}_{\mathbb R^r}$. \\
+Let $\bar{\bm H}=\bm D^{-1}\bm H$ so that $\bm e^\top\bar{\bm W}\bar{\bm H}=\bm e^\top \bar{\bm H}$. \\
+We know $\bar{\bm W}\bar{\bm H}=\bm W\bm H\approx \bm A$, and $\underbrace{\bm e^\top}_{\mathbb R^m} \bm A=\underbrace{\bm e^\top}_{\mathbb R^n}$ by assumption. \\
+So may as well take columns of $\bar{\bm H}$ to have $1$-norm equal to $1$. ($\bm e^\top \bar{\bm H}\approx \bm e^\top \bm A=\bm e^\top$)
+
+Under assumption that columns of $\bm W,\bm H,\bm A$ are all normalized, NMF looks as follows:
+\[
+\Delta^m=m\text{-dimensional standard simplex}=\{\bm x\in\mathbb R^m:\bm e^\top \bm x=1,\bm x\geq \bm0\}.
+\]
+Columns of $\bm A$ lie in $\Delta^m$ as do columns of $\bm W$. \\
+Columns of $\bm H$ are coefficients of convex combinations. \\
+$\bm A=\bm W\bm H$ means each column of $\bm A$ is a convex combination of columns of $\bm W$.
+
+\end{claimbox}
+
+When posed as optimization, for example
+\[
+\min\;\|\bm A-\bm W\bm H\|_{\text{F}}\quad \text{S.T.}\quad \bm W\in\mathbb R^{m\times r},\bm H\in\mathbb R^{r\times n},\bm W\geq \bm 0,\bm H\geq \bm 0
+\]
+is NP-hard.
+
+Special case: columns of $\bm W$ appear as columns of $\bm A$. \\
+In context of term-doc matrices, for each topic there is a \emph{pure document} only about that topic, and it is comprehensive. \\
+This is called \emph{Separable Case} in literature. \\
+Gillis and Vavasis proposed algorithm \textbf{SPA} to solve separable with noise. \\
+
+\newpage
+
+\begin{factbox}[title={}]
+    
+For nonseparable case: \textbf{Alternating Nonnegative Least Squares (ANLS)}.
+
+If $\bm W$ is given, optimal $\bm H$ solves:
+\[
+\argmin_{\bm H}\;\big\{\|\bm A-\bm W\bm H\|_{\text F}:\bm H\in\mathbb R^{r\times n},\ \bm H\geq \bm 0\big\}
+\]
+is convex in $\bm H$. \\
+In fact, this is quadratic programming. \\
+Even better: decouples into $n$ problems of size $r$, for $k=1:n$
+\[
+\argmin_{\bm H(:,k)}\;\left\{\|\bm A(:,k)-\bm W\bm H(:,k)\|^2:\bm H(:,k)\geq \bm 0\right\}.
+\]
+
+ANLS: alternately optimize for $\bm H$ as above, then fix $\bm H$ and optimize for $\bm W$. \\
+Optimizing for $\bm W$ yields $m$ quadratic programming problems each of $r$ variables. \\
+This could be slow.
+
+\end{factbox}
+
+\begin{claimbox}[title={}]
+    
+Another faster algorithm in practice: \textbf{Hierarchical Alternating Least Squares (HALS)}. \\
+Consider row $\ell$ of $\bm H$. \\
+Fix all other entries of $\bm H$. \\
+Optimal choice for row:
+\[
+\argmin_{\bm H(\ell,:)\geq0}\;\left\|\bm A-\sum_{k\neq \ell} \bm W(:,k)\bm H(k,:)-\bm W(:,\ell)\bm H(\ell,:)\right\|_{\text F}^2.
+\]
+
+Simpler notation: $\bm h:=\bm H(\ell,:)^\top$, $\bm w:=\bm W(:,\ell)$, $\displaystyle \bm B^\ell=\bm A-\sum_{k\neq \ell} \bm W(:,k)\bm H(k,:)$,
+\[
+\argmin_{\bm h\geq \bm 0}\;\bigg\{\big\|\bm B^\ell-\underbrace{\bm w\bm h^\top}_{\mathbb R^{m\times n}}\big\|_{\text F}^2\bigg\}.
+\]
+
+The problem separates over $j$:
+\[
+\argmin_{h_j\geq 0}\;\left\|\bm B^\ell(:,j)-\bm w h_j\right\|^2
+=\argmin_{h_j\geq 0}\;\left\{\bm w^\top\bm w\, h_j^2-2\bm w^\top \bm B^\ell(:,j)h_j+\|\bm B^\ell(:,j)\|^2\right\}.
+\]
+
+This is a parabola:
+\[
+h_j=\max\left\{0,\frac{\bm w^\top \bm B^\ell(:,j)}{\bm w^\top\bm w}\right\}.
+\]
+
+So HALS applies this formula to update every entry of $\bm H$, then every entry of $\bm W$, then back to $\bm H$, etc. \\
+
+\end{claimbox}
+
+Both HALS and ANLS have a descent property: $\|\bm A-\bm W\bm H\|_{\text F}$ decreases on every iteration. \\
+To make HALS efficient, must compute $\bm B^\ell$ via updating previous values.
+
+\subsection{Gradient Descent and Related Methods}
+
+\subsubsection{\emph{GD}}
+
+Suppose \emph{GD} applied to $f:\mathbb R^n\rightarrow \mathbb R$, $L$-smooth, not necessarily convex. \\
+Assume $f$ bounded below by $f_{\min}$. \\
+Then after $k$ iterations of \emph{GD} with stepsize $\dfrac1L$,
+\[
+\min_{0\leq j\leq k-1}\;\|\nabla f(\bm x^j)\|\leq\sqrt{\frac{2L (f(\bm x^0)-f_{\min})}{k}}
+\]
+also,
+\[
+\lim_{k\rightarrow \infty}\nabla f(\bm x^k)= \bm0.
+\]
+
+What if $L$ not known? \\
+Can use \textbf{Backtrack Line-Search} (Problem Set 3):
+\[
+\bm x^{k+1}:=\bm x^k-2^{\ell_k}\nabla f(\bm x^k)
+\]
+where $\ell_k\in\mathbb Z$ determined adaptively (Armijo's Condition). \\
+Assuming $f$ is $L$-smooth, previous theorem holds with worse constants for Backtrack Line-Search. \\
+Flaw with Backtrack Line-Search: each iteration is more expensive than using step-size $\dfrac1L$, because of the need to evaluate $f(\bm x^k-2^\ell \nabla f(\bm x^k))$ for multiple values of $\ell$ for each $k$. \\
+Published Line-Search Algorithms are more efficient than \emph{Backtrack Line-Search}. \\
+In convex case, can improve on \emph{GD} via \emph{AGD}. But \emph{AGD} is not usable in nonconvex cases.
+
+\subsubsection{\emph{CGD}}
+    
+\textbf{Nonlinear Conjugate Gradient Descent (\emph{CGD})} often outperforms \emph{GD}. \\
+(Linear) Conjugate Gradient (Hestenes and Stiefel 1952) solves
+\[
+\min\;\underbrace{\frac12 \bm x^\top \bm A\bm x-\bm b^\top \bm x}_{f(\bm x)},\quad \bm A\in\mathbb S^{n},\ \bm A\succ 0
+\]
+which is same as solving $\bm A\bm x=\bm b$.
+
+\begin{examplebox}[title={}]
+
+Given $\bm x_0\in\mathbb R^n$ arbitrarily, \\
+(1) $\bm g_0:=\bm A\bm x_0-\bm b \quad\big(\;=\nabla f(\bm x_0)\;\big)$ \\
+(2) $\bm p_0:=-\bm g_0$ \\\\for $k=0,1,2,\dots$ \\\\
+\hspace*{2ex} (3) $\alpha_k:=\dfrac{-\bm g_k^\top \bm p_k}{\bm p_k^\top \bm A\bm p_k}$ \\
+\hspace*{2ex} (4) $\bm x_{k+1}:=\bm x_k+\alpha_k\bm p_k$ \\
+\hspace*{2ex} (5) $\bm g_{k+1}:=\bm g_k+\alpha_k \bm A\bm p_k\quad\big(\;=\bm A\bm x_{k+1}-\bm b=\nabla f(\bm x_{k+1})\;\big)$ \\
+\hspace*{2ex} (6) $\beta_{k+1}:=\dfrac{\bm g_{k+1}^\top \bm g_{k+1}}{\bm g_k^\top \bm g_k}$ \\
+\hspace*{2ex} (7) $\bm p_{k+1}:=-\bm g_{k+1}+\beta_{k+1}\bm p_k$.
+
+\end{examplebox}
+
+Step (3) is called \textbf{Exact Line-Search}
+\[
+\alpha_k:=\argmin_\alpha\;f(\bm x_k+\alpha\bm p_k).
+\]
+
+Exact Line-Search is generally not used in optimization because of little benefit for expensive computation (use Backtrack Line-Search instead), however in current settings it's OK. \\
+Fact: in exact arithmetic, \emph{CG} returns the exact minimizer of $f$ after $\leq n$ iterations. \\
+Thanks to success of \emph{CG}, there are many attempts to extend to an arbitrary $f$. \\
+
+\begin{factbox}[title={}]
+\textbf{(Fletcher-Reeves 1960s.)}
+\begin{itemize}
+  \item replace $\bm g_k$ with $\nabla f(\bm x_k)$
+  \item use inexact line-search for $\alpha_k$
+  \item many formulas for $\beta_k$
+  \item occasional restart: set $\beta_{k+1}:=0$
+\end{itemize}
+\end{factbox}
+
+Say $\mu$ is the modulus of strong convexity, $L$ is the modulus of smoothness.
+
+\begin{center}
+\begin{tabular}{l l}
+(Nonlinear) \emph{CGD} & (Convex Functions) \emph{AGD} \\ [1ex]\hline
+Quadratics & Convex functions \\
+$\left(1-\sqrt{\dfrac{\mu}{L}}\right)^k$ (better constant) & $\left(1-\sqrt{\dfrac{\mu}{L}}\right)^k$ \\
+No guarantees for nonquadratics & Guaranteed for all convex functions \\
+No hyperparameters & Needs $\mu,L$
+\end{tabular}
+\end{center}

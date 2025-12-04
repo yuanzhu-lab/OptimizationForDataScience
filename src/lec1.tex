@@ -1,0 +1,313 @@
+\section{Lec 1}
+
+\subsection{Prerequisites}
+
+\begin{examplebox}[title={}]
+
+Allowed coding languages: \textsc{Matlab}, \textsc{R}, \textsc{Python}, \textsc{Julia}.
+
+\end{examplebox}
+
+\subsection{Optimization Problems}
+
+\subsubsection{Unconstrained Optimization}
+
+\[
+\min_{\bm x} f(\bm x)
+\]
+where $\bm x$ is the unknown \emph{variable} (also called the \emph{decision variable}) and
+\[
+f:\R^n \to \R
+\]
+is called the \emph{objective function}.
+
+\subsubsection{Constrained Optimization}
+
+\[
+\min_{\bm x \in C} f(\bm x)
+\]
+where $C \subseteq \R^n$ is called the \emph{feasible region}.
+
+Commonly, $C$ is specified by inequality and equality constraints:
+\[
+C=\Bigl\{\bm x\in \R^n:
+g_1(\bm x)\ge 0,\dots,g_k(\bm x)\ge 0;\;
+h_1(\bm x)=0,\dots,h_j(\bm x)=0
+\Bigr\}.
+\]
+
+\subsection{Supervised Learning}
+
+\subsubsection{Definitions}
+
+\textbf{Training data.} We are given labeled examples, typically as pairs
+\[
+(\bm a_1,\bm y_1),\dots,(\bm a_m,\bm y_m),
+\]
+where
+\[
+\bm a_i \in \R^d,\quad i=1,\dots,m \quad\text{(``feature vectors'')},
+\]
+\[
+\bm y_i \in \R^e,\quad i=1,\dots,m \quad\text{(``labels'')}.
+\]
+
+We seek a function $\Phi$ such that
+\[
+\Phi(\bm a_i) \approx \bm y_i,\quad i=1,\dots,m.
+\]
+
+\textbf{Why find such a function $\Phi$?}
+\begin{itemize}
+  \item Reason: To apply it to future \emph{unseen} feature vectors $\bm a \in \R^d$.
+\end{itemize}
+
+\subsubsection{Usual Optimization-Based Approach}
+
+Assume that $\Phi$ comes from a parametric family:
+\[
+\Phi(\bm a) \equiv f(\bm a,\bm x),
+\]
+where $f$ is a fixed known function, and $\bm x$ is a vector of (say) $p$ parameters, initially unknown.
+
+\textbf{Loss function.} Define a \emph{loss function} $l$ to measure the discrepancy between the prediction
+$f(\bm a_i,\bm x)$ and the label $\bm y_i$.
+
+\begin{examplebox}
+\textbf{Least squares.}  
+A common choice is the squared $\ell_2$ loss:
+\[
+l(\bm a,\bm y,\bm x)
+= \frac12 \bigl\|f(\bm a,\bm x)-\bm y\bigr\|^2.
+\]
+Let the training set be
+\[
+D=\{(\bm a_1,\bm y_1),\dots,(\bm a_m,\bm y_m)\}.
+\]
+Define the \emph{empirical loss}:
+\[
+L_D(\bm x)=\sum_{i=1}^m l(\bm a_i,\bm y_i,\bm x).
+\]
+Then the learning problem becomes the optimization problem
+\[
+\min_{\bm x} \; L_D(\bm x).
+\]
+\end{examplebox}
+
+\textbf{How to find an optimal $\bm x$?}\\
+This is the role of optimization \emph{algorithms}, which will be introduced later in the course.
+
+\textbf{Generalization and test set.}
+\begin{itemize}
+  \item Question: How do we know that $f(\bm a,\bm x)$ is a good predictor for
+  $\bm y$ when $\bm a \notin \{\bm a_1,\dots,\bm a_m\}$?
+\end{itemize}
+
+Hold aside additional labeled data items
+\[
+(\bm a_{m+1},\bm y_{m+1}),\dots,(\bm a_{m'},\bm y_{m'}),
+\]
+called the \emph{test set}. We evaluate the learned parameter vector $\bm x$ by computing the \emph{test loss} on this set:
+\[
+\sum_{i=m+1}^{m'} l(\bm a_i,\bm y_i,\bm x).
+\]
+
+\subsection{Unsupervised Learning}
+
+\subsubsection{Clustering}
+
+\textbf{Classic version: Clustering.}\\[0.3em]
+Given data points
+\[
+\bm a_1,\dots,\bm a_m \in \R^d,
+\]
+we want to partition them into $k$ clusters. This can be expressed by selecting labels
+\[
+y_1,\dots,y_m \quad\text{such that}\quad y_i \in \{1,\dots,k\},\ \forall i=1,\dots,m,
+\]
+and enforcing that
+\[
+\|\bm a_i-\bm a_j\|
+\quad\text{is}\quad
+\begin{cases}
+\text{small}, & y_i = y_j,\\
+\text{large}, & y_i \neq y_j.
+\end{cases}
+\]
+
+\subsubsection{K-means Objective Function}
+
+Introduce additional variables (cluster centers)
+\[
+\bm c_1,\dots,\bm c_k \in \R^d.
+\]
+
+\begin{examplebox}
+\textbf{K-means objective.}  
+The K-means clustering problem can be written as
+\[
+\min_{\{y_1,\dots,y_m\}}
+\;\min_{\{\bm c_1,\dots,\bm c_k\}}
+\;\sum_{i=1}^m \bigl\|\bm a_i-\bm c_{y_i}\bigr\|^2.
+\]
+\begin{itemize}
+  \item This is a \emph{partially discrete} optimization problem (e.g., K-means): the labels $y_i$ are discrete, while the centers $\bm c_j$ are continuous.
+  \item In contrast, an example of a purely \emph{continuous} optimization problem is linear least squares.
+\end{itemize}
+\end{examplebox}
+
+\subsection{Linear Least Squares}
+
+Consider data points
+\[
+(\bm a_1,y_1),\dots,(\bm a_m,y_m),
+\quad
+\bm a_i\in \R^n,\ y_i\in \R.
+\]
+
+\textbf{Linear model hypothesis.}  
+Assume there exists $\bm x\in \R^n$ such that
+\[
+y_i \approx \bm a_i^{\top}\bm x,
+\quad \forall i=1,2,\dots,m.
+\]
+
+\textbf{Inner product and transpose.}\\
+For $\bm a,\bm b\in \R^n$,
+\[
+\bm a^{\top}\bm b = a_1 b_1 + \cdots + a_n b_n
+\]
+is the inner product. The superscript ${}^{\top}$ denotes transpose.
+
+\begin{examplebox}
+\textbf{Least-squares fit as supervised learning.}\\[0.3em]
+In the earlier supervised-learning notation, we have
+\[
+\Phi(\bm a)\equiv f(\bm a,\bm x)\equiv
+\bm a^{\top}\bm x.
+\]
+Use the loss
+\[
+l(\bm a,\bm y,\bm x)
+=\frac12\bigl(\bm a^{\top}\bm x-\bm y\bigr)^2,
+\]
+so that
+\[
+L_D(\bm x)
+=\frac12 \sum_{i=1}^m
+\bigl(\bm a_i^{\top}\bm x-y_i\bigr)^2.
+\]
+\end{examplebox}
+
+Now define the data matrix
+\[
+\bm A=
+\begin{pmatrix}
+\bm a_1^{\top}\\
+\vdots\\
+\bm a_m^{\top}
+\end{pmatrix}
+\in \R^{m\times n}.
+\]
+
+Usually, vectors are treated as column vectors, which means $\bm x^{\top}$ is the corresponding row vector with the same entries.
+
+\begin{factbox}
+\textbf{Least squares in matrix form.}
+\[
+\frac12\|\bm A\bm x-\bm y\|^2
+= \frac12 \sum_{i=1}^m (\bm A\bm x-\bm y)_i^2
+= \frac12 \sum_{i=1}^m
+\bigl(\bm a_i^{\top}\bm x-y_i\bigr)^2
+= L_D(\bm x),
+\]
+where $\bm A$ is an $m\times n$ matrix, $\bm x$ is $n$-dimensional, and $\bm y$ is $m$-dimensional.
+\end{factbox}
+
+\subsection{Linear Algebra Review}
+
+Vectors are (by default) \emph{column} vectors in $\R^n$.
+
+\textbf{Special vectors.}
+\[
+\begin{aligned}
+&\0 &&\text{all-zero vector},\\
+&\bm e &&\text{all-one vector},\\
+&\bm e_1,\dots,\bm e_n &&\text{standard basis vectors}.
+\end{aligned}
+\]
+
+\subsubsection{Linear Dependence}
+
+Say $\bm v_1,\dots,\bm v_k\in \R^n$ are \textbf{dependent} if there exist scalars
+$\alpha_1,\dots,\alpha_k\in \R$, not all $0$, such that
+\[
+\alpha_1\bm v_1+\cdots+\alpha_k\bm v_k = \0.
+\]
+
+The left-hand side is called a \emph{linear combination} of
+$\bm v_1,\dots,\bm v_k$.
+
+If the \emph{only} solution is $\alpha_1=\cdots=\alpha_k=0$, then $\bm v_1,\dots,\bm v_k$ are \textbf{independent}.
+
+\subsubsection{Subspaces and Span}
+
+A set $S\subseteq \R^n$ is a \textbf{subspace} if:
+\[
+\0\in S,
+\]
+and for all $\bm x,\bm y\in S$ and all $\alpha,\beta\in \R$,
+\[
+\alpha\bm x+\beta\bm y\in S.
+\]
+
+Two extreme examples of subspaces are $\{\0\}$ and $\R^n$.
+
+Given $k$ vectors $\bm v_1,\dots,\bm v_k\in \R^n$, the set of all linear combinations is their \emph{span}:
+\[
+\spann\{\bm v_1,\dots,\bm v_k\}.
+\]
+
+\begin{factbox}
+\begin{itemize}
+  \item A span is always a subspace.
+  \item If $S\subseteq \R^n$ is a subspace, then there exist
+  $\bm v_1,\dots,\bm v_k\in S$ such that
+  \[
+  S=\spann\{\bm v_1,\dots,\bm v_k\},
+  \]
+  and $\bm v_1,\dots,\bm v_k$ are independent.
+  The set $\{\bm v_1,\dots,\bm v_k\}$ is called a \emph{basis} of $S$, where
+  $k = \dim(S)$.
+
+  Note that
+  \[
+  \spann\{\} = \{\0\}.
+  \]
+
+  \item For a subspace $S$, all bases of $S$ have the same cardinality.
+  This cardinality is called the \emph{dimension} of $S$ and is denoted $\dim(S)$.
+
+  \item If $S,T\subseteq \R^n$ are subspaces with $S\subseteq T$, then
+  \[
+  \dim(S)\le \dim(T).
+  \]
+  If $\dim(S)=\dim(T)$, then $S=T$.
+
+  Furthermore, if $\{\bm v_1,\dots,\bm v_k\}$ is a basis of $S$ with
+  $k=\dim(S)$, then there exist vectors
+  \[
+  \bm v_{k+1},\dots,\bm v_{\dim(T)}\in T
+  \]
+  such that $\{\bm v_1,\dots,\bm v_{\dim(T)}\}$ is a basis of $T$. This is the
+  \emph{Basis Extension Theorem}.
+\end{itemize}
+\end{factbox}
+
+\subsubsection{Special Matrices}
+
+\textbf{Special matrices.}
+\begin{itemize}
+  \item $\0$: all-zero matrix.
+  \item $\I$: identity matrix.
+\end{itemize}

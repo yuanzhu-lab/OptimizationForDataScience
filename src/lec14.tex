@@ -1,0 +1,388 @@
+\section{Lec 14}
+
+\subsection{Theorems with Normal Cones}
+
+\begin{theorembox}
+\textbf{(From last lecture).}
+Suppose $\Omega\subseteq \R^n$ is closed, nonempty, and convex, and
+$f:\R^n\to \R\cup\{\infty\}$ is convex and differentiable, with
+$\Omega\subseteq \intdom(f)$. Then
+\[
+\bm x^* \in \argmin\{f(\bm x): \bm x\in \Omega\}
+\quad\Longleftrightarrow\quad
+\bm x^*\in \Omega\ \text{and}\ -\nabla f(\bm x^*)\in N_{\Omega}(\bm x^*).
+\]
+\end{theorembox}
+
+\begin{theorembox}
+Let $\Omega = \Omega_1\cap\cdots\cap\Omega_m$, where each $\Omega_i$ is
+closed and convex (so $\Omega$ is closed and convex). Then, for all
+$\bm x\in \Omega$,
+\[
+N_{\Omega_1}(\bm x) + \cdots + N_{\Omega_m}(\bm x)\ \subseteq\ N_{\Omega}(\bm x).
+\]
+Here $+$ denotes the \textbf{Minkowski sum}:
+given $A,B\subseteq \R^n$,
+\[
+A+B = \{\bm a+\bm b : \bm a\in A,\ \bm b\in B\}.
+\]
+\end{theorembox}
+
+\begin{proofbox}
+Let $\bm v = \bm v_1+\cdots+\bm v_m$ with
+$\bm v_i\in N_{\Omega_i}(\bm x)$ for all $i=1,\dots,m$.
+
+By definition of the normal cone,
+\[
+\bm v_i^\top(\bm z-\bm x) \le 0,
+\quad \forall \bm z\in \Omega,\ \forall i=1,\dots,m.
+\]
+Summing these inequalities over $i$ gives
+\[
+\bm v^\top(\bm z-\bm x)
+= \sum_{i=1}^m \bm v_i^\top(\bm z-\bm x) \le 0,
+\quad \forall \bm z\in \Omega.
+\]
+Hence $\bm v\in N_{\Omega}(\bm x)$.
+\end{proofbox}
+
+In many generic situations, the inclusion in the theorem is actually an equality:
+\[
+N_{\Omega_1}(\bm x)+\cdots+N_{\Omega_m}(\bm x) = N_{\Omega}(\bm x).
+\]
+A condition that guarantees this equality is called a \textbf{constraint qualification} (CQ).
+
+\begin{factbox}
+\textbf{Constraint qualifications ensuring equality.}
+\begin{itemize}
+  \item (CQ1) If $\Omega_1,\dots,\Omega_m$ are all polyhedral sets, then
+        \[
+        N_{\Omega_1}(\bm x)+\cdots+N_{\Omega_m}(\bm x) = N_{\Omega}(\bm x).
+        \]
+  \item (CQ2, Slater condition) If $\operatorname{int}(\Omega)\neq\varnothing$, then the same equality holds.
+\end{itemize}
+\end{factbox}
+
+\begin{examplebox}
+\textbf{Example where equality fails.}
+
+Let $n=2$, $m=2$, and
+\[
+\Omega_1 = \{\bm x : x_2 \le 0\}, \qquad
+\Omega_2 = \{\bm x : x_2 \ge x_1^2\},
+\]
+and set $\Omega := \Omega_1\cap\Omega_2 = \{\bm 0\}$.
+
+Then
+\[
+N_{\Omega}(\bm 0) = \R^2.
+\]
+However,
+\[
+N_{\Omega_1}(\bm 0)
+= \{\lambda(0,1)^\top : \lambda\ge 0\},
+\qquad
+N_{\Omega_2}(\bm 0)
+= \{\lambda(0,1)^\top : \lambda\le 0\}.
+\]
+Thus
+\[
+N_{\Omega_1}(\bm 0) + N_{\Omega_2}(\bm 0)
+= \{\lambda(0,1)^\top : \lambda\in\R\}
+\subsetneq \R^2
+= N_{\Omega}(\bm 0).
+\]
+
+Neither CQ1 nor CQ2 holds in this example. Intuitively, the normal cone
+summarizes the local behavior of $\Omega$ via linear approximation; here
+the linear approximations of $\Omega_1$ and $\Omega_2$ fail to capture
+the “sharp” intersection at the origin.
+\end{examplebox}
+
+\begin{theorembox}
+Let $f:\R^n\to \R\cup\{\infty\}$ be convex, and fix $\beta\in\R$. Define
+the level set
+\[
+S = \{\bm y : f(\bm y)\le \beta\}.
+\]
+For any $\bm x\in S$:
+\begin{enumerate}[label=\alph*)]
+  \item $S$ is convex.
+  \item If $f(\bm x)<\beta$, then $N_S(\bm x)=\{\bm 0\}$.
+  \item If $f(\bm x)=\beta$ and $\nabla f(\bm x)\neq \bm 0$, then
+        \[
+        N_S(\bm x) = \{\lambda\,\nabla f(\bm x) : \lambda\ge 0\}.
+        \]
+\end{enumerate}
+\end{theorembox}
+
+\begin{proofbox}
+\textbf{(a) Convexity of $S$.}
+
+Let $\bm x_1,\bm x_2\in S$ and $\lambda\in[0,1]$. By convexity of $f$,
+\[
+f\bigl((1-\lambda)\bm x_1 + \lambda \bm x_2\bigr)
+\le (1-\lambda)f(\bm x_1) + \lambda f(\bm x_2)
+\le (1-\lambda)\beta + \lambda\beta
+= \beta.
+\]
+Hence $(1-\lambda)\bm x_1 + \lambda \bm x_2\in S$, so $S$ is convex.
+
+\medskip
+
+\textbf{(b) Interior point: $f(\bm x)<\beta \Rightarrow N_S(\bm x)=\{\bm 0\}$.}
+
+Since $f$ is convex, it is continuous on the interior of its domain.
+Thus there exists $r>0$ such that
+\[
+f(\bm y) \le \beta,\quad \forall \bm y\in \overline{\mathbb B}(\bm x,r),
+\]
+so $\overline{\mathbb B}(\bm x,r)\subseteq S$.
+
+Assume, to get a contradiction, that
+$\bm v\in N_S(\bm x)\setminus\{\bm 0\}$. Then, by definition of the normal cone,
+\[
+\bm v^\top\bigl(\bm x + r\,\tfrac{\bm v}{\|\bm v\|} - \bm x\bigr)
+\le 0,
+\]
+i.e.
+\[
+\frac{r\,\bm v^\top \bm v}{\|\bm v\|}
+= \frac{r\|\bm v\|^2}{\|\bm v\|}
+= r\|\bm v\|
+\le 0,
+\]
+which is impossible since $r>0$ and $\bm v\neq \bm 0$. Hence
+$N_S(\bm x) = \{\bm 0\}$.
+
+\medskip
+
+\textbf{(c) Boundary point: $f(\bm x)=\beta$, $\nabla f(\bm x)\ne 0$.}
+
+First we show
+\[
+\{\lambda\nabla f(\bm x):\lambda\ge 0\} \subseteq N_S(\bm x).
+\]
+Let $\bm y\in S$, so $f(\bm y)\le \beta = f(\bm x)$. By convexity and
+differentiability,
+\[
+f(\bm y) \ge f(\bm x) + \nabla f(\bm x)^\top(\bm y-\bm x).
+\]
+Hence
+\[
+0 \ge f(\bm y) - f(\bm x)
+\ge \nabla f(\bm x)^\top(\bm y-\bm x),
+\]
+so $\nabla f(\bm x)^\top(\bm y-\bm x)\le 0$ for all $\bm y\in S$, which
+means $\nabla f(\bm x)\in N_S(\bm x)$, and therefore
+$\lambda\nabla f(\bm x)\in N_S(\bm x)$ for all $\lambda\ge 0$.
+
+The converse inclusion
+\[
+N_S(\bm x)\subseteq \{\lambda\nabla f(\bm x):\lambda\ge 0\}
+\]
+is more delicate and is omitted here.
+\end{proofbox}
+
+\begin{theorembox}
+Let $\bm A\in\R^{m\times n}$ and $\bm b\in\R^m$, and define
+\[
+\Omega = \{\bm x\in\R^n : \bm A\bm x = \bm b\}.
+\]
+Then for every $\bm x\in\Omega$,
+\[
+N_{\Omega}(\bm x) = \operatorname{Range}(\bm A^\top).
+\]
+\end{theorembox}
+
+\begin{examplebox}
+\textbf{Geometric intuition.}
+
+Fix a point $\bm x\in\Omega$. Any feasible direction $\bm d$ at $\bm x$
+must satisfy
+\[
+\bm A(\bm x+\bm d) = \bm b \quad\Longrightarrow\quad \bm A\bm d = \bm 0,
+\]
+so $\bm d\in\operatorname{Null}(\bm A)$. By the fundamental theorem of
+linear algebra,
+\[
+\operatorname{Null}(\bm A)^\perp = \operatorname{Range}(\bm A^\top).
+\]
+On the other hand, the normal cone $N_{\Omega}(\bm x)$ consists of all
+vectors orthogonal to every feasible direction $\bm d$, i.e.
+\[
+N_{\Omega}(\bm x) = \operatorname{Null}(\bm A)^\perp = \operatorname{Range}(\bm A^\top).
+\]
+\end{examplebox}
+
+\begin{proofbox}
+We prove both inclusions.
+
+\medskip
+
+\textbf{($\subseteq$ direction).}
+We first show
+\[
+\operatorname{Range}(\bm A^\top) \subseteq N_{\Omega}(\bm x).
+\]
+Let $\bm p\in\operatorname{Range}(\bm A^\top)$, so $\bm p = \bm A^\top\bm v$ for
+some $\bm v\in\R^m$. For any $\bm w\in\Omega$,
+\[
+\bm p^\top(\bm w-\bm x)
+= \bm v^\top \bm A(\bm w-\bm x)
+= \bm v^\top(\bm b-\bm b)
+= 0.
+\]
+Thus $\bm p^\top(\bm w-\bm x)\le 0$ for all $\bm w\in\Omega$, so
+$\bm p\in N_{\Omega}(\bm x)$.
+
+\medskip
+
+\textbf{($\supseteq$ direction).}
+We next show
+\[
+N_{\Omega}(\bm x) \subseteq \operatorname{Range}(\bm A^\top).
+\]
+Equivalently, we show
+\[
+\R^n\setminus \operatorname{Range}(\bm A^\top)
+\subseteq
+\R^n\setminus N_{\Omega}(\bm x).
+\]
+
+Take $\bm p\in\R^n\setminus \operatorname{Range}(\bm A^\top)$. By the
+fundamental theorem of linear algebra, we can write
+\[
+\bm p = \bm p_1 + \bm p_2,
+\]
+where
+\[
+\bm p_1\in\operatorname{Range}(\bm A^\top),\quad
+\bm p_2\in\operatorname{Null}(\bm A),\quad
+\bm p_1^\top \bm p_2 = 0.
+\]
+Since $\bm p\notin\operatorname{Range}(\bm A^\top)$, we must have
+$\bm p_2\neq \bm 0$.
+
+Note that $\bm x + \bm p_2\in\Omega$ because
+\[
+\bm A(\bm x+\bm p_2) = \bm A\bm x + \bm A\bm p_2 = \bm b + \bm 0 = \bm b.
+\]
+Then
+\[
+\bm p^\top\bigl((\bm x+\bm p_2)-\bm x\bigr)
+= \bm p^\top\bm p_2
+= (\bm p_1+\bm p_2)^\top\bm p_2
+= \bm p_2^\top\bm p_2
+> 0.
+\]
+Hence $\bm p^\top(\bm w-\bm x) > 0$ for the feasible point
+$\bm w = \bm x+\bm p_2$, so $\bm p\notin N_{\Omega}(\bm x)$. Thus
+$N_{\Omega}(\bm x)\subseteq \operatorname{Range}(\bm A^\top)$.
+\end{proofbox}
+
+\subsection{Convex Programming}
+
+A \textbf{convex program (CP)} has the form
+\[
+\min_{\bm x} f_0(\bm x)
+\quad\text{s.t.}\quad
+f_1(\bm x)\le 0,\ \dots,\ f_m(\bm x)\le 0,\quad
+\bm A\bm x = \bm b,
+\]
+where $f_0,\dots,f_m$ are convex functions.
+
+\begin{examplebox}
+\textbf{Examples of convex programming.}
+\begin{itemize}
+  \item Least squares (LS).
+  \item $\ell_1$-regularized least squares ($\ell_1$LS).
+  \item The SVM formulations SVM-3, SVM-4, SVM-6, SVM-7, SVM-8.
+\end{itemize}
+\end{examplebox}
+
+Let
+\[
+\Omega = \{\bm x : f_1(\bm x)\le 0,\dots,f_m(\bm x)\le 0,\ \bm A\bm x=\bm b\},
+\]
+the \textbf{feasible region} of convex programming.
+
+We say the problem is \textbf{smooth} if $f_0,\dots,f_m$ are all
+differentiable on an open set containing $\Omega$. (Examples: SVM-4,
+SVM-6, SVM-7.)
+
+Recall SVM-3:
+\[
+\max_{\bm x,\xi,\bm t}\;\min_{i=1,\dots,N} t_i
+\quad\text{s.t.}\quad
+\bm a_i^\top \bm x+\xi = t_i\ (y_i=1),\quad
+\bm a_i^\top \bm x+\xi = -t_i\ (y_i=-1),\quad
+\|\bm x\|\le 1,\ \bm t\ge \bm 0.
+\]
+Equivalently,
+\[
+\min_{\bm x,\xi,\bm t}\; -\min_{i=1,\dots,N} t_i
+\quad\text{s.t. the same constraints,}
+\]
+or
+\[
+\min_{\bm x,\xi,\bm t}\; \max_{i=1,\dots,N} (-t_i)
+\quad\text{s.t. the same constraints.}
+\]
+Here the function $f(s,t) = \max(s,t)$ is convex but not differentiable
+when $s=t$.
+
+\subsubsection{KKT Conditions}
+
+Let $\widehat{\bm x}\in\Omega$ and assume
+\[
+\nabla f_1(\widehat{\bm x})\neq \bm 0,\dots,\nabla f_m(\widehat{\bm x})\neq \bm 0,
+\]
+and that a suitable constraint qualification (polyhedrality, Slater, or
+similar) holds.
+
+Then:
+\[
+\widehat{\bm x}\ \text{is optimal for CP}
+\quad\Longleftrightarrow\quad
+-\nabla f_0(\widehat{\bm x}) \in N_{\Omega}(\widehat{\bm x}).
+\]
+Using the normal cone decomposition,
+\[
+N_{\Omega}(\widehat{\bm x})
+= N_{\Omega_1}(\widehat{\bm x}) + \cdots + N_{\Omega_{m+1}}(\widehat{\bm x}),
+\]
+where
+\[
+\Omega_i := \{\bm x : f_i(\bm x)\le 0\},\ i=1,\dots,m,
+\quad
+\Omega_{m+1} := \{\bm x : \bm A\bm x = \bm b\}.
+\]
+
+Let
+\[
+C := \{i\in\{1,\dots,m\} : f_i(\widehat{\bm x}) = 0\}
+\]
+be the set of \textbf{active constraints} at $\widehat{\bm x}$, and
+\[
+I := \{1,\dots,m\}\setminus C
+\]
+the set of \textbf{inactive constraints}.
+
+Then the optimality condition becomes
+\[
+-\nabla f_0(\widehat{\bm x}) \in
+\sum_{i\in C} N_{\Omega_i}(\widehat{\bm x})
++ N_{\Omega_{m+1}}(\widehat{\bm x}).
+\]
+Using the previous theorem about level sets and the equality-constraint
+normal cone, this is equivalent to the existence of multipliers
+$\lambda_i\ge 0$ for $i\in C$ and $\bm v\in\R^m$ such that
+\[
+-\nabla f_0(\widehat{\bm x})
+= \sum_{i\in C} \lambda_i\,\nabla f_i(\widehat{\bm x})
+  + \bm A^\top \bm v.
+\]
+
+These are the (primal) \textbf{KKT conditions} in this smooth convex
+setting.

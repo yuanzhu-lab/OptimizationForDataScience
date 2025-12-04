@@ -1,0 +1,445 @@
+\section{Lec 15}
+
+\subsection{KKT Conditions}
+
+Recall convex programming (CP):
+\[
+\min_{\bm x} f_0(\bm x)
+\quad\text{s.t.}\quad
+f_i(\bm x)\le 0,\ i=1,\dots,m,\quad
+\bm A\bm x = \bm b,
+\]
+with
+\[
+\Omega \defeq \{\bm x : f_1(\bm x)\le 0,\dots,f_m(\bm x)\le 0,\ \bm A\bm x=\bm b\}.
+\]
+
+We have the normal-cone optimality condition:
+\[
+\begin{aligned}
+\hat{\bm x}\text{ is optimal for CP}
+&\Longleftrightarrow
+-\nabla f_0(\hat{\bm x}) \in N_{\Omega}(\hat{\bm x}),\ \hat{\bm x}\in\Omega\\
+&\Longleftrightarrow
+-\nabla f_0(\hat{\bm x}) \in
+N_{\Omega_1}(\hat{\bm x}) + \cdots + N_{\Omega_{m+1}}(\hat{\bm x}),\ \hat{\bm x}\in\Omega,
+\end{aligned}
+\]
+where
+\[
+\Omega_i := \{\bm x : f_i(\bm x)\le 0\},\ i=1,\dots,m,
+\qquad
+\Omega_{m+1} := \{\bm x : \bm A\bm x = \bm b\},
+\]
+and we assume a suitable \textbf{constraint qualification} (CQ).
+
+Let
+\[
+C \subseteq \{1,\dots,m\}
+\]
+be the set of \textbf{active constraints} at $\hat{\bm x}$:
+\[
+i\in C \iff f_i(\hat{\bm x}) = 0.
+\]
+Assume also
+\[
+\nabla f_i(\hat{\bm x}) \ne \bm 0,\quad i=1,\dots,m.
+\]
+
+Then
+\[
+-\nabla f_0(\hat{\bm x})
+\in \sum_{i\in C} N_{\Omega_i}(\hat{\bm x}) + N_{\Omega_{m+1}}(\hat{\bm x})
+\]
+is equivalent to the existence of multipliers $\lambda_i\ge 0$ ($i\in C$)
+and $\bm v\in\R^p$ such that
+
+\begin{theorembox}[title={}]
+\[
+-\nabla f_0(\hat{\bm x})
+= \sum_{i\in C} \lambda_i\,\nabla f_i(\hat{\bm x})
+  + \bm A^\top \bm v.
+\]
+\end{theorembox}
+
+The condition above is called the \textbf{KKT condition}
+(Karush–Kuhn–Tucker) for convex programming.
+
+\subsection{Subdifferential}
+
+\subsubsection{Definition}
+
+Recall the (gradient) subgradient inequality: if
+$f:\R^n\to\R\cup\{\infty\}$ is convex and differentiable at
+$\bm x\in\operatorname{dom}(f)$, then for all $\bm y\in\R^n$,
+\[
+f(\bm y) \ge f(\bm x) + \nabla f(\bm x)^\top(\bm y-\bm x).
+\]
+
+For a nonsmooth convex function (e.g. $f(x) = \max(x,0)$ at $x=0$), the
+gradient may not exist but we can still have affine lower bounds.
+
+\begin{factbox}[title={}]
+Let $f:\R^n\to\R\cup\{\infty\}$ be convex and
+$\bm x\in\operatorname{dom}(f)$. A vector $\bm g\in\R^n$ is called a
+\textbf{subgradient} of $f$ at $\bm x$ if
+\[
+f(\bm y) \ge f(\bm x) + \bm g^\top(\bm y-\bm x),
+\quad \forall\,\bm y\in\R^n.
+\]
+The set of all subgradients at $\bm x$ is the \textbf{subdifferential}
+of $f$ at $\bm x$, denoted
+\[
+\partial f(\bm x).
+\]
+
+\end{factbox}
+
+\subsubsection{Relative Interior}
+
+For a convex set $C\subseteq\R^n$, the (usual) interior is
+\[
+\operatorname{int}(C)
+= \{\bm x\in C : \exists r>0\ \text{s.t.}\ \mathbb B(\bm x,r)\subseteq C\}.
+\]
+
+Given $S\subseteq\R^n$, its \textbf{affine hull} is
+\[
+\operatorname{aff}(S)
+= \left\{
+\bm z : \exists\,\bm s_1,\dots,\bm s_m\in S,\ 
+\exists\,\lambda_1,\dots,\lambda_m\ \text{with }
+\sum_{i=1}^m\lambda_i=1,\
+\bm z = \sum_{i=1}^m\lambda_i\bm s_i
+\right\}.
+\]
+Moreover, there exist $\bm A\in\R^{m\times n}$ and $\bm b\in\R^m$ such that
+\[
+\operatorname{aff}(S) = \{\bm x : \bm A\bm x = \bm b\}.
+\]
+
+For a convex set $S\subseteq\R^n$, the \textbf{relative interior} is
+\[
+\operatorname{relint}(S)
+= \{\bm x\in S : \exists r>0\ \text{s.t.}\ 
+\mathbb B(\bm x,r)\cap \operatorname{aff}(S) \subseteq S\}.
+\]
+Intuitively, this is the interior of $S$ relative to the (possibly
+lower-dimensional) affine space $\operatorname{aff}(S)$.
+
+For any nonempty convex set $S\subseteq\R^n$,
+\[
+\operatorname{relint}(S) \ne \varnothing.
+\]
+
+\begin{factbox}
+Let $f:\R^n\to\R\cup\{\infty\}$ be convex. Then:
+\begin{enumerate}
+  \item For all $\bm x\in\operatorname{dom}(f)$, the subdifferential
+        $\partial f(\bm x)$ is a closed, convex set.
+  \item For all
+        $\bm x\in\operatorname{relint}(\operatorname{dom}(f))$,
+        the subdifferential is nonempty:
+        \[
+        \partial f(\bm x)\ne\varnothing.
+        \]
+  \item If $\bm x\in\operatorname{int}(\operatorname{dom}(f))$,
+        then $\partial f(\bm x)$ is bounded; hence it is convex,
+        compact, and nonempty.
+  \item If $\bm x\in\operatorname{int}(\operatorname{dom}(f))$, then
+        $f$ is differentiable at $\bm x$ if and only if
+        \[
+        \partial f(\bm x) = \{\nabla f(\bm x)\}.
+        \]
+\end{enumerate}
+\end{factbox}
+
+\begin{examplebox}
+\textbf{Why use relative interior?}
+
+Consider
+\[
+f(x) =
+\begin{cases}
+-\sqrt{1-x^2}, & x\in[-1,1],\\[0.3em]
+\infty, & \text{otherwise}.
+\end{cases}
+\]
+Then $\partial f(x) = \varnothing$ at the endpoints $x=\pm 1$, even
+though $f$ is convex. These points lie on the boundary of
+$\operatorname{dom}(f)$, outside the relative interior.
+\end{examplebox}
+
+\begin{theorembox}
+Let $f:\R^n\to\R\cup\{\infty\}$ be convex and
+$\bm x\in\operatorname{dom}(f)$. Then
+\[
+\bm x \in \argmin f
+\quad\Longleftrightarrow\quad
+\bm 0 \in \partial f(\bm x).
+\]
+\end{theorembox}
+
+\begin{proofbox}
+We have
+\[
+\bm x\text{ is a global minimizer}
+\quad\Longleftrightarrow\quad
+f(\bm y)\ge f(\bm x),\ \forall \bm y\in\R^n.
+\]
+This is equivalent to
+\[
+f(\bm y)\ge f(\bm x) + \bm 0^\top(\bm y-\bm x),
+\quad \forall\bm y\in\R^n,
+\]
+which is exactly the condition $\bm 0\in\partial f(\bm x)$.
+\end{proofbox}
+
+\begin{factbox}[title={}]
+\textbf{Terminology.}
+A convex function $f:\R^n\to\R\cup\{\infty\}$ is called \emph{proper} if
+$\operatorname{dom}(f)\ne\varnothing$.
+\end{factbox}
+
+\subsection{Epigraphs}
+
+For $f:\R^n\to\R\cup\{\infty\}$, the \textbf{epigraph} of $f$ is
+\[
+\operatorname{epi}(f)
+= \{(\bm x,y)\in\R^n\times\R : y\ge f(\bm x)\}.
+\]
+We say that $f$ is \textbf{closed} if $\operatorname{epi}(f)$ is a
+closed set.
+
+\begin{examplebox}
+Let
+\[
+f(x) =
+\begin{cases}
+-\ln x, & x>0,\\[0.3em]
+\infty, & x\le 0.
+\end{cases}
+\]
+Here $\operatorname{dom}(f) = (0,\infty)$ is not closed, but
+$\operatorname{epi}(f)$ is closed. Conversely, a closed domain does not
+guarantee a closed epigraph.
+\end{examplebox}
+
+\begin{factbox}
+A proper convex function with closed epigraph is often called
+\textbf{lower semicontinuous (lsc)} or a \emph{closed convex function}.
+If $f:\R^n\to\R$ is (finite-valued) convex, then $f$ is automatically
+proper and closed.
+\end{factbox}
+
+\begin{theorembox}
+A convex function $f$ is closed if and only if each level set
+\[
+\{\bm x : f(\bm x)\le \beta\},\quad \beta\in\R,
+\]
+is a closed set.
+\end{theorembox}
+
+\begin{theorembox}
+If $f,g:\R^n\to\R$ are closed (finite-valued) convex functions, then
+their sum $f+g$ is also closed.
+\end{theorembox}
+
+\begin{theorembox}
+Let $f_1,f_2:\R^n\to\R\cup\{\infty\}$ be convex, closed, and proper.
+Assume
+\[
+\operatorname{relint}(\operatorname{dom}(f_1))
+\ \cap\
+\operatorname{relint}(\operatorname{dom}(f_2))
+\ne \varnothing.
+\]
+Then for all
+$\bm x\in\operatorname{dom}(f_1)\cap\operatorname{dom}(f_2)$,
+\[
+\partial f_1(\bm x)
+\ +\ \partial f_2(\bm x)
+= \partial(f_1+f_2)(\bm x),
+\]
+where $+$ denotes the Minkowski sum of sets.
+\end{theorembox}
+
+\begin{factbox}
+The relative-interior intersection condition above acts as a type of
+\textbf{constraint qualification} for subdifferentials of sums.
+\end{factbox}
+
+\subsection{Indicator Function}
+
+\begin{examplebox}
+\textbf{Indicator of an interval.}
+
+Let
+\[
+f(x) =
+\begin{cases}
+0, & x\in[0,1],\\[0.3em]
+\infty, & x\notin[0,1].
+\end{cases}
+\]
+This is the \textbf{indicator function} of $[0,1]$, denoted
+$\mathbb I_{[0,1]}(x)$.
+\end{examplebox}
+
+\begin{claimbox}
+For the interval $[0,1]$,
+\[
+\partial \mathbb I_{[0,1]}(1) = [0,\infty).
+\]
+\end{claimbox}
+
+\begin{theorembox}
+Let $\Omega\subseteq\R^n$ be nonempty, closed, and convex. The indicator
+function
+\[
+\mathbb I_{\Omega}(\bm x) =
+\begin{cases}
+0, & \bm x\in\Omega,\\[0.3em]
+\infty, & \bm x\notin\Omega,
+\end{cases}
+\]
+is proper, closed, and convex. Moreover, for all $\bm x\in\Omega$,
+\[
+\partial \mathbb I_{\Omega}(\bm x) = N_{\Omega}(\bm x),
+\]
+the normal cone of $\Omega$ at $\bm x$.
+\end{theorembox}
+
+\begin{proofbox}
+\textbf{Proper:} Since $\Omega\ne\varnothing$, we have
+$\operatorname{dom}(\mathbb I_{\Omega}) = \Omega\ne\varnothing$.
+
+\medskip
+
+\textbf{Convex:} For any $\bm x_1,\bm x_2\in\R^n$ and
+$\lambda\in[0,1]$, convexity follows by checking cases depending on
+whether $\bm x_1$ and $\bm x_2$ lie in $\Omega$.
+
+\medskip
+
+\textbf{Closed:} The epigraph is
+\[
+\operatorname{epi}(\mathbb I_{\Omega})
+= \{(\bm x,y) : \bm x\in\Omega,\ y\ge 0\}
+= \Omega\times[0,\infty),
+\]
+which is closed because $\Omega$ is closed.
+
+\medskip
+
+\textbf{Subdifferential equals normal cone.}
+
+\emph{First inclusion: $\partial \mathbb I_{\Omega}(\bm x)\subseteq N_{\Omega}(\bm x)$.}
+
+Let $\bm g\in\partial \mathbb I_{\Omega}(\bm x)$. Then, by definition,
+\[
+\mathbb I_{\Omega}(\bm y)
+\ge \mathbb I_{\Omega}(\bm x) + \bm g^\top(\bm y-\bm x),
+\quad\forall\,\bm y\in\R^n.
+\]
+For $\bm y\in\Omega$, both sides are finite and
+\[
+0 = \mathbb I_{\Omega}(\bm y)
+\ge 0 + \bm g^\top(\bm y-\bm x),
+\]
+so $\bm g^\top(\bm y-\bm x)\le 0$ for all $\bm y\in\Omega$, which means
+$\bm g\in N_{\Omega}(\bm x)$.
+
+\medskip
+
+\emph{Second inclusion: $N_{\Omega}(\bm x)\subseteq \partial \mathbb I_{\Omega}(\bm x)$.}
+
+Take $\bm v\in N_{\Omega}(\bm x)$, so
+\[
+\bm v^\top(\bm y-\bm x)\le 0,\quad\forall\,\bm y\in\Omega.
+\]
+For $\bm y\in\Omega$,
+\[
+\mathbb I_{\Omega}(\bm y) = 0
+\ge 0 + \bm v^\top(\bm y-\bm x)
+= \mathbb I_{\Omega}(\bm x) + \bm v^\top(\bm y-\bm x).
+\]
+For $\bm y\notin\Omega$, we have $\mathbb I_{\Omega}(\bm y)=\infty$, so the
+inequality
+\[
+\mathbb I_{\Omega}(\bm y)
+\ge \mathbb I_{\Omega}(\bm x) + \bm v^\top(\bm y-\bm x)
+\]
+holds trivially. Thus $\bm v\in\partial \mathbb I_{\Omega}(\bm x)$.
+
+Combining both inclusions gives
+$\partial \mathbb I_{\Omega}(\bm x)=N_{\Omega}(\bm x)$.
+\end{proofbox}
+
+\newpage
+
+\subsection{Rederiving the Normal-Cone Optimality Condition}
+
+\begin{theorembox}
+Let $f:\R^n\to\R\cup\{\infty\}$ be differentiable on a neighborhood of
+$\Omega$, where $\Omega\subseteq\R^n$ is closed and convex. Then
+\[
+\bm x\in\argmin\{f(\bm x):\bm x\in\Omega\}
+\]
+if and only if
+\[
+-\nabla f(\bm x) \in N_{\Omega}(\bm x).
+\]
+\end{theorembox}
+
+\begin{proofbox}
+We can rewrite the constrained problem as unconstrained:
+\[
+\min_{\bm x\in\Omega} f(\bm x)
+\quad\Longleftrightarrow\quad
+\min_{\bm x} \bigl(f(\bm x) + \mathbb I_{\Omega}(\bm x)\bigr).
+\]
+
+Thus
+\[
+\bm x\in\argmin\{f(\bm x):\bm x\in\Omega\}
+\quad\Longleftrightarrow\quad
+\bm x\in\argmin\{f(\bm x)+\mathbb I_{\Omega}(\bm x)\}.
+\]
+By the subgradient optimality condition,
+\[
+\bm x\text{ minimizer}
+\quad\Longleftrightarrow\quad
+\bm 0\in\partial\bigl(f+\mathbb I_{\Omega}\bigr)(\bm x).
+\]
+
+Assuming
+\[
+\operatorname{relint}(\operatorname{dom} f)
+\cap
+\operatorname{relint}(\operatorname{dom} \mathbb I_{\Omega})
+\neq\varnothing,
+\]
+we can apply the subdifferential sum rule:
+\[
+\partial\bigl(f+\mathbb I_{\Omega}\bigr)(\bm x)
+= \partial f(\bm x) + \partial\mathbb I_{\Omega}(\bm x).
+\]
+Since $f$ is differentiable at $\bm x$,
+\[
+\partial f(\bm x) = \{\nabla f(\bm x)\},
+\]
+and by the indicator theorem,
+\[
+\partial \mathbb I_{\Omega}(\bm x) = N_{\Omega}(\bm x).
+\]
+
+Thus
+\[
+\bm 0\in\partial(f+\mathbb I_{\Omega})(\bm x)
+\quad\Longleftrightarrow\quad
+\bm 0 \in \{\nabla f(\bm x)\} + N_{\Omega}(\bm x)
+\quad\Longleftrightarrow\quad
+-\nabla f(\bm x)\in N_{\Omega}(\bm x).
+\]
+\end{proofbox}

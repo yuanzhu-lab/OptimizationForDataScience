@@ -1,0 +1,344 @@
+\section{Lec 3}
+
+\subsection{Quadratic Functions}
+
+\subsubsection{The Minimizer}
+
+Given $\bm H\in \Sbb^n$, $\bm g\in \R^n$, $d\in \R$, consider
+\[
+f(\bm x)
+= \frac12 \bm x^{\top}\bm H\bm x
++ \bm g^{\top}\bm x
++ d.
+\]
+
+\begin{theorembox}
+The function $f$ is bounded below and has a minimizer if and only if:
+\begin{enumerate}[label=\alph*)]
+  \item $\bm H$ is positive semidefinite, and
+  \item $\bm g \in \operatorname{Range}(\bm H)$.
+\end{enumerate}
+In this case, any solution of
+\[
+\bm H\bm x = -\bm g
+\]
+is a minimizer.
+\end{theorembox}
+
+\begin{factbox}
+\textbf{Contrapositive Theorem.}  
+If $\bm H$ is not positive semidefinite, or $\bm H$ is positive semidefinite and
+$\bm g\notin \operatorname{Range}(\bm H)$, then $f$ is unbounded below.
+\end{factbox}
+
+\subsubsection{Proof of the Contrapositive}
+
+\begin{proofbox}
+\textbf{Case 1: (a) fails: $\bm H$ is not positive semidefinite.}
+
+Then there exists $\bm z\in \R^n$ such that
+\[
+\bm z^{\top}\bm H\bm z < 0.
+\]
+Define the univariate function
+\[
+q(t) = f(t\bm z)
+= \frac12 t^2 \bm z^{\top}\bm H\bm z + t\,\bm g^{\top}\bm z + d.
+\]
+This is a quadratic function in $t$ with \emph{negative} leading coefficient
+$\frac12 \bm z^{\top}\bm H\bm z < 0$, so $q(t)$ attains arbitrarily negative values as $t\to \pm\infty$. Therefore $f$ has no lower bound and has no minimizer.
+
+\bigskip
+
+\textbf{Case 2: (a) holds but (b) fails: $\bm H$ is positive semidefinite and $\bm g\notin \operatorname{Range}(\bm H)$.}
+
+By the Fundamental Theorem of Linear Algebra for symmetric $\bm H$,
+\[
+\R^n = \operatorname{Range}(\bm H) \oplus \operatorname{Null}(\bm H),
+\]
+with $\operatorname{Range}(\bm H) \perp \operatorname{Null}(\bm H)$. Thus there exist
+\[
+\bm g_1 \in \operatorname{Range}(\bm H),\quad
+\bm g_2 \in \operatorname{Null}(\bm H)
+\]
+such that
+\[
+\bm g = \bm g_1 + \bm g_2,
+\quad
+\bm g_1^{\top}\bm g_2 = 0.
+\]
+
+Define
+\[
+q(t) := f(t\bm g_2).
+\]
+Since $\bm H\bm g_2 = \0$ (because $\bm g_2\in \operatorname{Null}(\bm H)$), we have
+\[
+\begin{aligned}
+q(t)
+&= \frac12 t^2 \bm g_2^{\top}\bm H\bm g_2
+   + t\,\bm g^{\top}\bm g_2 + d \\
+&= t\,\bm g^{\top}\bm g_2 + d.
+\end{aligned}
+\]
+Next,
+\[
+\bm g^{\top}\bm g_2
+= (\bm g_1 + \bm g_2)^{\top}\bm g_2
+= \bm g_2^{\top}\bm g_2 > 0,
+\]
+because $\bm g\notin \operatorname{Range}(\bm H)\Rightarrow\bm g\neq \bm g_1\Rightarrow \bm g_2\neq \0$.
+
+Hence $q(t)$ is a linear function of $t$ with positive slope. Therefore
+\[
+q(t)\to -\infty \quad\text{as}\quad t\to -\infty,
+\]
+so $f$ is unbounded below.
+\end{proofbox}
+
+\subsection{Linear Least Squares}
+
+\subsubsection{Norms}
+
+For $\bm x\in \R^n$, the Euclidean norm (or $2$-norm) is
+\[
+\|\bm x\| = \sqrt{x(1)^2 + \cdots + x(n)^2}.
+\]
+
+A \textbf{norm} $\|\cdot\|$ on $\R^n$ satisfies, for all $\bm x,\bm y\in \R^n$ and all $\lambda\in \R$:
+\begin{enumerate}
+  \item Positivity:
+  \[
+  \|\bm x\| > 0 \text{ for } \bm x\neq \0,
+  \quad\text{and}\quad
+  \|\bm x\| = 0 \Rightarrow \bm x = \0.
+  \]
+  \item Positive 1-homogeneity:
+  \[
+  \|\lambda \bm x\| = |\lambda|\cdot \|\bm x\|.
+  \]
+  \item Triangle inequality:
+  \[
+  \|\bm x + \bm y\|
+  \le \|\bm x\| + \|\bm y\|.
+  \]
+\end{enumerate}
+
+\subsubsection{Linear Least Squares (LLS)}
+
+Given $\bm A\in \R^{m\times n}$ and $\bm y\in \R^m$, we want $\bm x\in \R^n$ to solve
+\[
+\min_{\bm x}\; \|\bm A\bm x - \bm y\|.
+\]
+This is equivalent to
+\[
+\min_{\bm x}\; \|\bm A\bm x - \bm y\|^2
+\quad\text{or}\quad
+\min_{\bm x}\; \frac12 \|\bm A\bm x - \bm y\|^2.
+\]
+
+Compute:
+\[
+\begin{aligned}
+\frac12 \|\bm A\bm x - \bm y\|^2
+&= \frac12 (\bm A\bm x - \bm y)^{\top}(\bm A\bm x - \bm y)\\
+&= \frac12\bigl(\bm x^{\top}\bm A^{\top} - \bm y^{\top}\bigr)
+   (\bm A\bm x - \bm y)\\
+&= \frac12 \bm x^{\top}\bm A^{\top}\bm A\bm x
+   - \frac12 \bm y^{\top}\bm A\bm x
+   - \frac12 \bm x^{\top}\bm A^{\top}\bm y
+   + \frac12 \bm y^{\top}\bm y\\
+&= \frac12 \bm x^{\top}\bm A^{\top}\bm A\bm x
+   - \bm y^{\top}\bm A\bm x
+   + \frac12 \bm y^{\top}\bm y,
+\end{aligned}
+\]
+since $\bm x^{\top}\bm A^{\top}\bm y = \bm y^{\top}\bm A\bm x$ (both scalars).
+
+This is a quadratic function in $\bm x$ with
+\[
+\bm H := \bm A^{\top}\bm A,\quad
+\bm g := -\bm A^{\top}\bm y,\quad
+d := \frac12 \bm y^{\top}\bm y.
+\]
+
+\begin{theorembox}
+For all $\bm A\in \R^{m\times n}$, the matrix $\bm A^{\top}\bm A$ is positive semidefinite.
+\end{theorembox}
+
+\begin{proofbox}
+\[
+\bm x^{\top}\bm A^{\top}\bm A\bm x
+= (\bm A\bm x)^{\top}\bm A\bm x
+= \|\bm A\bm x\|^2 \ge 0,\quad \forall \bm x\in \R^n.
+\]
+\end{proofbox}
+
+\begin{theorembox}
+For all $\bm A\in \R^{m\times n}$ and all $\bm y\in \R^m$,
+\[
+\bm A^{\top}\bm y \in \operatorname{Range}(\bm A^{\top}\bm A).
+\]
+\end{theorembox}
+
+\begin{proofbox}
+\textbf{(Idea.)}  
+Otherwise, by the quadratic theorem for
+\[
+\frac12\|\bm A\bm x - \bm y\|^2
+= \frac12 \bm x^{\top}\bm A^{\top}\bm A\bm x
+  - \bm y^{\top}\bm A\bm x
+  + \frac12 \bm y^{\top}\bm y,
+\]
+the objective would be unbounded below, contradicting the fact that squared norms are always nonnegative. Therefore a minimizer exists and must satisfy
+\[
+\bm A^{\top}\bm A\bm x = \bm A^{\top}\bm y.
+\]
+\end{proofbox}
+
+This system is called the \textbf{system of normal equations}. The solution is unique if $\bm A^{\top}\bm A$ is positive definite.
+
+\begin{theorembox}
+For $\bm A\in \R^{m\times n}$, the following are equivalent:
+\[
+\bm A^{\top}\bm A \text{ is positive definite}
+\;\Longleftrightarrow\;
+\bm A^{\top}\bm A \text{ is nonsingular}
+\;\Longleftrightarrow\;
+\operatorname{rank}(\bm A) = n.
+\]
+\end{theorembox}
+
+\begin{proofbox}
+\textbf{(Sketch.)}  
+If $\operatorname{rank}(\bm A)=n$, the columns of $\bm A$ are independent, so
+\[
+\bm A\bm x \neq \0 \quad \forall \bm x\neq \0.
+\]
+Hence
+\[
+\bm x^{\top}\bm A^{\top}\bm A\bm x
+= \|\bm A\bm x\|^2 > 0 \quad \forall \bm x\neq \0,
+\]
+so $\bm A^{\top}\bm A$ is positive definite and thus nonsingular. The other implications follow from standard linear algebra facts about positive definite and nonsingular matrices.
+\end{proofbox}
+
+\subsection{Orthogonal Matrices}
+
+Recall: if $\bm x^{\top}\bm y=0$, we say $\bm x$ and $\bm y$ are \textbf{orthogonal}.
+
+If $\{\bm x_1,\dots,\bm x_k\}$ is an orthonormal set with
+\[
+\bm x_i^{\top}\bm x_j = \delta_{ij},
+\]
+and $\bm U$ is the matrix having these vectors as columns, then
+\[
+\bm U^{\top}\bm U = \I,\quad \operatorname{rank}(\bm U)=k\le n.
+\]
+
+If $\bm Q\in \R^{n\times n}$ is square and satisfies
+\[
+\bm Q^{\top}\bm Q = \I,
+\]
+then $\bm Q$ is an \textbf{orthogonal matrix}. In this case,
+\[
+\bm Q^{-1} = \bm Q^{\top},
+\]
+and the rows of $\bm Q$ are also orthonormal.
+
+\begin{factbox}
+\begin{itemize}
+  \item If $\bm Q$ is orthogonal, then $\bm Q^{\top}$ is also orthogonal.
+  \item If $\bm Q_1, \bm Q_2$ are orthogonal, then $\bm Q_1\bm Q_2$ is orthogonal as well.  
+        (The set
+        \[
+        O(n) = \{\bm Q\in \R^{n\times n}: \bm Q^{\top}\bm Q = \I\}
+        \]
+        is a \emph{Lie group}.)
+  \item For any orthogonal $\bm Q$ and any $\bm x\in \R^n$,
+        \[
+        \|\bm Q\bm x\| = \|\bm x\|.
+        \]
+\end{itemize}
+\end{factbox}
+
+Orthogonal matrices represent rotations or reflections.
+
+\newpage
+
+\subsection{Eigendecomposition}
+
+\subsubsection{Spectral Theorem}
+
+\begin{theorembox}
+For any $\bm A\in \Sbb^n$, there exists an orthogonal matrix $\bm Q$ and a diagonal matrix $\bm D$ such that
+\[
+\bm A = \bm Q \bm D \bm Q^{\top}.
+\]
+The diagonal entries of $\bm D$ are the eigenvalues of $\bm A$ (unique up to ordering), and the columns of $\bm Q$ are the corresponding eigenvectors.
+
+Equivalently,
+\[
+\bm A = \bm Q \bm D \bm Q^{\top} \Longleftrightarrow \bm A \bm Q = \bm Q \bm D.
+\]
+\end{theorembox}
+
+\subsubsection{Characterizations of Positive Semidefiniteness}
+
+\begin{theorembox}
+For $\bm A\in \Sbb^n$, the following are equivalent:
+\begin{enumerate}
+  \item $\bm A$ is positive semidefinite.
+  \item All eigenvalues of $\bm A$ are $\ge 0$.
+  \item There exists a matrix $\bm G$ such that $\bm A = \bm G\bm G^{\top}$.
+\end{enumerate}
+\end{theorembox}
+
+\subsubsection{Characterizations of Positive Definiteness}
+
+\begin{theorembox}
+For $\bm A\in \Sbb^n$, the following are equivalent:
+\begin{enumerate}
+  \item $\bm A$ is positive definite.
+  \item All eigenvalues of $\bm A$ are $>0$.
+  \item There exists a matrix $\bm G$ such that $\bm A = \bm G\bm G^{\top}$ and $\operatorname{rank}(\bm G) = n$.
+\end{enumerate}
+\end{theorembox}
+
+\medskip
+
+\begin{factbox}[title={}]
+\textbf{Notation.}
+\begin{itemize}
+  \item $\bm A \succeq \bm B$ means $\bm A - \bm B$ is positive semidefinite.
+  \item $\bm A \succ \bm B$ means $\bm A - \bm B$ is positive definite.
+  \item $\Spp$ denotes the set of positive semidefinite matrices.
+  \item $\mathbb S_{++}^n$ denotes the set of positive definite matrices.
+\end{itemize}
+\end{factbox}
+
+\subsection{Topology Review}
+
+Point-set topology of $\R^n$.
+
+The \textbf{open ball} of radius $r>0$ around $\bm x\in \R^n$ is
+\[
+\mathbb B(\bm x,r) = \{\bm y\in \R^n : \|\bm y - \bm x\| < r\}.
+\]
+
+The \textbf{closed ball} of radius $r>0$ around $\bm x\in \R^n$ is
+\[
+\overline{\mathbb B}(\bm x,r) = \{\bm y\in \R^n : \|\bm y - \bm x\| \le r\}.
+\]
+
+\begin{factbox}
+\begin{itemize}
+  \item A set $S\subseteq \R^n$ is \textbf{open} if for every $\bm x\in S$ there exists $r>0$ such that
+        \[
+        \mathbb B(\bm x,r) \subseteq S.
+        \]
+  \item A set $S\subseteq \R^n$ is \textbf{closed} if every convergent sequence in $S$ has its limit in $S$.
+\end{itemize}
+\end{factbox}
+
+A set that contains only part of its boundary is, in general, neither open nor closed.

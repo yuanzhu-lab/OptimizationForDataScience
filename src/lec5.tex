@@ -1,0 +1,382 @@
+\section{Lec 5}
+
+\subsection{$L$-smooth Functions}
+
+Given $\bm f:\Omega\to \R^m$, $\Omega\subseteq \R^n$, we say $\bm f$ is \textbf{Lipschitz continuous} with modulus $L$ if
+\[
+\|\bm f(\bm x)-\bm f(\bm y)\|
+\le L\|\bm x-\bm y\|,
+\quad \forall \bm x,\bm y\in \Omega.
+\]
+
+Given $f:\Omega\to \R$, we say $f$ is \textbf{$L$-smooth} (smooth with modulus $L$) if $f$ is differentiable and its gradient is $L$-Lipschitz continuous, i.e.,
+\[
+\|\nabla f(\bm x)-\nabla f(\bm y)\|
+\le L\|\bm x-\bm y\|,
+\quad \forall \bm x,\bm y\in \Omega.
+\]
+
+\begin{theorembox}[title={Lemma}]
+If $f$ is $L$-smooth and $\operatorname{dom}(f)$ is open and convex, then
+\[
+f(\bm y)
+\le f(\bm x)
++ \nabla f(\bm x)^{\top}(\bm y-\bm x)
++ \frac{L}{2}\|\bm x-\bm y\|^2,
+\quad \forall \bm x,\bm y\in \operatorname{dom}(f).
+\]
+\end{theorembox}
+
+\emph{(This looks like a Taylor expansion with a quadratic remainder term.)}
+
+\begin{proofbox}
+\[
+\begin{aligned}
+f(\bm y)-f(\bm x)
+&- \nabla f(\bm x)^{\top}(\bm y-\bm x)\\[0.3em]
+&=
+\left(\int_0^1
+  \nabla f(\bm x+\gamma(\bm y-\bm x))^{\top}
+  (\bm y-\bm x)\,\mathrm d\gamma
+\right)
+- \nabla f(\bm x)^{\top}(\bm y-\bm x)\\[0.3em]
+&=
+\int_0^1
+\bigl[\nabla f(\bm x+\gamma(\bm y-\bm x))
+      - \nabla f(\bm x)\bigr]^{\top}
+(\bm y-\bm x)\,\mathrm d\gamma\\[0.3em]
+&\le \int_0^1
+\bigl\|\nabla f(\bm x+\gamma(\bm y-\bm x))
+      - \nabla f(\bm x)\bigr\|
+\cdot \|\bm y-\bm x\|\,\mathrm d\gamma
+\quad (\text{Cauchy--Schwarz})\\[0.3em]
+&\le \int_0^1
+L\|\bm x+\gamma(\bm y-\bm x)-\bm x\|
+\cdot \|\bm y-\bm x\|\,\mathrm d\gamma
+\quad (\text{$L$-smoothness})\\[0.3em]
+&=
+\int_0^1 L\gamma \|\bm y-\bm x\|^2\,\mathrm d\gamma\\[0.3em]
+&=
+L\|\bm y-\bm x\|^2 \int_0^1 \gamma\,\mathrm d\gamma\\[0.3em]
+&=
+\frac12 L\|\bm y-\bm x\|^2.
+\end{aligned}
+\]
+Rearranging gives the desired inequality.
+\end{proofbox}
+
+\subsection{Necessary and Sufficient Conditions for Optimality}
+
+\subsubsection{First-order Necessary Condition}
+
+\begin{theorembox}
+Let $f:\Omega\to \R$ be differentiable at a point $\bm x^*\in \Omega$, and assume that $\bm x^*$ is an interior point of $\Omega$ and a local minimizer of $f$. Then
+\[
+\nabla f(\bm x^*) = \0.
+\]
+\end{theorembox}
+
+\begin{proofbox}
+\textbf{(Contrapositive.)}  
+Assume $\nabla f(\bm x^*)\neq \0$. Let
+\[
+\bm p := -\nabla f(\bm x^*).
+\]
+By the definition of differentiability, there exists a function $\phi_{\bm x^*}$ such that, for all $|\alpha|$ sufficiently small,
+\[
+f(\bm x^*+\alpha \bm p)
+= f(\bm x^*) + \alpha\,\nabla f(\bm x^*)^{\top}\bm p
++ \phi_{\bm x^*}(\alpha \bm p),
+\]
+and
+\[
+\frac{\phi_{\bm x^*}(\alpha \bm p)}{\|\alpha \bm p\|}
+\to 0
+\quad\Leftrightarrow\quad
+\frac{\phi_{\bm x^*}(\alpha \bm p)}{|\alpha|}
+\to 0
+\quad\text{as } \alpha\to 0.
+\]
+
+Since $\bm p = -\nabla f(\bm x^*)$,
+\[
+f(\bm x^*+\alpha \bm p)
+= f(\bm x^*)
+  - \alpha \|\nabla f(\bm x^*)\|^2
+  + \phi_{\bm x^*}(\alpha \bm p).
+\]
+
+Because $\|\bm p\|>0$ and
+\(
+\phi_{\bm x^*}(\alpha \bm p)/|\alpha| \to 0,
+\)
+there exists $\bar\alpha>0$ such that
+\[
+\frac{\|\phi_{\bm x^*}(\alpha \bm p)\|}
+     {|\alpha|\|\bm p\|}
+\le \frac{\|\bm p\|}{2},
+\quad \forall |\alpha|\le \bar\alpha.
+\]
+
+For such $\alpha\in (0,\bar\alpha]$,
+\[
+\begin{aligned}
+f(\bm x^*+\alpha \bm p)
+&\le f(\bm x^*)
+   - \alpha \|\nabla f(\bm x^*)\|^2
+   + \frac{\|\bm p\|}{2}\,|\alpha|\,\|\bm p\|\\[0.3em]
+&= f(\bm x^*)
+   - \frac{\alpha}{2}\|\bm p\|^2\\[0.3em]
+&< f(\bm x^*).
+\end{aligned}
+\]
+Thus $f$ strictly decreases in direction $\bm p$ away from $\bm x^*$, so $\bm x^*$ cannot be a local minimizer.
+\end{proofbox}
+
+\subsubsection{Second-order Necessary Condition}
+
+\begin{theorembox}
+Suppose $f$ is $\mathcal C^2$ at $\bm x^*\in \Omega$, and $\bm x^*$ is a local minimizer. Then
+\[
+\nabla f(\bm x^*) = \0
+\quad\text{and}\quad
+\nabla^2 f(\bm x^*) \succeq \0
+\text{ (positive semidefinite)}.
+\]
+\end{theorembox}
+
+\begin{proofbox}
+\textbf{(Contrapositive idea.)}  
+We already know from Theorem~1 that a local minimizer must satisfy $\nabla f(\bm x^*) = \0$. Now assume $\nabla f(\bm x^*) = \0$ but $\nabla^2 f(\bm x^*)$ is not positive semidefinite. Then there exists $\bm p$ such that
+\[
+\bm p^{\top}\nabla^2 f(\bm x^*)\bm p < 0.
+\]
+
+By the second-order Taylor expansion,
+\[
+f(\bm x^*+\alpha \bm p)
+= f(\bm x^*)
+  + \alpha\,\nabla f(\bm x^*)^{\top}\bm p
+  + \frac12 \alpha^2 \bm p^{\top}\nabla^2 f(\bm x^*)\bm p
+  + \psi_{\bm x^*}(\alpha \bm p),
+\]
+and we know
+\[
+\frac{\psi_{\bm x^*}(\alpha \bm p)}{\alpha^2}
+\to 0 \quad\text{as } \alpha\to 0.
+\]
+
+Choose $\bar\alpha>0$ sufficiently small such that
+\[
+\frac{|\psi_{\bm x^*}(\alpha \bm p)|}{\alpha^2}
+\le \frac14 \bigl|\bm p^{\top}\nabla^2 f(\bm x^*)\bm p\bigr|,
+\quad \forall \alpha\in (0,\bar\alpha].
+\]
+
+Using $\nabla f(\bm x^*)=\0$, we get for all $\alpha\in (0,\bar\alpha]$,
+\[
+\begin{aligned}
+f(\bm x^*+\alpha \bm p)
+&\le f(\bm x^*)
+   + \frac12 \alpha^2 \bm p^{\top}\nabla^2 f(\bm x^*)\bm p
+   + \frac14 \alpha^2 \bigl|\bm p^{\top}\nabla^2 f(\bm x^*)\bm p\bigr|\\[0.3em]
+&= f(\bm x^*)
+   - \frac12 \alpha^2 \bigl|\bm p^{\top}\nabla^2 f(\bm x^*)\bm p\bigr|
+   + \frac14 \alpha^2 \bigl|\bm p^{\top}\nabla^2 f(\bm x^*)\bm p\bigr|\\[0.3em]
+&= f(\bm x^*)
+   - \frac{\alpha^2}{4}\bigl|\bm p^{\top}\nabla^2 f(\bm x^*)\bm p\bigr|\\[0.3em]
+&< f(\bm x^*),
+\end{aligned}
+\]
+so $\bm x^*$ is not a local minimizer.
+\end{proofbox}
+
+\begin{examplebox}
+\textbf{(Quadratic and Least Squares.)}
+
+Let
+\[
+f(\bm x)
+= \frac12 \bm x^{\top} \bm H\bm x
+  + \bm g^{\top}\bm x
+  + d.
+\]
+Then
+\[
+\nabla f(\bm x)
+=  \bm H\bm x + \bm g,
+\]
+and
+\[
+\nabla f(\bm x) = \0
+\Longleftrightarrow
+ \bm H\bm x + \bm g = \0
+\Longleftrightarrow
+ \bm H\bm x = -\bm g.
+\]
+Also,
+\[
+\nabla^2 f(\bm x) =  \bm H,
+\]
+so
+\[
+\nabla^2 f(\bm x)\text{ is positive semidefinite}
+\Longleftrightarrow
+ \bm H \text{ is positive semidefinite}.
+\]
+For quadratics, these conditions are \textbf{necessary and sufficient} for optimality.
+
+For linear least squares
+\[
+f(\bm x) = \frac12 \|\bm A\bm x - \bm y\|^2,
+\]
+we have
+\[
+\nabla f(\bm x) =  \bm A^{\top}(\bm A\bm x-\bm y),
+\quad
+\nabla^2 f(\bm x) =  \bm A^{\top} \bm A.
+\]
+\end{examplebox}
+
+\subsubsection{Second-order Sufficient Condition}
+
+\begin{theorembox}
+Let $f:\Omega\to \R$, $\Omega\subseteq \R^n$. Suppose $\bm x^*\in \operatorname{int}(\Omega)$, $f$ is $\mathcal C^2$ at $\bm x^*$, $\nabla f(\bm x^*)=\0$, and
+\[
+\nabla^2 f(\bm x^*) \succ \0.
+\]
+Then $\bm x^*$ is a \textbf{strict local minimizer} of $f$.
+\end{theorembox}
+
+\begin{proofbox}
+\begin{theorembox}[title={Lemma}]
+If $\bm U\succ  \0$, then there exists $r>0$ such that
+\[
+\bm V\succ \0,\quad \forall \bm V\in \mathbb B(\bm U,r),
+\]
+where $\mathbb B(\bm U,r)\subseteq \Sbb^n$ is the Frobenius-norm ball:
+\[
+\| \bm X\|_F
+= \sqrt{\sum_{i=1}^n \sum_{j=1}^n X(i,j)^2}.
+\]
+Equivalently, the set of positive definite matrices is an open subset of $\Sbb^n$.
+\end{theorembox}
+
+\begin{proofbox}
+\textbf{Proof of Lemma.}
+\begin{itemize}
+  \item The eigenvalues are continuous functions of the matrix entries.
+  \item If $\bm U\succ \0$, then $\lambda_{\min}(\bm U)>0$, where
+  \[
+  \lambda_{\min}(\bm U)
+  = \min_{\|\bm x\|=1} \bm x^{\top}\bm U\bm x.
+  \]
+\end{itemize}
+
+These imply that for sufficiently small $\bm\Delta\in \Sbb^n$,
+\[
+\begin{aligned}
+\lambda_{\min}(\bm U+\bm\Delta)
+&= \min_{\|\bm x\|=1}
+   \bm x^{\top}(\bm U+\bm\Delta)\bm x\\
+&\ge \min_{\|\bm x\|=1}
+   \bigl(\bm x^{\top}\bm U\bm x
+         - |\bm x^{\top}\bm\Delta\bm x|\bigr)\\
+&\ge \min_{\|\bm x\|=1} \bm x^{\top}\bm U\bm x
+    - \min_{\|\bm x\|=1}
+      \bigl(\|\bm x\|\,\|\bm\Delta\|_F\,\|\bm x\|\bigr)\\
+&= \lambda_{\min}(\bm U) - \|\bm\Delta\|_F\\[0.3em]
+&\ge \frac{\lambda_{\min}(\bm U)}{2}
+\quad\text{provided }\|\bm\Delta\|_F
+\le \frac{\lambda_{\min}(\bm U)}{2}.
+\end{aligned}
+\]
+Hence $\lambda_{\min}(\bm U+\bm\Delta)>0$, so $\bm U+\bm\Delta\succ \0$.
+\end{proofbox}
+
+\textbf{Proof of Theorem.}  
+Because $f$ is $\mathcal C^2$ at $\bm x^*$ and $\nabla^2 f(\bm x^*)\succ \0$, by the lemma there exists $\rho>0$ such that
+\[
+\mathbb B(\bm x^*,\rho)\subseteq \Omega
+\quad\text{and}\quad
+\nabla^2 f(\bm x)\succ \0,
+\quad \forall \bm x\in \mathbb B(\bm x^*,\rho).
+\]
+
+Choose any $\bm y\in \mathbb B(\bm x^*,\rho)\setminus\{\bm x^*\}$. By the second-order Taylor expansion, there exists $\gamma\in[0,1]$ such that
+\[
+f(\bm y)
+= f(\bm x^*)
+  + \nabla f(\bm x^*)^{\top}(\bm y-\bm x^*)
+  + \frac12 (\bm y-\bm x^*)^{\top}
+           \nabla^2 f(\bm x^*+\gamma(\bm y-\bm x^*))
+           (\bm y-\bm x^*).
+\]
+Since $\nabla f(\bm x^*)=\0$ and
+\[
+\nabla^2 f(\bm x^*+\gamma(\bm y-\bm x^*))\succ \0
+\quad\text{(as }\bm x^*+\gamma(\bm y-\bm x^*)\in \mathbb B(\bm x^*,\rho)),
+\]
+we have
+\[
+f(\bm y) > f(\bm x^*).
+\]
+Thus $\bm x^*$ is a strict local minimizer.
+\end{proofbox}
+
+\subsubsection{Summary of First- and Second-order Conditions}
+
+\begin{factbox}[title={Summary}]
+Let $f:\Omega\to \R$, $\Omega\subseteq \R^n$, and $\bm x^*\in \Omega$. Suppose $f$ is $\mathcal C^2$ at $\bm x^*$. Then we have the chain:
+\[
+\begin{aligned}
+&\nabla f(\bm x^*) = \0,\quad
+ \nabla^2 f(\bm x^*) \succ \0
+ \;\Rightarrow\;
+ \bm x^* \text{ is a strict local minimizer}\\
+&\Rightarrow\;
+ \bm x^* \text{ is a local minimizer}\\
+&\Rightarrow\;
+ \nabla f(\bm x^*) = \0,\quad
+ \nabla^2 f(\bm x^*) \succeq \0.
+\end{aligned}
+\]
+
+This chain of implications cannot be reversed in general.
+\end{factbox}
+
+\begin{examplebox}
+\begin{itemize}
+  \item $f(x)=x^4$:
+  \[
+  x^* = 0 \text{ is a strict local minimizer, but } f''(0) = 0 \text{ (not $>0$)}.
+  \]
+  \item $f(x)=1$:
+  \[
+  x^* = 0 \text{ is a local minimizer (in fact, every point is), but not a strict local minimizer}.
+  \]
+  \item $f(x)=x^3$:
+  \[
+  f'(0)=0,\ f''(0)=0,\ \text{but } x^*=0 \text{ is not a local minimizer}.
+  \]
+\end{itemize}
+\end{examplebox}
+
+\newpage
+
+\subsection{Convex Functions}
+
+Let $f:\Omega\to \R$, $\Omega\subseteq \R^n$, and assume $\Omega=\operatorname{dom}(f)$ is a convex set. We say $f$ is a \textbf{convex function} if
+\[
+\forall \bm x,\bm y\in \Omega,\ \forall \lambda\in [0,1],
+\]
+\[
+f\bigl((1-\lambda)\bm x + \lambda \bm y\bigr)
+\le (1-\lambda)f(\bm x) + \lambda f(\bm y).
+\]
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.9\textwidth]{src/img/ConvexFunction.png}
+  \caption*{}
+\end{figure}

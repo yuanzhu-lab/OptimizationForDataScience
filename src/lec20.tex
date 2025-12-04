@@ -1,0 +1,357 @@
+\section{Lec 20}
+
+\subsection{Singular Value Decomposition}
+
+Given $\bm A\in\R^{m\times n}$, we want a matrix $\tilde{\bm A}$ such that
+$\tilde{\bm A}\approx \bm A$ and $\operatorname{rank}(\tilde{\bm A})=r\ll\min(m,n)$.
+
+\begin{theorembox}
+\textbf{(SVD.)}
+
+For any matrix $\bm A\in\R^{m\times n}$, there exist orthogonal
+$\bm U\in\R^{m\times m}$, $\bm V\in\R^{n\times n}$ and a diagonal
+$\bm\Sigma\in\R^{m\times n}$ such that
+\[
+\bm A = \bm U\bm\Sigma\bm V^\top.
+\]
+
+The diagonal entries of $\bm\Sigma$, denoted
+$\sigma_1,\dots,\sigma_{\min(m,n)}$, are the \textbf{singular values}
+of $\bm A$ and satisfy
+\[
+\sigma_1 \ge \sigma_2 \ge \cdots \ge \sigma_{\min(m,n)} \ge 0.
+\]
+The singular values are uniquely determined by $\bm A$.
+\end{theorembox}
+
+Properties of the SVD:
+
+1. If $\sigma_1\ge\cdots\ge\sigma_r\ge 0$ and
+   $\sigma_{r+1}=\cdots=\sigma_{\min(m,n)}=0$, then
+   $\operatorname{rank}(\bm A)=r$.
+
+2. $\bm A=\bm U\bm\Sigma\bm V^\top \;\Longleftrightarrow\; \bm A^\top = \bm V\bm\Sigma^\top \bm U^\top$.
+
+3. If $\bm A=\bm U\bm\Sigma\bm V^\top$, then
+   \[
+   \bm A^\top \bm A = \bm V\bm\Sigma^\top \bm\Sigma \bm V^\top,
+   \]
+   where $\bm\Sigma^\top \bm\Sigma$ is square diagonal. Thus the singular
+   values of $\bm A$ are the square roots of the eigenvalues of $\bm A^\top \bm A$.
+
+4. If $\operatorname{rank}(\bm A)=r$, then
+   \[
+   \bm A
+   = \bm U(:,1\!:\!r)\,\bm\Sigma(1\!:\!r,1\!:\!r)\,\bm V(:,1\!:\!r)^\top
+   = \sum_{i=1}^r \bm U(:,i)\,\sigma_i\,\bm V(:,i)^\top,
+   \]
+   a sum of $r$ rank–$1$ matrices.
+
+5. If $\bm B := \bm Q\bm A\bm Z^\top$ with $\bm Q,\bm Z$ orthogonal and
+   $\bm A=\bm U\bm\Sigma\bm V^\top$ is an SVD, then
+   \[
+   \bm B = (\bm Q\bm U)\bm\Sigma(\bm V\bm Z)^\top
+   \]
+   is an SVD of $\bm B$. Hence $\bm A$ and $\bm B$ have the same singular values.
+
+6. If $\bm D$ is diagonal, then its singular values are the absolute values
+   of its diagonal entries, sorted in nonincreasing order.
+
+\begin{theorembox}
+\textbf{(Eckart–Young.)}
+
+Let $\bm A\in\R^{m\times n}$ and $0\le \rho\le \min(m,n)$. Then
+\[
+\min\bigl\{\|\bm A-\bm X\|_{\mathrm F} : \bm X\in\R^{m\times n},
+\ \operatorname{rank}(\bm X)\le \rho\bigr\}
+=
+\sqrt{\sigma_{\rho+1}^2+\cdots+\sigma_{\min(m,n)}^2},
+\]
+and a minimizer is
+\[
+\bm X
+=
+\bm U(:,1\!:\!\rho)\,\bm\Sigma(1\!:\!\rho,1\!:\!\rho)\,\bm V(:,1\!:\!\rho)^\top,
+\]
+where $\bm A=\bm U\bm\Sigma\bm V^\top$ is an SVD.
+\end{theorembox}
+
+\subsection{Latent Semantic Indexing}
+
+(Deerwester et al., 1990)
+
+Given a corpus of documents, form the \textbf{term–document matrix}
+$\bm A\in\R^{m\times n}$, where $m$ is the number of terms in the language
+and $n$ is the number of documents. The entry $\bm A(i,j)$ is the number of
+occurrences of term $i$ in document $j$ (after normalization).
+
+Compute the SVD of $\bm A$ and keep the rank–$\rho$ approximation
+\[
+\hat{\bm A}
+= \bm U(:,1\!:\!\rho)\,\bm\Sigma(1\!:\!\rho,1\!:\!\rho)\,\bm V(:,1\!:\!\rho)^\top,
+\]
+where $\rho$ is an estimate of the number of topics in the corpus.
+
+Given a query vector $\bm q\in\R^m$, the vector
+\[
+\bm q^\top \hat{\bm A} \in \R^n
+\]
+gives scores that can be interpreted as the relevance of each document
+to the query.
+
+\subsection{Matrix Completion Problem}
+
+Let $\bm M\in(\R\cup\{?\})^{m\times n}$ be a partially observed matrix. We
+want to fill in the missing entries “?” with numbers.
+
+\textbf{Application:} recommender systems.
+
+Rows of $\bm M$ correspond to users, columns to products, and $\bm M(i,j)$ is
+the rating user $i$ gives to product $j$. Most entries are missing;
+the vendor wants to predict missing entries to recommend products.
+
+A reasonable model: assume the completed $\bm M$ has low rank.
+
+Intuition: each user can be modeled as a linear combination of a small
+number of \emph{prototypical users} (unknown). If ratings are linear
+combinations of the ratings given by prototypical users, then the
+completed $\bm M$ will have rank equal to the number of prototypical users.
+
+Mathematical formulation:
+
+Find $\bm X\in\R^{m\times n}$ such that $\bm X(\Omega)=\bm M(\Omega)$, where
+\[
+\Omega = \{(i,j) : \bm M(i,j)\neq ?\},
+\]
+and subject to this constraint, $\operatorname{rank}(\bm X)$ is minimized.
+This problem is \textbf{NP-hard}.
+
+Candès and Recht showed that under certain assumptions on $\bm M$ and
+$\Omega$, the matrix $\bm X$ solving this NP-hard problem is also a solution
+of the convex optimization problem
+\[
+\min \|\bm X\|_{*}
+\quad\text{s.t.}\quad
+\bm X(\Omega)=\bm M(\Omega),
+\]
+where $\|\bm X\|_{*}$ is the \textbf{nuclear norm} of $\bm X$,
+\[
+\|\bm X\|_{*} = \sigma_1(\bm X)+\cdots+\sigma_{\min(m,n)}(\bm X).
+\]
+
+We check that this is (indeed) a norm.
+
+A norm $\|\cdot\|$ must satisfy:
+
+1. $\|\bm X\|\ge 0$ and $\|\bm X\|=0 \iff \bm X=\bm 0$.
+
+2. $\|\lambda \bm X\| = |\lambda|\,\|\bm X\|$ for all scalars $\lambda$.
+
+3. $\|\bm X+\bm Y\|\le \|\bm X\|+\|\bm Y\|$ (triangle inequality).
+
+\begin{theorembox}
+
+Let $\|\cdot\|_\square$ be a norm on $\R^m$ and
+$\|\cdot\|_\triangle$ a norm on $\R^n$. The
+\textbf{$\triangle\to\square$ operator norm} on $\R^{m\times n}$ is
+defined by
+\[
+\|\bm A\|_{\triangle\to\square}
+\defeq
+\sup\{\|\bm A\bm v\|_\square : \|\bm v\|_\triangle\le 1\}.
+\]
+This is a norm on $\R^{m\times n}$ (an \textbf{induced norm}).
+\end{theorembox}
+
+\begin{theorembox}
+
+For $\bm A\in\R^{m\times n}$, the largest singular value $\sigma_1(\bm A)$ is
+the operator norm induced by the Euclidean norm $\|\cdot\|_2$, i.e.
+\[
+\|\bm A\|_{2\to 2} = \sigma_1(\bm A).
+\]
+\end{theorembox}
+
+\begin{proofbox}
+
+We show that
+\[
+\sup_{\|\bm x\|_2\le 1} \|\bm A\bm x\|_2 = \sigma_1(\bm A).
+\]
+
+First, $\|\bm A\bm x\|_2 \le \sigma_1(\bm A)$ for all $\|\bm x\|_2\le 1$.
+
+Let $\bm A=\bm U\bm\Sigma\bm V^\top$ be an SVD. For any $\bm x$ with $\|\bm x\|_2\le 1$,
+\[
+\|\bm A\bm x\|_2 = \|\bm U\bm\Sigma\bm V^\top\bm x\|_2 = \|\bm\Sigma \bm V^\top\bm x\|_2,
+\]
+since orthogonal matrices preserve the $2$-norm. Let
+$\bm w = \bm V^\top\bm x$. Then $\|\bm w\|_2 = \|\bm x\|_2\le 1$, and if
+$m\ge n$,
+\[
+\|\bm\Sigma\bm w\|_2
+=
+\Bigl(\sigma_1^2 w_1^2+\cdots+\sigma_n^2 w_n^2\Bigr)^{1/2}
+\le
+\sigma_1 \Bigl(w_1^2+\cdots + w_n^2\Bigr)^{1/2}
+\le \sigma_1.
+\]
+Thus $\|\bm A\bm x\|_2\le \sigma_1$ for all $\|\bm x\|_2\le 1$, so
+$\|\bm A\|_2\le \sigma_1(\bm A)$.
+
+For the reverse inequality, take
+\[
+\bm x = \bm V\bm e_1,
+\quad
+\bm e_1 = (1,0,\dots,0)^\top.
+\]
+Then $\|\bm x\|_2 = 1$ and
+\[
+\|\bm A\bm x\|_2
+= \|\bm U\bm\Sigma\bm V^\top \bm V\bm e_1\|_2
+= \|\bm U\bm\Sigma\bm e_1\|_2
+= \|\bm\Sigma\bm e_1\|_2
+= \|\,( \sigma_1,0,\dots,0 )^\top\|_2
+= \sigma_1.
+\]
+Hence $\|\bm A\|_2\ge \sigma_1(\bm A)$, and combining both directions gives
+$\|\bm A\|_2=\sigma_1(\bm A)$.
+\end{proofbox}
+
+\begin{theorembox}
+
+Let $\|\cdot\|_\square$ be a norm on $\R^m$ (or on $\R^{m\times n}$).
+The function
+\[
+\bm x \mapsto \sup\{\langle \bm x,\bm y\rangle :
+\|\bm y\|_\square\le 1\}
+\]
+is the \textbf{dual norm} of $\|\cdot\|_\square$ and is itself a norm.
+\end{theorembox}
+
+\begin{proofbox}
+
+This is the operator norm of the linear map
+$\bm y\mapsto \langle \bm x,\bm y\rangle$, so it satisfies the norm
+axioms.
+\end{proofbox}
+
+For vectors:
+
+1. The dual norm of the Euclidean norm is itself
+   (Cauchy–Schwarz inequality).
+
+2. The dual norm of $\|\bm x\|_1$ is $\|\bm x\|_\infty$.
+
+\begin{theorembox}
+
+For matrices, the dual norm of $\|\cdot\|_2$ (spectral norm) is the
+nuclear norm $\|\cdot\|_{*}$.
+\end{theorembox}
+
+\begin{proofbox}
+
+See Problem Set~6.
+\end{proofbox}
+
+Back to Candès and Recht: why does
+\[
+\min \|\bm X\|_{*}
+\quad\text{s.t.}\quad
+\bm X(\Omega)=\bm M(\Omega)
+\]
+typically yield a low-rank $\bm X$?
+
+\begin{theorembox}
+
+Let $\bm A\in\R^{m\times n}\setminus\{\bm 0\}$ with $m\ge n$. Consider
+\[
+\min \|\bm X\|_{*}
+\quad \text{s.t.}\quad
+\langle \bm A,\bm X\rangle = 1.
+\]
+Then an optimal solution is
+\[
+\hat{\bm X}
+=
+\bm U\begin{bmatrix}
+\frac{1}{\sigma_1(\bm A)} & & & \\
+& 0 & & \\
+& & \ddots & \\
+& & & 0
+\end{bmatrix}\bm V^\top,
+\]
+where $\bm A=\bm U\bm\Sigma \bm V^\top$ is an SVD of $\bm A$.
+\end{theorembox}
+
+\begin{proofbox}
+
+First, check that $\hat{\bm X}$ is feasible:
+\[
+\begin{aligned}
+\langle \bm A,\hat{\bm X}\rangle
+&=
+\left\langle
+\bm U\bm\Sigma \bm V^\top,\;
+\bm U\begin{bmatrix}
+\frac{1}{\sigma_1(\bm A)} & & & \\
+& 0 & & \\
+& & \ddots & \\
+& & & 0
+\end{bmatrix}\bm V^\top
+\right\rangle\\
+&= \operatorname{Tr}\Bigl(
+\bm U\bm\Sigma \bm V^\top \bm V
+\begin{bmatrix}
+\frac{1}{\sigma_1(\bm A)} & & & \\
+& 0 & & \\
+& & \ddots & \\
+& & & 0
+\end{bmatrix}^\top
+\bm U^\top
+\Bigr)\\
+&= \operatorname{Tr}\Bigl(
+\bm\Sigma
+\begin{bmatrix}
+\frac{1}{\sigma_1(\bm A)} & & & \\
+& 0 & & \\
+& & \ddots & \\
+& & & 0
+\end{bmatrix}^\top
+\Bigr)
+\quad\text{(cyclic invariance of trace, and $\bm U^\top \bm U=\bm I$)}\\
+&= \operatorname{Tr}
+\begin{bmatrix}
+1 & & & \\
+& 0 & & \\
+& & \ddots & \\
+& & & 0
+\end{bmatrix}
+= 1.
+\end{aligned}
+\]
+
+Next, note that $\|\hat{\bm X}\|_2 = \dfrac{1}{\sigma_1(\bm A)}$.
+
+For any other feasible $\bm X$ (i.e.\ $\langle \bm A,\bm X\rangle=1$), the nuclear
+norm can be written using the dual norm relationship:
+\[
+\|\bm X\|_{*}
+=
+\sup\{\langle \bm X,\bm Y\rangle : \|\bm Y\|_2\le 1\}.
+\]
+Take
+\[
+\bar{\bm Y} = \frac{\bm A}{\sigma_1(\bm A)} = \frac{\bm A}{\|\bm A\|_2},
+\]
+so $\|\bar{\bm Y}\|_2=1$. Then
+\[
+\|\bm X\|_{*}
+\ge \langle \bm X,\bar{\bm Y}\rangle
+= \left\langle \bm X,\frac{\bm A}{\sigma_1(\bm A)}\right\rangle
+= \frac{1}{\sigma_1(\bm A)}\langle \bm X,\bm A\rangle
+= \frac{1}{\sigma_1(\bm A)}.
+\]
+Thus any feasible $\bm X$ has nuclear norm at least $1/\sigma_1(\bm A)$, which
+is exactly $\|\hat{\bm X}\|_{*}$. Therefore $\hat{\bm X}$ is optimal.
+\end{proofbox}

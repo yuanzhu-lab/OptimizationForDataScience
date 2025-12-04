@@ -1,0 +1,441 @@
+\section{Lec 16}
+
+\subsection{Composite Minimization}
+
+We consider the problem
+\[
+\min_{\bm x} F(\bm x),
+\qquad
+F(\bm x) \defeq f(\bm x) + \psi(\bm x),
+\]
+where
+\begin{itemize}
+  \item $f:\R^n\to\R$ is convex and $L$-smooth;
+  \item $\psi:\R^n\to\R\cup\{\infty\}$ is proper, closed, and convex.
+\end{itemize}
+
+\begin{examplebox}
+\begin{itemize}
+  \item SVM-8 (hinge loss + quadratic regularizer).
+  \item $\ell_1$-regularized least squares:
+  \[
+    \ell_1\text{LS}:\quad
+    \min_{\bm x}\;
+    \underbrace{\frac12\|\bm A\bm x-\bm b\|^2}_{f(\bm x)}
+    + \underbrace{\gamma\|\bm x\|_1}_{\psi(\bm x)}.
+  \]
+\end{itemize}
+\end{examplebox}
+
+\begin{theorembox}
+\textbf{Optimality condition for composite minimization.}
+
+For $F(\bm x)=f(\bm x)+\psi(\bm x)$ as above,
+\[
+\bm x\in\argmin F
+\quad\Longleftrightarrow\quad
+-\nabla f(\bm x)\in\partial\psi(\bm x).
+\]
+\end{theorembox}
+
+\begin{proofbox}
+Since $F=f+\psi$ with $f$ differentiable,
+\[
+\partial F(\bm x) = \partial f(\bm x) + \partial\psi(\bm x)
+= \{\nabla f(\bm x)\} + \partial\psi(\bm x).
+\]
+By the subgradient optimality condition,
+\[
+\bm x\in\argmin F
+\quad\Longleftrightarrow\quad
+\bm 0\in\partial F(\bm x)
+\quad\Longleftrightarrow\quad
+\bm 0\in \{\nabla f(\bm x)\}+\partial\psi(\bm x),
+\]
+which is equivalent to $-\nabla f(\bm x)\in\partial\psi(\bm x)$.
+\end{proofbox}
+
+\begin{theorembox}
+\textbf{Uniqueness under strong convexity.}
+
+Suppose, in addition, that $f$ is $m$-strongly convex with $m>0$. Then
+$F=f+\psi$ has a unique minimizer.
+\end{theorembox}
+
+\begin{proofbox}
+A sum of a strongly convex function and a convex function is strongly
+convex. Thus $F$ is strongly convex, so it is strictly convex and hence
+has at most one minimizer. Since $F$ is proper, closed, and coercive
+(cf.\ the level-set argument below), a minimizer exists and must be
+unique.
+\end{proofbox}
+
+\begin{claimbox}
+For any $\bm x_0\in\operatorname{dom}(\psi)$, the level set
+\[
+S \defeq \{\bm x\in\R^n : F(\bm x)\le F(\bm x_0)\}
+\]
+is closed.
+\end{claimbox}
+
+\begin{proofbox}
+Both $f$ and $\psi$ are closed, so their sum $F=f+\psi$ is closed.
+For a closed function, all sublevel sets $\{\bm x : F(\bm x)\le\beta\}$
+are closed. Taking $\beta=F(\bm x_0)$ gives that $S$ is closed.
+\end{proofbox}
+
+\begin{claimbox}
+Choose $\bm x_0\in\operatorname{ri}(\operatorname{dom}(\psi))$ and let
+$S$ be the level set above. Then $S$ is bounded.
+\end{claimbox}
+
+\begin{proofbox}
+Because $\bm x_0\in\operatorname{ri}(\operatorname{dom}(\psi))$ and
+$\psi$ is convex, we have $\partial\psi(\bm x_0)\ne\varnothing$.
+Choose some $\bm g\in\partial\psi(\bm x_0)$. Then for all $\bm x$,
+\[
+\psi(\bm x) \ge \psi(\bm x_0) + \bm g^\top(\bm x-\bm x_0).
+\]
+Since $f$ is $m$-strongly convex,
+\[
+f(\bm x) \ge f(\bm x_0)
++ \nabla f(\bm x_0)^\top(\bm x-\bm x_0)
++ \frac{m}{2}\|\bm x-\bm x_0\|^2.
+\]
+Adding gives
+\[
+F(\bm x)
+\ge F(\bm x_0)
++ (\nabla f(\bm x_0)+\bm g)^\top(\bm x-\bm x_0)
++ \frac{m}{2}\|\bm x-\bm x_0\|^2.
+\]
+
+For $\bm x\in S$, we have $F(\bm x)-F(\bm x_0)\le 0$, hence
+\[
+0 \ge F(\bm x)-F(\bm x_0)
+\ge (\nabla f(\bm x_0)+\bm g)^\top(\bm x-\bm x_0)
+  + \frac{m}{2}\|\bm x-\bm x_0\|^2.
+\]
+Applying Cauchy–Schwarz,
+\[
+(\nabla f(\bm x_0)+\bm g)^\top(\bm x-\bm x_0)
+\ge -\|\nabla f(\bm x_0)+\bm g\|\;\|\bm x-\bm x_0\|.
+\]
+Thus
+\[
+0
+\ge -\|\nabla f(\bm x_0)+\bm g\|\;\|\bm x-\bm x_0\|
+  + \frac{m}{2}\|\bm x-\bm x_0\|^2.
+\]
+Rearranging (and assuming $\bm x\ne\bm x_0$ so the norm is nonzero) gives
+\[
+\frac{m}{2}\,\|\bm x-\bm x_0\|
+\le \|\nabla f(\bm x_0)+\bm g\|.
+\]
+Hence $\|\bm x-\bm x_0\|$ is uniformly bounded for all $\bm x\in S$.
+Therefore $S$ is bounded.
+\end{proofbox}
+
+\begin{claimbox}
+$F$ is bounded below on $S$ and attains a minimum over $S$ (and hence
+over $\R^n$).
+\end{claimbox}
+
+\begin{proofbox}
+For any $\bm x\in S$, using the same inequality as above but dropping
+the quadratic term yields
+\[
+F(\bm x)
+\ge F(\bm x_0)
++ (\nabla f(\bm x_0)+\bm g)^\top(\bm x-\bm x_0)
+\ge F(\bm x_0)
+- \|\nabla f(\bm x_0)+\bm g\|\;\|\bm x-\bm x_0\|.
+\]
+Using the bound on $\|\bm x-\bm x_0\|$ from Claim~2,
+we obtain a uniform lower bound:
+\[
+F(\bm x) \ge F_{\min} \quad\text{for all } \bm x\in S
+\]
+for some finite $F_{\min}$.
+
+Since $S$ is closed and bounded, it is compact. The epigraph
+\[
+\operatorname{epi}(F)
+= \{(\bm x,y) : y\ge F(\bm x)\}
+\]
+is closed, so
+\[
+\operatorname{epi}(F) \cap (S\times[F_{\min},\infty))
+\]
+is a nonempty compact set. The projection map
+$\phi(\bm x,y)=y$ attains its minimum on this set at some
+$(\bm x^*,F(\bm x^*))$. Thus $F$ attains its minimum on $S$ at
+$\bm x^*$.
+
+For any $\bm x\notin S$, we have $F(\bm x)>F(\bm x_0)\ge F(\bm x^*)$,
+so $\bm x^*$ is in fact a global minimizer of $F$ over $\R^n$.
+\end{proofbox}
+
+\subsection{Proximal Operator}
+
+Let $\psi:\R^n\to\R\cup\{\infty\}$ be proper, closed, and convex.
+The \textbf{proximal operator} of $\psi$ is defined by
+\[
+\operatorname{prox}_{\psi}(\bm x)
+\defeq
+\argmin_{\bm z}\Bigl\{\psi(\bm z)+\frac12\|\bm z-\bm x\|^2\Bigr\}.
+\]
+
+Intuitively, $\operatorname{prox}_{\psi}(\bm x)$ finds a point $\bm z$
+that balances two goals:
+staying close to the current point $\bm x$, and having a small value of
+the regularizer $\psi$.
+
+\begin{theorembox}
+\textbf{Existence and uniqueness of the proximal point.}
+
+For each $\bm x\in\R^n$, the function
+\[
+\bm z\mapsto \psi(\bm z)+\frac12\|\bm z-\bm x\|^2
+\]
+has a unique minimizer, i.e.\ $\operatorname{prox}_{\psi}(\bm x)$ is
+well-defined and single-valued.
+\end{theorembox}
+
+\begin{proofbox}
+The function $\bm z\mapsto \frac12\|\bm z-\bm x\|^2$ is strongly convex.
+Adding the convex function $\psi$ preserves strong convexity, so
+$\psi(\bm z)+\frac12\|\bm z-\bm x\|^2$ is strongly convex and proper,
+closed. Hence it has a unique minimizer.
+\end{proofbox}
+
+We say that $\psi$ is \emph{proximable} if there exists an efficient
+algorithm to compute $\operatorname{prox}_{\psi}(\bm x)$.
+
+\begin{examplebox}
+\textbf{Example 1: Scalar $\ell_1$-prox.}
+
+Let $n=1$ and
+\[
+\psi(x) = t|x|,\quad t>0.
+\]
+Define
+\[
+q(z) \defeq t|z|+\frac12(z-x)^2.
+\]
+Then $\operatorname{prox}_{t|\cdot|}(x)$ is the unique minimizer of $q$.
+We have
+\[
+\partial q(z) = t\,\partial|z| + (z-x).
+\]
+Recall
+\[
+\partial|z|=
+\begin{cases}
+\{-1\}, & z<0,\\[0.2em]
+[-1,1], & z=0,\\[0.2em]
+\{1\},  & z>0.
+\end{cases}
+\]
+
+The optimality condition
+\[
+0\in\partial q(z)
+\quad\Longleftrightarrow\quad
+0\in t\,\partial|z| + z - x
+\]
+leads to three cases:
+\[
+x-z\in
+\begin{cases}
+\{-t\}, & z<0,\\
+[-t,t], & z=0,\\
+\{t\},  & z>0.
+\end{cases}
+\]
+
+\begin{itemize}
+  \item \textbf{Case $z<0$:} $x-z=-t \Rightarrow z=x+t$. Validity
+        requires $z<0\Rightarrow x<-t$.
+  \item \textbf{Case $z=0$:} $x-z\in[-t,t] \Rightarrow x\in[-t,t]$.
+  \item \textbf{Case $z>0$:} $x-z=t \Rightarrow z=x-t$. Validity
+        requires $z>0\Rightarrow x>t$.
+\end{itemize}
+
+Summarizing,
+\[
+\operatorname{prox}_{t|\cdot|}(x)
+=
+\begin{cases}
+x+t, & x<-t,\\[0.2em]
+0,   & x\in[-t,t],\\[0.2em]
+x-t, & x>t.
+\end{cases}
+\]
+This is the usual scalar \emph{soft-thresholding} operator.
+\end{examplebox}
+
+\begin{examplebox}
+\textbf{Example 2: Vector $\ell_1$-prox.}
+
+For $\bm x\in\R^n$ and $t>0$,
+\[
+\operatorname{prox}_{t\|\cdot\|_1}(\bm x)
+= \argmin_{\bm z} \bigl\{t\|\bm z\|_1 + \tfrac12\|\bm z-\bm x\|^2\bigr\}.
+\]
+Because the function is separable across coordinates, the solution is
+obtained by applying the scalar soft thresholding coordinatewise:
+\[
+\operatorname{prox}_{t\|\cdot\|_1}(\bm x)
+= \begin{pmatrix} u_1 \\ \vdots \\ u_n \end{pmatrix}
+\quad\text{with}\quad
+u_i =
+\begin{cases}
+x_i+t, & x_i<-t,\\[0.2em]
+0,     & x_i\in[-t,t],\\[0.2em]
+x_i-t, & x_i>t,
+\end{cases}
+\quad i=1,\dots,n.
+\]
+\end{examplebox}
+
+\begin{examplebox}
+\textbf{Example 3: Prox of the Euclidean norm.}
+
+Let
+\[
+\psi(\bm x) = t\|\bm x\|,\quad t>0.
+\]
+We know
+\[
+\partial\|\bm z\|=
+\begin{cases}
+\left\{\dfrac{\bm z}{\|\bm z\|}\right\}, & \bm z\ne\bm 0,\\[0.4em]
+\overline{\mathbb B}(\bm 0,1), & \bm z=\bm 0,
+\end{cases}
+\]
+where $\overline{\mathbb B}(\bm 0,1)$ is the closed unit ball.
+
+Consider
+\[
+q(\bm z) \defeq t\|\bm z\| + \frac12\|\bm z-\bm x\|^2.
+\]
+Then
+\[
+\bm 0\in\partial q(\bm z)
+\quad\Longleftrightarrow\quad
+\bm 0\in t\,\partial\|\bm z\| + (\bm z-\bm x),
+\]
+i.e.
+\[
+\bm x-\bm z \in
+\begin{cases}
+\overline{\mathbb B}(\bm 0,t), & \bm z=\bm 0 \quad (\text{a}),\\[0.2em]
+t\,\dfrac{\bm z}{\|\bm z\|},   & \bm z\ne\bm 0 \quad (\text{b}).
+\end{cases}
+\]
+
+\textbf{Case (a):} $\bm z=\bm 0$ is valid if and only if
+$\bm x\in\overline{\mathbb B}(\bm 0,t)$, i.e.\ $\|\bm x\|\le t$.
+
+\textbf{Case (b):} Assume $\bm z\ne\bm 0$ and write $\bm z=\theta\bm x$
+for some scalar $\theta$. Then
+\[
+\bm x-\theta\bm x
+= t\,\frac{\theta\bm x}{\|\theta\bm x\|}
+= t\,\frac{\theta}{|\theta|}\,\frac{\bm x}{\|\bm x\|}.
+\]
+Assuming $\theta>0$ (we expect $\bm z$ to be in the same direction as
+$\bm x$), we get
+\[
+1-\theta = \frac{t}{\|\bm x\|}\quad\Rightarrow\quad
+\theta = 1 - \frac{t}{\|\bm x\|}.
+\]
+Thus
+\[
+\bm z
+= \left(1-\frac{t}{\|\bm x\|}\right)\bm x,
+\]
+which is valid only when $\bm z\ne\bm 0$, i.e.\ $\|\bm x\|>t$.
+
+Combining both cases:
+\[
+\operatorname{prox}_{t\|\cdot\|}(\bm x)
+=
+\begin{cases}
+\bm 0, & \|\bm x\|\le t,\\[0.3em]
+\left(1-\dfrac{t}{\|\bm x\|}\right)\bm x,
+& \|\bm x\|>t.
+\end{cases}
+\]
+This is often called the \emph{vector soft-thresholding} or
+\emph{shrinkage} operator.
+\end{examplebox}
+
+\begin{factbox}
+For any closed, proper, convex function $\psi$, the proximal map
+$\operatorname{prox}_{\psi}:\R^n\to\R^n$ is 1-Lipschitz, i.e.
+\[
+\|\operatorname{prox}_{\psi}(\bm x)
+ - \operatorname{prox}_{\psi}(\bm y)\|
+\le \|\bm x-\bm y\|,\quad \forall\,\bm x,\bm y\in\R^n.
+\]
+In particular, the proximal map is continuous.
+\end{factbox}
+
+\subsection{Proximal Gradient}
+
+We return to the composite setup
+\[
+\min_{\bm x} F(\bm x),
+\qquad
+F(\bm x)=f(\bm x)+\psi(\bm x),
+\]
+with $f$ convex and $L$-smooth and $\psi$ proper, closed, convex.
+
+\begin{factbox}[title={}]
+\textbf{Proximal gradient.}
+
+The \emph{proximal gradient} of $F$ (with parameter $L$) is
+\[
+\text G_L(\bm x)
+\defeq
+L\left(
+\bm x
+- \operatorname{prox}_{\psi/L}\!\left(
+\bm x - \frac1L\nabla f(\bm x)
+\right)
+\right).
+\]
+\end{factbox}
+
+Intuitively, the mapping
+\[
+\bm x \mapsto \operatorname{prox}_{\psi/L}\!\left(
+\bm x - \frac1L\nabla f(\bm x)
+\right)
+\]
+performs one gradient step on the smooth part $f$ followed by one prox
+step on the (possibly nonsmooth) part $\psi$. The vector $\text G_L(\bm x)$ is
+the scaled difference between the current point and this update, and
+plays the role of a generalized gradient.
+
+\begin{examplebox}
+\textbf{Special case $\psi\equiv 0$.}
+
+If $\psi\equiv 0$, then
+\[
+\operatorname{prox}_0(\bm x)
+= \argmin_{\bm z}\frac12\|\bm z-\bm x\|^2
+= \bm x.
+\]
+Hence
+\[
+\text G_L(\bm x)
+= L\left(
+\bm x - \left(\bm x - \frac1L\nabla f(\bm x)\right)
+\right)
+= \nabla f(\bm x),
+\]
+so the proximal gradient reduces to the usual gradient.
+\end{examplebox}

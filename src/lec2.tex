@@ -1,0 +1,409 @@
+\section{Lec 2}
+
+\subsection{Matrix Concepts}
+
+\subsubsection{Matrix--Vector Product}
+
+Let $\bm A\in \R^{m\times n}$ and $\bm x\in \R^n$. Define $\bm y\in \R^m$ by
+\[
+y_i = \sum_{j=1}^n A(i,j)\,x_j,\quad i=1,\dots,m.
+\]
+Then $\bm y$ is called the \emph{matrix--vector product} of $\bm A$ and $\bm x$, and we write
+\[
+\bm y = \bm A\bm x.
+\]
+
+\begin{factbox}
+For all $\bm x,\bm y\in \R^n$ and all scalars $\alpha\in \R$:
+\begin{itemize}
+  \item $\displaystyle \bm A(\bm x+\bm y)=\bm A\bm x + \bm A\bm y$,
+  \item $\displaystyle \bm A(\alpha \bm x)=\alpha (\bm A\bm x)$.
+\end{itemize}
+\end{factbox}
+
+A mapping $T:\R^n \to \R^m$ is called a \textbf{linear transformation} if and only if it satisfies
+\[
+T(\bm x+\bm y)=T(\bm x)+T(\bm y),\quad
+T(\alpha \bm x)=\alpha\,T(\bm x)
+\]
+for all $\bm x,\bm y\in \R^n$ and all $\alpha\in \R$.
+
+\begin{factbox}
+For any linear transformation $T:\R^n\to \R^m$, there exists a matrix $\bm A\in \R^{m\times n}$ such that
+\[
+T(\bm x)\equiv \bm A\bm x,\quad \forall \bm x\in \R^n.
+\]
+\end{factbox}
+
+\textbf{Interpretations of $\bm y=\bm A\bm x$:}
+\[
+\bm y = \bm A\bm x
+\Longleftrightarrow
+\bm y = \bm A(:,1)\,x_1 + \cdots + \bm A(:,n)\,x_n
+\Longleftrightarrow
+\bm y =
+\begin{pmatrix}
+\bm A(1,:)\,\bm x\\
+\vdots\\
+\bm A(m,:)\,\bm x
+\end{pmatrix},
+\]
+where $\bm A(:,j)$ denotes the $j$-th column of $\bm A$, and $\bm A(i,:)$ denotes the $i$-th row.
+
+\begin{examplebox}
+\textbf{Identity matrix.}  
+For the identity matrix $\I\in \R^{n\times n}$,
+\[
+\I\bm x = \bm x,\quad \forall \bm x\in \R^n.
+\]
+\end{examplebox}
+
+\subsubsection{Transpose}
+
+For $\bm A\in \R^{m\times n}$, its \textbf{transpose} $\bm A^{\top}\in \R^{n\times m}$ is defined by
+\[
+\bm A^{\top}(j,i) = A(i,j),\quad \forall i=1,\dots,m,\ \forall j=1,\dots,n.
+\]
+For a vector $\bm x\in \R^n$, the transpose $\bm x^{\top}$ is a row vector with the same entries as $\bm x$.
+
+\subsubsection{Inner Product}
+
+For $\bm x,\bm y\in \R^n$, the \textbf{inner product} is
+\[
+\bm x^{\top}\bm y = \sum_{i=1}^n x_i y_i.
+\]
+
+\subsubsection{Range and Nullspace}
+
+For any $\bm A\in \R^{m\times n}$, define:
+\begin{enumerate}
+  \item $\displaystyle \operatorname{Range}(\bm A) = \{\bm A\bm x : \bm x\in \R^n\} \subseteq \R^m$,
+  \item $\displaystyle \operatorname{Null}(\bm A) = \{\bm y\in \R^n : \bm A\bm y = \0\} \subseteq \R^n$.
+\end{enumerate}
+
+\begin{factbox}
+$\operatorname{Range}(\bm A)$ and $\operatorname{Null}(\bm A)$ are subspaces.
+\end{factbox}
+
+Intuitively:
+\begin{itemize}
+  \item $\operatorname{Range}(\bm A)$ is the \emph{output space} (all vectors that can appear as $\bm A\bm x$),
+  \item $\operatorname{Null}(\bm A)$ is the space of vectors that \emph{disappear} under the transformation (they are mapped to $\0$).
+\end{itemize}
+
+The \textbf{rank} of $\bm A$ is
+\[
+\operatorname{rank}(\bm A) = \dim\bigl(\operatorname{Range}(\bm A)\bigr).
+\]
+
+\begin{factbox}
+\[
+\operatorname{rank}(\bm A) \le \min(m,n).
+\]
+\end{factbox}
+
+We can express the range as
+\[
+\operatorname{Range}(\bm A) = \spann\{\bm A(:,1),\dots,\bm A(:,n)\}.
+\]
+
+\begin{factbox}
+\[
+\operatorname{rank}(\bm A) = \operatorname{rank}\bigl(\bm A^{\top}\bigr).
+\]
+\end{factbox}
+
+\begin{examplebox}
+If $\bm A\in \R^{n\times n}$ is \textbf{diagonal} (i.e., $A(i,j)=0$ whenever $i\neq j$), then
+\[
+\operatorname{rank}(\bm A) = \text{number of nonzero diagonal entries of }\bm A.
+\]
+\end{examplebox}
+
+\subsubsection{Matrix Multiplication}
+
+Let $\bm A\in \R^{m\times n}$ and $\bm B\in \R^{n\times p}$. Their product $\bm C=\bm A\bm B\in \R^{m\times p}$ is defined by
+\[
+C(i,j) = \sum_{k=1}^n A(i,k)\,B(k,j),
+\quad \forall i=1,\dots,m,\ \forall j=1,\dots,p.
+\]
+
+\begin{factbox}
+Matrix multiplication corresponds to composition of linear transformations:
+\[
+\forall \bm x\in \R^p,\quad \bm A(\bm B\bm x) = (\bm A\bm B)\bm x.
+\]
+\end{factbox}
+
+\begin{factbox}
+Matrix multiplication is associative:
+\[
+\bm A(\bm B\bm C) = (\bm A\bm B)\bm C.
+\]
+\end{factbox}
+
+In general, matrix multiplication is \emph{not} commutative:
+\[
+\bm A\bm B \ne \bm B\bm A.
+\]
+
+\subsubsection{Square Matrices and Invertibility}
+
+\begin{factbox}
+Given $\bm A\in \R^{n\times n}$, the following are equivalent:
+\begin{enumerate}
+  \item There exists a matrix $\bm A^{-1}\in \R^{n\times n}$ such that
+        \[
+        \bm A^{-1}\bm A = \I
+        \]
+        (then $\bm A^{-1}$ is called the \emph{inverse} of $\bm A$).
+  \item $\operatorname{rank}(\bm A)=n \Longleftrightarrow \operatorname{Range}(\bm A)=\R^n$.
+  \item $\operatorname{Null}(\bm A)=\{\0\}$.
+  \item The columns of $\bm A$ are linearly independent.
+\end{enumerate}
+If any (and hence all) of these hold, we say $\bm A$ is \textbf{invertible} or \textbf{nonsingular}.
+\end{factbox}
+
+\subsubsection{Properties of the Inverse}
+
+\begin{factbox}
+Let $\bm A\in \R^{n\times n}$.
+\begin{enumerate}
+  \item If $\bm A$ is invertible, then $\bm A^{-1}$ is uniquely determined and
+        \[
+        \bm A\bm A^{-1} = \bm A^{-1}\bm A = \I.
+        \]
+  \item If $\bm A$ is invertible, then
+        \[
+        (\bm A^{-1})^{-1} = \bm A.
+        \]
+  \item If $\bm A,\bm B\in \R^{n\times n}$ are invertible, then $\bm A\bm B$ is invertible and
+        \[
+        (\bm A\bm B)^{-1} = \bm B^{-1}\bm A^{-1}.
+        \]
+        Similarly for transposes:
+        \[
+        (\bm A\bm B)^{\top} = \bm B^{\top}\bm A^{\top}.
+        \]
+  \item If $\bm A$ is invertible, then $\bm A^{\top}$ is invertible and
+        \[
+        (\bm A^{-1})^{\top} = (\bm A^{\top})^{-1}.
+        \]
+\end{enumerate}
+\end{factbox}
+
+Notation:
+\[
+\bm A^{-{\top}} \defeq (\bm A^{-1})^{\top}.
+\]
+
+\subsection{Quadratic Functions}
+
+\subsubsection{Definition of Quadratic Functions}
+
+A function $f:\R^n\to \R$ is called \textbf{quadratic} if it is a sum of terms, each of which is
+\begin{itemize}
+  \item constant (e.g.\ $7$),
+  \item linear (e.g.\ $b_i x_i$),
+  \item or quadratic (e.g.\ $7x_i^2$ or $8x_ix_j$).
+\end{itemize}
+
+\begin{factbox}
+If $f:\R^n\to \R$ is quadratic, then it can be written in the \textbf{standard form}
+\[
+f(\bm x)
+= \frac12\,\bm x^{\top}\bm H\bm x
+  + \bm g^{\top}\bm x
+  + d,
+\]
+where
+\begin{itemize}
+  \item $\bm H\in \Sbb^n$ is a \textbf{symmetric} matrix:
+        \[
+        \bm H = \bm H^{\top},\quad H(i,j)=H(j,i),\quad i,j=1,\dots,n,
+        \]
+  \item $\bm g\in \R^n$ is a vector;
+  \item $d\in \R$ is a scalar.
+\end{itemize}
+\end{factbox}
+
+\begin{examplebox}
+Let
+\[
+f(\bm x) = 2x_1^2 - 7x_1x_2 - 3x_1 - 9.
+\]
+Then we can write
+\[
+f(\bm x)
+= \frac12
+\begin{pmatrix}x_1\\x_2\end{pmatrix}^{\top}
+\begin{pmatrix}4 & -7\\ -7 & 0\end{pmatrix}
+\begin{pmatrix}x_1\\x_2\end{pmatrix}
++
+\begin{pmatrix}-3\\[0.2em]0\end{pmatrix}^{\top}
+\begin{pmatrix}x_1\\x_2\end{pmatrix}
+- 9.
+\]
+\end{examplebox}
+
+Note that $\dfrac12\,\bm x^{\top}\bm H\bm x$ is a scalar.
+
+\subsubsection{Positive (Semi)definite Matrices}
+
+Let $\bm A\in \Sbb^n$ (symmetric).
+
+\begin{itemize}
+  \item $\bm A$ is \textbf{positive semidefinite} (psd) if
+  \[
+  \forall \bm x\in \R^n,\quad \bm x^{\top}\bm A\bm x \ge 0.
+  \]
+  We write $\bm A\succeq \0$.
+
+  \item $\bm A$ is \textbf{positive definite} (pd) if
+  \[
+  \forall \bm x\in \R^n\setminus\{\0\},\quad
+  \bm x^{\top}\bm A\bm x > 0.
+  \]
+  We write $\bm A\succ \0$.
+\end{itemize}
+
+\begin{examplebox}
+\[
+\begin{aligned}
+&\bm A \text{ pd} \;\Rightarrow\; \bm A \text{ psd},\\[0.3em]
+&\begin{pmatrix}1 & 0\\ 0 & 1\end{pmatrix} \text{ is pd},\\[0.5em]
+&\begin{pmatrix}0 & 0\\ 0 & 0\end{pmatrix} \text{ is psd, not pd},\\[0.5em]
+&\begin{pmatrix}1 & 1\\ 1 & 2\end{pmatrix} \text{ is pd},\\[0.5em]
+&\begin{pmatrix}1 & 1\\ 1 & 1\end{pmatrix} \text{ is psd, not pd},\\[0.5em]
+&\begin{pmatrix}1 & 2\\ 2 & 1\end{pmatrix} \text{ is not psd},\\[0.5em]
+&\begin{pmatrix}1 & -1\\ -1 & 2\end{pmatrix} \text{ is pd}.
+\end{aligned}
+\]
+\end{examplebox}
+
+\subsection{Theorem on Quadratic Minimization}
+
+\begin{theorembox}
+Consider the quadratic function
+\[
+f(\bm x)
+= \frac12\,\bm x^{\top}\bm H\bm x
+  + \bm g^{\top}\bm x
+  + d,
+\]
+where $\bm H\in \Sbb^n$. Then $f$ is \textbf{bounded below} and has a \textbf{minimizer} if and only if
+\begin{itemize}
+  \item $\bm H$ is positive semidefinite, and
+  \item $\bm g \in \operatorname{Range}(\bm H)$.
+\end{itemize}
+In this case, any solution to
+\[
+\bm H\bm x = -\bm g
+\]
+is a minimizer of $f$.
+\end{theorembox}
+
+If $\bm H$ is positive definite, then all the above conditions hold automatically:
+\[
+\bm H\text{ pd} \;\Rightarrow\; \bm H\text{ psd},
+\]
+\[
+\bm H\text{ pd} \;\Rightarrow\; \bm H\text{ nonsingular}
+\;\Rightarrow\; \operatorname{Range}(\bm H)=\R^n
+\;\Rightarrow\; \bm g \in \operatorname{Range}(\bm H).
+\]
+
+\textbf{Why a positive definite matrix is nonsingular?}\\[0.3em]
+If $\bm H$ were singular, then there would exist
+$\bm x\in \operatorname{Null}(\bm H)\setminus\{\0\}$ with
+$\bm H\bm x=\0$. Then
+\[
+\bm x^{\top}\bm H\bm x = \bm x^{\top}\0 = 0,
+\]
+contradicting the condition for positive definiteness
+$\bm x^{\top}\bm H\bm x>0$ for all $\bm x\ne \0$.
+
+\begin{factbox}
+If $f:\R^n\to \R$ is continuous and $f$ has a minimizer, then $f$ is bounded below.  
+(The converse is not always true.)
+\end{factbox}
+
+\subsubsection{Proof of Theorem (Forward Direction)}
+
+\begin{proofbox}
+Assume $\bm H$ is positive semidefinite and $\bm g\in \operatorname{Range}(\bm H)$.
+Then $-\bm g\in \operatorname{Range}(\bm H)$, so there exists $\bm w\in \R^n$ such that
+\[
+\bm H\bm w = -\bm g.
+\]
+
+Let $\bm x\in \R^n$ be arbitrary. Then
+\[
+\begin{aligned}
+f(\bm x)
+&= \frac12\,\bm x^{\top}\bm H\bm x
+  + \bm g^{\top}\bm x
+  + d\\[0.3em]
+&= \frac12\,\bm x^{\top}\bm H\bm x
+  - \bm w^{\top}\bm H\bm x + d
+  \quad (\text{since } \bm g = -\bm H\bm w)\\[0.3em]
+&= \frac12(\bm x-\bm w)^{\top}\bm H(\bm x-\bm w)
+   - \frac12\,\bm w^{\top}\bm H\bm w + d
+   \quad (\text{completing the square}).
+\end{aligned}
+\]
+
+Note that $\bm w^{\top}\bm H\bm x
+= \bm x^{\top}\bm H\bm w$ since both are scalars.
+
+Because $\bm H$ is positive semidefinite,
+\[
+\frac12(\bm x-\bm w)^{\top}\bm H(\bm x-\bm w) \ge 0
+\quad\text{for all }\bm x,
+\]
+and the minimum value $0$ is attained at $\bm x=\bm w$.
+
+The remaining term $-\frac12\,\bm w^{\top}\bm H\bm w + d$ is constant, so
+$f$ is bounded below and attains its minimum at $\bm x=\bm w$.
+\end{proofbox}
+
+\subsubsection{Tools for the Converse Direction (Unfinished)}
+
+Let $S\subseteq \R^n$ be a subspace. Its \textbf{orthogonal complement} is
+\[
+S^\perp = \{\bm x\in \R^n : \bm x^{\top}\bm y=0,\ \forall\,\bm y\in S\}.
+\]
+If $\bm x^{\top}\bm y=0$, we say that $\bm x$ and $\bm y$ are \textbf{orthogonal}.
+
+\begin{factbox}
+For a subspace $S\subseteq \R^n$:
+\begin{itemize}
+  \item $S^\perp$ is a subspace.
+  \item $(S^\perp)^\perp = S$.
+  \item $\dim(S) + \dim(S^\perp) = n$.
+  \item For every $\bm w\in \R^n$, there exist unique
+        \(\bm x\in S\) and \(\bm y\in S^\perp\) such that
+        \[
+        \bm w = \bm x + \bm y.
+        \]
+\end{itemize}
+\end{factbox}
+
+\begin{factbox}
+\textbf{Fundamental Theorem of Linear Algebra.}  
+For all $\bm A\in \R^{m\times n}$,
+\[
+\operatorname{Range}(\bm A)^\perp = \operatorname{Null}\bigl(\bm A^{\top}\bigr).
+\]
+\end{factbox}
+
+\textbf{Contrapositive statement (for the theorem).}\\[0.3em]
+If $\bm H$ is not positive semidefinite, \emph{or} $\bm H$ is positive semidefinite and
+$\bm g\notin \operatorname{Range}(\bm H)$, then the quadratic function
+\[
+f(\bm x)
+= \frac12\,\bm x^{\top}\bm H\bm x
+  + \bm g^{\top}\bm x
+  + d
+\]
+is \textbf{unbounded below}. (Proof of this converse direction is finished in next lecture.)

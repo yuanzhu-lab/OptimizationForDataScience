@@ -1,0 +1,227 @@
+\section{Lec 12}
+
+\subsection{Review of \emph{SGD}}
+
+From last lecture: \emph{SGD} convergence.
+
+\begin{itemize}[leftmargin=1.2em]
+  \item \emph{Ergodic} convergence vs.\ \emph{last-iterate} convergence.
+  \item Step size $\alpha = \dfrac{1}{L + \frac{1}{\eta}}$ depends on the number of steps $\ell$
+        (this implies $\alpha$ cannot be arbitrarily large, otherwise the method diverges; the upper bound is $\dfrac{1}{L}$).
+  \item Larger $\alpha$ means faster convergence to a poorer solution.
+  \item Decrease step size: one can use, for example, $\alpha_k = \dfrac{\text{const}}{\text{const}+k}$.
+  \item In practice: use a \emph{stepsize schedule} (e.g.\ $\alpha_k$ is a staircase function of iteration $k$).
+\end{itemize}
+
+\emph{SGD} and its variants are the main optimization algorithms used for training modern machine-learning models (including ChatGPT, Deepseek, \dots).
+
+\subsection{\emph{SGD} Variants}
+
+\subsubsection{\emph{SGD} Variants in Theory}
+
+\begin{itemize}[leftmargin=1.2em]
+  \item SVRG,
+  \item SAGA.
+\end{itemize}
+
+Both of these do variance reduction, mainly for convex problems.
+
+\subsubsection{\emph{SGD} Variants in Practice}
+
+\begin{itemize}[leftmargin=1.2em]
+  \item \textbf{Minibatching:} e.g.\ select $8$ random samples instead of $1$ and compute the gradient of the sum of $8$ terms.
+  \item \textbf{Momentum} (similar to \emph{AGD} momentum).
+  \item \textbf{Coordinatewise scale}
+  \[
+    \bm x^{k+1} := \bm x^k - \bm D^k \bm g^k,
+  \]
+  where $\bm D^k$ is a diagonal matrix adaptively updated. In ordinary \emph{SGD}, $\bm D^k = \alpha_k \bm I$.
+
+  An extreme case is
+  \[
+    \bm x^{k+1} := \bm x^k - \alpha_k \cdot \operatorname{sign}(\bm g^k).
+  \]
+  \item A well-known \emph{SGD} variant is called \textbf{ADAM}, which combines momentum and coordinatewise scaling.
+\end{itemize}
+
+\subsection{Constrained and Nonsmooth Analysis}
+
+\subsubsection{Motivating Examples}
+
+\paragraph{$\ell_1$-regularized least squares.}
+
+Given $\bm A \in \R^{m\times n}$, $\bm y \in \R^m$, $\gamma>0$,
+\[
+  \ell_1\text{LS}:\quad
+  \min_{\bm x}\;
+  \frac12\|\bm A\bm x - \bm y\|^2 + \gamma\|\bm x\|_1,
+\]
+where $\|\bm x\|_1 = |\bm x_1| + \cdots + |\bm x_n|$. One can check the three properties of a norm are satisfied.
+
+Compare to ridge regression:
+\[
+  \text{RR}:\quad
+  \min_{\bm x}\;
+  \frac12\|\bm A\bm x - \bm y\|^2 + \frac{\gamma}{2}\|\bm x\|_2^2.
+\]
+
+\begin{enumerate}[leftmargin=1.4em]
+  \item Both $\ell_1\text{LS}$ and RR encourage shrinkage, i.e.\ large $\bm x$ is penalized.
+  \item $\ell_1\text{LS}$ has a second effect: \emph{selection}.
+
+  A solution $\bm x$ to $\ell_1\text{LS}$ has many entries identically equal to $0$. Thus it identifies features
+  (columns of $\bm A$) that are irrelevant to explaining $\bm y$.
+  Closely related to $\ell_1\text{LS}$ is Lasso regression:
+  \[
+    \min_{\bm x} \frac12\|\bm A\bm x - \bm y\|^2
+    \quad\text{s.t.}\quad \|\bm x\|_1 \le \rho.
+  \]
+\end{enumerate}
+
+Observe that
+\[
+  g(\bm x) := \|\bm x\|_1
+\]
+is a convex function, but not differentiable. So $\ell_1\text{LS}$ is convex and nonsmooth.
+
+Therefore plain \emph{GD} and \emph{AGD} (which need gradients) are not directly applicable.
+
+We can rewrite $\ell_1\text{LS}$ as a smooth constrained problem by introducing auxiliary variables:
+\[
+  \min_{\bm x,\bm t}\;
+  \frac12\|\bm A\bm x - \bm y\|^2 + \gamma\sum_{i=1}^n t_i
+  \quad\text{s.t.}\quad
+  t_i \ge x_i,\;\; t_i \ge -x_i,\;\; \forall i=1,\dots,n.
+\]
+These constraints are equivalent to $t_i \ge |x_i|$, but this latter form is nonsmooth.
+
+To exactly reproduce $\ell_1\text{LS}$, we should constrain $t_i = |x_i|$. It is nevertheless OK to use $t_i \ge |x_i|$,
+because no optimizer of the above problem would have $t_i > |x_i|$, due to the form of the objective function.
+
+\paragraph{Support vector machines.}
+
+Binary classification: given $(\bm a_1,y_1),\dots,(\bm a_N,y_N)$, with $\bm a_i\in\R^n$, $y_i\in\{1,-1\}$, seek
+$\bm x\in\R^n$, $\xi\in\R$ such that
+\[
+\begin{aligned}
+\bm a_i^{\top}\bm x + \xi > 0 &\quad\text{if } y_i=1,\\
+\bm a_i^{\top}\bm x + \xi < 0 &\quad\text{if } y_i=-1.
+\end{aligned}
+\]
+These are strict linear inequalities on $(\bm x,\xi)$.
+The solution set of a system of (non-strict) linear inequalities is called a \emph{polyhedron}
+(generalization of polygons in 2D).
+
+Idea of SVM: find $(\bm x,\xi)$ to maximize the width between the $+1$ and $-1$ classes.
+
+\begin{theorembox}
+Assume $\|\bm x\| = 1$. Given $\bm a\in\R^n$, the distance from $\bm a$ to the hyperplane
+\[
+\{\bm v : \bm v^{\top}\bm x + \xi = 0\}
+\]
+is $|\bm a^{\top}\bm x + \xi|$.
+\end{theorembox}
+
+\begin{proofbox}
+Claim that the closest point on the plane to $\bm a$ is
+\[
+\bm v^* := \bm a - (\bm a^{\top}\bm x + \xi)\bm x.
+\]
+
+\textbf{Check that $\bm v^*$ lies on the plane.}
+\[
+(\bm v^*)^{\top}\bm x + \xi
+= \bm a^{\top}\bm x - (\bm a^{\top}\bm x + \xi)\,\bm x^{\top}\bm x + \xi
+= \bm a^{\top}\bm x - (\bm a^{\top}\bm x + \xi)\cdot 1 + \xi = 0.
+\]
+
+\textbf{Check that the distance from $\bm a$ to $\bm v^*$ is as claimed:}
+\[
+\|\bm a - \bm v^*\|
+= \|\bm a - \bm a + (\bm a^{\top}\bm x + \xi)\bm x\|
+= |\bm a^{\top}\bm x + \xi|\cdot\|\bm x\|
+= |\bm a^{\top}\bm x + \xi|
+\]
+since $\|\bm x\| = 1$.
+
+\textbf{Check that no other point on the plane is closer to $\bm a$ than $\bm v^*$.}
+
+Let $\bm v^1$ also lie on the plane, so $(\bm v^1)^{\top}\bm x + \xi = 0$. Then
+\[
+(\bm v^1 - \bm v^*)^{\top}\bm x = 0.
+\]
+Let $\bm p := \bm v^1 - \bm v^*$. Then
+\[
+\begin{aligned}
+\|\bm a - \bm v^1\|^2
+&= \|\bm a - \bm a + (\bm a^{\top}\bm x + \xi)\bm x - \bm p\|^2\\
+&= |\bm a^{\top}\bm x + \xi|^2\|\bm x\|^2
+   - 2(\bm a^{\top}\bm x + \xi)\,\bm x^{\top}\bm p
+   + \|\bm p\|^2\\
+&= |\bm a^{\top}\bm x + \xi|^2 + \|\bm p\|^2
+\end{aligned}
+\]
+because $\bm x^{\top}\bm p = 0$. So the distance is minimized when $\bm p = \bm 0$, i.e.\ when $\bm v^1 = \bm v^*$.
+\end{proofbox}
+
+Thus we can write the SVM optimization problem as
+\[
+\begin{aligned}
+(\mathrm{SVM\mbox{-}1})\quad
+&\max_{\bm x,\xi}\ \min_{i=1,\dots,N} \bigl|\bm a_i^{\top}\bm x + \xi\bigr|\\
+\text{s.t.}\quad
+&\bm a_i^{\top}\bm x + \xi \ge 0 \quad (y_i = 1),\\
+&\bm a_i^{\top}\bm x + \xi \le 0 \quad (y_i = -1),\\
+&\|\bm x\| = 1.
+\end{aligned}
+\]
+Assume for now that there exists a separating plane $(\bm x,\xi)$ for which the above objective is positive.
+This implies the objective function is positive at the optimizer.
+
+Introduce variables $\bm t$ to remove the absolute value:
+\[
+\begin{aligned}
+(\mathrm{SVM\mbox{-}2})\quad
+&\max_{\bm x,\xi,\bm t}\ \min_{i=1,\dots,N} t_i\\
+\text{s.t.}\quad
+&\bm a_i^{\top}\bm x + \xi = \phantom{-}t_i \quad (y_i = 1),\\
+&\bm a_i^{\top}\bm x + \xi = -t_i \quad (y_i = -1),\\
+&\|\bm x\| = 1,\quad \bm t \ge \bm 0.
+\end{aligned}
+\]
+This formulation gets rid of the absolute value in SVM-1.
+
+
+\begin{claimbox}
+We obtain the same optimizer if we replace $\|\bm x\| = 1$ with $\|\bm x\|\le 1$:
+\[
+\begin{aligned}
+(\mathrm{SVM\mbox{-}3})\quad
+&\max_{\bm x,\xi,\bm t}\ \min_{i=1,\dots,N} t_i\\
+\text{s.t.}\quad
+&\bm a_i^{\top}\bm x + \xi = \phantom{-}t_i \quad (y_i = 1),\\
+&\bm a_i^{\top}\bm x + \xi = -t_i \quad (y_i = -1),\\
+&\|\bm x\|\le 1,\quad \bm t \ge \bm 0.
+\end{aligned}
+\]
+\end{claimbox}
+
+\begin{proofbox}
+Suppose $(\bm x,\xi,\bm t)$ is feasible for SVM-3 with $\|\bm x\| < 1$.
+
+Assume $\bm x \ne \bm 0$ (indeed, if $\bm x = \bm 0$, then the constraints force $\xi = 0$ and hence the objective
+$\min_i t_i = 0$, which cannot be optimal since we assumed the optimal value is positive).
+
+Define the rescaled variables
+\[
+  \bm x^1 := \frac{\bm x}{\|\bm x\|},\qquad
+  \xi^1 := \frac{\xi}{\|\bm x\|},\qquad
+  \bm t^1 := \frac{\bm t}{\|\bm x\|}.
+\]
+One checks that $(\bm x^1,\xi^1,\bm t^1)$ is feasible and
+\[
+\min_i t_i^1 = \frac{1}{\|\bm x\|}\min_i t_i > \min_i t_i,
+\]
+since $\|\bm x\|<1$. Thus we obtain a strictly higher objective value, contradicting optimality of a solution with
+$\|\bm x\|<1$. Therefore any optimizer of SVM-3 must satisfy $\|\bm x\|=1$, and the optimizers of SVM-2 and SVM-3 coincide.
+\end{proofbox}

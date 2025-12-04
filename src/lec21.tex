@@ -1,0 +1,390 @@
+\section{Lec 21}
+
+\subsection{Matrix Completion Problem}
+
+Given partially specified $\bm M \in (\R \cup \{?\})^{m \times n}$, the goal is
+to fill in the missing entries to obtain a completion with as low rank as
+possible.
+
+\begin{theorembox}
+\textbf{Candès–Recht Relaxation (CR Relaxation).}
+\[
+\min_{\bm X} \|\bm X\|_* \quad \text{subject to} \quad \bm X(\Omega) = \bm M(\Omega),
+\]
+where
+\[
+\Omega = \{(i,j)\in\{1,\dots,m\}\times\{1,\dots,n\} : \bm M(i,j)\neq ?\}.
+\]
+\end{theorembox}
+
+Extension of CR Relaxation to noisy $\bm M$:
+\[
+\min_{\bm X} \frac12 \sum_{(i,j)\in\Omega} \bigl(\bm X(i,j)-\bm M(i,j)\bigr)^2
+\;+\; \gamma \|\bm X\|_*.
+\]
+
+Norms are proper, closed, convex functions and are typically nonsmooth,
+so we are in a good setting for proximal / first-order methods.
+
+We will use \emph{APGD} and therefore need $\operatorname{prox}$ for the nuclear norm
+$\|\cdot\|_*$.
+
+\begin{theorembox}
+Let $\bm X\in\R^{m\times n}$ with $m\ge n$, and let $\bm X=\bm U\bm\Sigma \bm V^\top$ be its SVD
+with singular values $\sigma_1,\dots,\sigma_n$ on the diagonal of $\bm\Sigma$.
+Then
+\[
+\operatorname{prox}_{t\|\cdot\|_*}(\bm X)
+=
+\bm U\,
+\operatorname{diag}\bigl(\max(\sigma_1-t,0),\dots,\max(\sigma_n-t,0)\bigr)\,
+\bm V^\top.
+\]
+That is, the proximal operator for $\|\cdot\|_*$ performs soft–thresholding
+on the singular values.
+\end{theorembox}
+
+\begin{proofbox}
+
+For matrices, the proximal operator is
+\[
+\operatorname{prox}_{t\|\cdot\|_*}(\bm X)
+=
+\argmin_{\bm Z}
+\left\{ t\|\bm Z\|_* + \frac12\|\bm Z-\bm X\|_{\mathrm F}^2 \right\}.
+\]
+
+Use unitary invariance of both $\|\cdot\|_{\mathrm F}$ and $\|\cdot\|_*$.
+Write $\bm X=\bm U\bm\Sigma \bm V^\top$ with $\bm U,\bm V$ orthogonal, and set
+\[
+\bm W \defeq \bm U^\top \bm Z \bm V.
+\]
+Then
+\[
+\|\bm Z-\bm X\|_{\mathrm F} = \|\bm U^\top \bm Z \bm V - \bm\Sigma\|_{\mathrm F} = \|\bm W-\bm\Sigma\|_{\mathrm F},
+\qquad
+\|\bm Z\|_* = \|\bm U^\top \bm Z \bm V\|_* = \|\bm W\|_*.
+\]
+Hence
+\[
+\argmin_{\bm Z}\left\{t\|\bm Z\|_* + \frac12\|\bm Z-\bm X\|_{\mathrm F}^2\right\}
+=
+\bm U\left(
+\argmin_{\bm W}\left\{t\|\bm W\|_* + \frac12\|\bm W-\bm\Sigma\|_{\mathrm F}^2\right\}
+\right)\bm V^\top.
+\]
+So it suffices to solve
+\[
+\min_{\bm W} \; t\|\bm W\|_* + \frac12\|\bm W-\bm\Sigma\|_{\mathrm F}^2.
+\]
+
+\begin{theorembox}[title={Lemma}]
+For any $\bm W\in\R^{m\times n}$ with $m\ge n$,
+\[
+\|\bm W\|_* \;\ge\; |\bm W(1,1)|+\cdots+|\bm W(n,n)|.
+\]
+\end{theorembox}
+
+\begin{proofbox}
+\textbf{Proof of Lemma.}
+
+By the dual characterization of the nuclear norm,
+\[
+\|\bm W\|_* = \sup\{\langle \bm W,\bm Y\rangle : \|\bm Y\|_2\le 1\}.
+\]
+Choose
+\[
+\hat{\bm Y} = \operatorname{diag}(\pm1,\dots,\pm1),
+\]
+with signs chosen so that the $(i,i)$ entry of $\hat{\bm Y}$ has the same
+sign as $\bm W(i,i)$. Then $\|\hat{\bm Y}\|_2=1$ and
+\[
+\|\bm W\|_* \;\ge\; \langle \bm W,\hat{\bm Y}\rangle
+= \sum_{i=1}^n \bm W(i,i)\,\hat{\bm Y}(i,i)
+= \sum_{i=1}^n |\bm W(i,i)|.
+\]
+\end{proofbox}
+
+Now consider the objective
+\[
+\Phi(\bm W) \defeq t\|\bm W\|_* + \frac12\|\bm W-\bm\Sigma\|_{\mathrm F}^2.
+\]
+Write $\bm W_0$ for the diagonal matrix formed from the diagonal of $\bm W$.  
+From the lemma, $\|\bm W\|_* \ge \|\bm W_0\|_*$, and since $\bm\Sigma$ is diagonal,
+\[
+\|\bm W-\bm\Sigma\|_{\mathrm F}^2
+=
+\|\bm W_0-\bm\Sigma\|_{\mathrm F}^2 + \text{(nonnegative off-diagonal terms)},
+\]
+so $\|\bm W-\bm\Sigma\|_{\mathrm F} \ge \|\bm W_0-\bm\Sigma\|_{\mathrm F}$ with equality only when $\bm W$ is
+diagonal. Thus $\Phi(\bm W)\ge \Phi(\bm W_0)$, and any minimizer of $\Phi$ must
+be diagonal.
+
+Let $\bm W=\operatorname{diag}(w_1,\dots,w_n)$ and
+$\bm\Sigma=\operatorname{diag}(\sigma_1,\dots,\sigma_n)$. Then
+\[
+\|\bm W\|_* = \sum_{i=1}^n |w_i|,
+\qquad
+\|\bm W-\bm\Sigma\|_{\mathrm F}^2 = \sum_{i=1}^n (w_i-\sigma_i)^2.
+\]
+So the problem decouples across $i$:
+\[
+\min_{\bm w\in\R^n}
+\left\{
+t\|\bm w\|_1 + \frac12\|\bm w - \bm\sigma\|_2^2
+\right\},
+\quad
+\bm\sigma=(\sigma_1,\dots,\sigma_n)^\top.
+\]
+This is exactly the proximal operator of $t\|\cdot\|_1$ at $\bm\sigma$,
+whose solution is componentwise soft–thresholding:
+\[
+w_i =
+\begin{cases}
+\sigma_i - t, & \sigma_i \ge t,\\[0.25em]
+0, & \sigma_i < t.
+\end{cases}
+\]
+
+Hence
+\[
+\operatorname{prox}_{t\|\cdot\|_*}(\bm X)
+=
+\bm U\,\operatorname{diag}\bigl(\max(\sigma_i-t,0)\bigr)_{i=1}^n\,\bm V^\top,
+\]
+which completes the proof.
+\end{proofbox}
+
+\subsection{Economy-sized SVD}
+
+Given $\bm X\in\R^{m\times n}$ with $m\ge n$,
+\[
+\bm X = \bm U\bm\Sigma\bm V^\top
+= \bm U(:,1\!:\!n)\,\bm\Sigma(1\!:\!n,1\!:\!n)\,\bm V(:,1\!:\!n)^\top.
+\]
+This is the \textbf{economy-sized SVD}.
+
+In practice, for the nuclear-norm proximal operator we only need the
+nonzero singular values and corresponding singular vectors, so we use
+the economy-sized SVD, especially when $m\gg n$.
+
+\subsection{Rank–Sparsity Decomposition}
+
+Given $\bm A\in\R^{m\times n}$, seek $\bm L,\bm M\in\R^{m\times n}$ such that
+\[
+\bm A = \bm L + \bm M,
+\]
+with
+\begin{itemize}
+  \item $\bm L$ sparse (most entries zero),
+  \item $\bm M$ low rank ($\operatorname{rank}(\bm M)\ll\min(m,n)$).
+\end{itemize}
+
+\emph{Application:} background identification / removal from video
+frames (Problem Set 6). Think of columns of $\bm A$ as vectorized frames:
+background is nearly low rank, moving objects are sparse.
+
+If $\bm A$ itself were simultaneously very sparse and very low rank, the
+decomposition would be ill-posed. So we assume $\bm L$ is sparse and
+high rank, while $\bm M$ is dense and low rank.
+
+\begin{theorembox}
+\textbf{Convex relaxation} (Candès et al.\ 2011; Chandrasekaran et al.\ 2011).
+\[
+\min_{\bm L,\bm M} \;\|\bm L\|_{\ell_1} + \gamma\|\bm M\|_*
+\quad\text{subject to}\quad
+\bm L + \bm M = \bm A,
+\]
+where
+\[
+\|\bm L\|_{\ell_1}
+=
+\sum_{i=1}^m\sum_{j=1}^n |\bm L(i,j)|,
+\quad
+\gamma>0.
+\]
+\end{theorembox}
+
+We solve this with \textbf{ADMM} (Alternating Direction Method of
+Multipliers).
+
+\subsubsection{ADMM for two blocks}
+
+General form:
+\[
+\min_{\bm x,\bm y} f(\bm x) + g(\bm y)
+\quad\text{subject to}\quad
+\bm A\bm x + \bm B\bm y = \bm c,
+\]
+where $\bm x\in\R^n$, $\bm y\in\R^m$, $\bm A\in\R^{p\times n}$,
+$\bm B\in\R^{p\times m}$, $\bm c\in\R^p$.
+
+\textbf{Augmented Lagrangian:}
+\[
+\mathcal L_A(\bm x,\bm y;\bm\mu)
+=
+f(\bm x)+g(\bm y)
++ \bm\mu^\top(\bm A\bm x + \bm B\bm y - \bm c)
++ \frac{\rho}{2}\|\bm A\bm x + \bm B\bm y - \bm c\|_2^2,
+\]
+where $\rho>0$.
+
+\textbf{ADMM iteration:}
+\[
+\begin{aligned}
+&\bm y^0\ \text{arbitrary},\quad \bm\mu^0\ \text{arbitrary},\\[0.25em]
+&\text{for }k=0,1,2,\dots\\
+&\quad \bm x^{k+1}
+:= \argmin_{\bm x}\;\mathcal L_A(\bm x,\bm y^k;\bm\mu^k),\\
+&\quad \bm y^{k+1}
+:= \argmin_{\bm y}\;\mathcal L_A(\bm x^{k+1},\bm y;\bm\mu^k),\\
+&\quad \bm\mu^{k+1}
+:= \bm\mu^k + \rho\,(\bm A\bm x^{k+1} + \bm B\bm y^{k+1} - \bm c).
+\end{aligned}
+\]
+
+\subsubsection{Specialization to Rank–Sparsity}
+
+Here the constraint is $\bm L+\bm M=\bm A$; the augmented Lagrangian is
+\[
+\mathcal L_A(\bm L,\bm M;\bm\Lambda)
+=
+\|\bm L\|_{\ell_1} + \gamma\|\bm M\|_*
++ \langle \bm\Lambda, \bm L+\bm M-\bm A\rangle
++ \frac{\rho}{2}\|\bm L+\bm M-\bm A\|_{\mathrm F}^2,
+\]
+where $\bm\Lambda$ is the matrix of Lagrange multipliers and
+$\langle \cdot,\cdot\rangle$ is the Frobenius inner product.
+
+\paragraph{Step 1: $\bm L$-update.}
+\[
+\begin{aligned}
+\bm L^{k+1}
+&:= \argmin_{\bm L}\;\mathcal L_A(\bm L,\bm M^k;\bm\Lambda^k)\\
+&= \argmin_{\bm L}\left\{
+\|\bm L\|_{\ell_1}
++ \langle \bm\Lambda^k,\bm L\rangle
++ \frac{\rho}{2}\|\bm L+\bm M^k-\bm A\|_{\mathrm F}^2
++ \text{(constants)}
+\right\}.
+\end{aligned}
+\]
+Complete the square:
+\[
+\bm L^{k+1}
+= \argmin_{\bm L}\left\{
+\|\bm L\|_{\ell_1}
++ \frac{\rho}{2}\left\|\bm L + \bm M^k - \bm A + \frac{1}{\rho}\bm\Lambda^k\right\|_{\mathrm F}^2
++ \text{(constants)}
+\right\}.
+\]
+Thus
+\[
+\bm L^{k+1}
+=
+\operatorname{prox}_{\frac1\rho\|\cdot\|_{\ell_1}}
+\left(-\bm M^k + \bm A - \frac{1}{\rho}\bm\Lambda^k\right),
+\]
+i.e.\ entrywise soft–thresholding with parameter $1/\rho$.
+
+\paragraph{Step 2: $\bm M$-update.}
+\[
+\begin{aligned}
+\bm M^{k+1}
+&:= \argmin_{\bm M}\;\mathcal L_A(\bm L^{k+1},\bm M;\bm\Lambda^k)\\
+&= \argmin_{\bm M}\left\{
+\gamma\|\bm M\|_*
++ \langle \bm\Lambda^k,\bm M\rangle
++ \frac{\rho}{2}\|\bm L^{k+1}+\bm M-\bm A\|_{\mathrm F}^2
+\right\}\\[0.25em]
+&= \argmin_{\bm M}\left\{
+\gamma\|\bm M\|_*
++ \frac{\rho}{2}
+\left\|\bm M + \bm L^{k+1} - \bm A + \frac{1}{\rho}\bm\Lambda^k\right\|_{\mathrm F}^2
+\right\}.
+\end{aligned}
+\]
+So
+\[
+\bm M^{k+1}
+=
+\operatorname{prox}_{\frac{\gamma}{\rho}\|\cdot\|_*}
+\left(-\bm L^{k+1} + \bm A - \frac{1}{\rho}\bm\Lambda^k\right),
+\]
+i.e.\ singular value soft–thresholding (using economy-sized SVD).
+
+\paragraph{Step 3: Multiplier update.}
+\[
+\bm\Lambda^{k+1}
+:= \bm\Lambda^k + \rho\bigl(\bm L^{k+1}+\bm M^{k+1}-\bm A\bigr).
+\]
+
+\subsubsection{ADMM Motivation: Method of Multipliers}
+
+Consider
+\[
+\min_{\bm x} f(\bm x)
+\quad\text{s.t.}\quad
+\bm h(\bm x)=\bm 0,
+\]
+with $f:\R^n\to\R$, $\bm h:\R^n\to\R^p$.
+
+The augmented Lagrangian is
+\[
+\mathcal L_A(\bm x;\bm\mu)
+=
+f(\bm x)
++ \bm\mu^\top \bm h(\bm x)
++ \frac12\rho\|\bm h(\bm x)\|_2^2.
+\]
+
+Given $\hat{\bm\mu}$, define $\hat{\bm x}$ by
+\[
+\nabla_{\bm x}\mathcal L_A(\hat{\bm x};\hat{\bm\mu}) = \bm 0,
+\]
+that is,
+\[
+\nabla f(\hat{\bm x})
++ \bm J(\hat{\bm x})^\top \hat{\bm\mu}
++ \rho\,\bm J(\hat{\bm x})^\top \bm h(\hat{\bm x}) = \bm 0,
+\]
+where
+\[
+\bm J(\hat{\bm x})
+=
+\begin{pmatrix}
+\nabla h_1(\hat{\bm x})^\top\\
+\vdots\\
+\nabla h_p(\hat{\bm x})^\top
+\end{pmatrix}
+\in\R^{p\times n}
+\]
+is the Jacobian.
+
+Compare with the KKT conditions:
+\[
+\begin{aligned}
+&\bm h(\bm x^*) = \bm 0,\\
+&\nabla f(\bm x^*) + \bm J(\bm x^*)^\top \bm\mu^* = \bm 0.
+\end{aligned}
+\]
+If we define
+\[
+\bm\mu^{\text{new}} := \hat{\bm\mu} + \rho\,\bm h(\hat{\bm x}),
+\]
+the stationarity equation above resembles the KKT stationarity equation
+with updated multiplier.
+
+Thus the \textbf{method of multipliers} (augmented Lagrangian method)
+updates
+\[
+\begin{aligned}
+\bm x^{k+1} &:= \argmin_{\bm x}\;\mathcal L_A(\bm x;\bm\mu^k),\\
+\bm\mu^{k+1} &:= \bm\mu^k + \rho\,\bm h(\bm x^{k+1}).
+\end{aligned}
+\]
+
+ADMM can be viewed as applying this idea but approximating the primal
+minimization by alternating minimization over blocks of variables
+($\bm x$-block, $\bm y$-block), which leads to the simple, proximal-based
+updates used in rank–sparsity decomposition.

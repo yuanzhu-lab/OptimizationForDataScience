@@ -1,0 +1,422 @@
+\section{Lec 7}
+
+\subsection{Descent Methods}
+
+\subsubsection{Analysis of Gradient Descent for $L$-smooth Convex Case}
+
+\begin{theorembox}
+Let $f:\R^n\to\R$ be convex and $L$-smooth, and suppose there exists $\bm x^*$ such that
+\[
+\nabla f(\bm x^*) = \0
+\]
+(so $\bm x^*$ is a global minimizer). If gradient descent is initiated at $\bm x^0$ with step sizes
+\[
+\alpha_k \equiv \frac{1}{L},
+\]
+then
+\[
+f(\bm x^k) - f(\bm x^*)
+\le \frac{L\|\bm x^0 - \bm x^*\|^2}{2k},
+\quad \forall k=1,2,\dots.
+\]
+\end{theorembox}
+
+Aside:
+\[
+f(\bm x^l)\le f(\bm x^{l-1})\le\cdots\le f(\bm x^0).
+\]
+
+Any method with this monotone decrease property is called a \textbf{descent method}.
+
+The proof was given in the previous lecture.
+
+\subsubsection{Analysis of Gradient Descent for $L$-smooth Nonconvex Case}
+
+For minimizing nonconvex functions, global minimizers are usually hard to find, even for $n=1$.  
+In higher dimensions, even local minimizers can be difficult.
+
+So we often settle for \textbf{stationary points}, i.e.\ seek $\bm x^*$ such that
+\[
+\nabla f(\bm x^*) = \0,
+\]
+(although even this may be impossible if $f$ has no stationary point).
+
+\begin{examplebox}
+\[
+f(x) = \sqrt{x^2+1} + x
+\]
+is smooth, convex, and $L$-smooth with $L=1$, but it has no stationary point.  
+
+If gradient descent is applied to this $f$, the sequence $x^k$ tends to $-\infty$ and $f'(x^k)\to 0$.
+\end{examplebox}
+
+\begin{theorembox}
+Suppose $f:\R^n\to\R$ is $L$-smooth (not necessarily convex) and bounded below by $f_{\min}$.  
+Apply gradient descent with step size $1/L$ starting at $\bm x^0$. Then:
+\begin{enumerate}
+\item
+\[
+\min_{0\le j\le k-1}\|\nabla f(\bm x^j)\|
+\;\le\;
+\sqrt{\frac{2L\bigl(f(\bm x^0)-f_{\min}\bigr)}{k}},
+\]
+\item
+\[
+\nabla f(\bm x^j)\to \0
+\quad\text{as } j\to\infty.
+\]
+\end{enumerate}
+\end{theorembox}
+
+\begin{proofbox}
+Recall from $L$-smoothness and the \emph{GD} update with step size $1/L$:
+\[
+f(\bm x^{j+1})
+\le f(\bm x^j) - \frac{1}{2L}\|\nabla f(\bm x^j)\|^2.
+\]
+
+Summing from $j=0$ to $k-1$,
+\[
+\begin{aligned}
+f(\bm x^k)
+&\le f(\bm x^0)
+   - \frac{1}{2L}\sum_{j=0}^{k-1}\|\nabla f(\bm x^j)\|^2.
+\end{aligned}
+\]
+
+Since $f(\bm x^k)\ge f_{\min}$, we obtain
+\[
+f_{\min} - f(\bm x^0)
+\le - \frac{1}{2L}\sum_{j=0}^{k-1}\|\nabla f(\bm x^j)\|^2,
+\]
+or equivalently
+\[
+\frac{1}{2L}\sum_{j=0}^{k-1}\|\nabla f(\bm x^j)\|^2
+\le f(\bm x^0) - f_{\min}.
+\]
+
+Taking $k\to\infty$ shows
+\[
+\sum_{j=0}^{\infty}\|\nabla f(\bm x^j)\|^2 < \infty,
+\]
+so $\|\nabla f(\bm x^j)\|\to 0$ as $j\to\infty$, proving (2).
+
+For (1), note
+\[
+\sum_{j=0}^{k-1}\|\nabla f(\bm x^j)\|^2
+\;\ge\;
+k\cdot \min_{0\le j\le k-1}\|\nabla f(\bm x^j)\|^2.
+\]
+Thus
+\[
+\frac{k}{2L}\,
+\min_{0\le j\le k-1}\|\nabla f(\bm x^j)\|^2
+\le f(\bm x^0) - f_{\min},
+\]
+which implies
+\[
+\min_{0\le j\le k-1}\|\nabla f(\bm x^j)\|
+\le \sqrt{\frac{2L\bigl(f(\bm x^0)-f_{\min}\bigr)}{k}}.
+\]
+\end{proofbox}
+
+\subsection{Strongly Convex Functions}
+
+\subsubsection{Definitions}
+
+Say $f:\R^n\to \R\cup\{\infty\}$ is \textbf{$m$-strongly convex} with modulus $m\ge 0$ if for all $\bm x,\bm y\in\R^n$ and all $\lambda\in[0,1]$,
+\begin{equation}
+f((1-\lambda)\bm x+\lambda \bm y)
+\le (1-\lambda)f(\bm x) + \lambda f(\bm y)
+   - \frac12\lambda(1-\lambda)m\|\bm x-\bm y\|^2.
+\tag{1}
+\end{equation}
+
+Notes:
+\begin{itemize}
+\item $m=0$ is exactly the usual notion of convexity.
+\item “Strongly convex” (without specifying $m$) means the above holds for some $m>0$.
+\end{itemize}
+
+\subsubsection{Differentiable Strongly Convex Functions}
+
+\begin{theorembox}
+Let $f:\R^n\to \R\cup\{\infty\}$ be differentiable on $\operatorname{dom}(f)$, and assume $\operatorname{dom}(f)$ is open and convex. Then $f$ is strongly convex with modulus $m$ if and only if
+\begin{equation}
+\forall \bm x,\bm y\in \R^n,\quad
+f(\bm y)
+\ge f(\bm x)
++ \nabla f(\bm x)^{\top}(\bm y-\bm x)
++ \frac{m}{2}\|\bm y-\bm x\|^2.
+\tag{2}
+\end{equation}
+\end{theorembox}
+
+Note that the last term strengthens the usual subgradient inequality.
+
+\begin{proofbox}
+\textbf{Forward direction $\Rightarrow$.}
+
+By differentiability, for any $\bm x,\bm y$ and $\lambda\in[0,1]$,
+\begin{equation}
+f((1-\lambda)\bm x+\lambda\bm y)
+= f(\bm x)
++ \lambda\,\nabla f(\bm x)^{\top}(\bm y-\bm x)
++ \phi_{\bm x}(\lambda(\bm y-\bm x)),
+\tag{3}
+\end{equation}
+where
+\[
+\lim_{\bm h\to \bm0,\ \bm h\ne \bm0}
+\frac{\phi_{\bm x}(\bm h)}{\|\bm h\|}=0.
+\]
+
+Combine strong convexity (1) with (3):
+\[
+\begin{aligned}
+&f(\bm x)
++ \lambda\,\nabla f(\bm x)^{\top}(\bm y-\bm x)
++ \phi_{\bm x}(\lambda(\bm y-\bm x))\\
+&\le (1-\lambda)f(\bm x) + \lambda f(\bm y)
+    - \frac12 m\lambda(1-\lambda)\|\bm y-\bm x\|^2.
+\end{aligned}
+\]
+
+Subtract $f(\bm x)$ and divide by $\lambda>0$:
+\[
+\nabla f(\bm x)^{\top}(\bm y-\bm x)
++ \frac{\phi_{\bm x}(\lambda(\bm y-\bm x))}{\lambda}
+\le f(\bm y) - f(\bm x)
+ - \frac12 m(1-\lambda)\|\bm y-\bm x\|^2.
+\]
+
+Let $\lambda\downarrow 0$. The remainder term vanishes and $(1-\lambda)\to 1$, yielding
+\[
+f(\bm y)
+\ge f(\bm x)
++ \nabla f(\bm x)^{\top}(\bm y-\bm x)
++ \frac{m}{2}\|\bm y-\bm x\|^2,
+\]
+which is (2).
+
+\medskip
+\textbf{Backward direction $\Leftarrow$.}
+
+Assume (2). Take $\bm x,\bm y\in\operatorname{dom}(f)$ and $\lambda\in[0,1]$. Let
+\[
+\bm z := (1-\lambda)\bm x + \lambda\bm y.
+\]
+
+Apply (2) twice, once with $(\bm z,\bm x)$ and once with $(\bm z,\bm y)$:
+\[
+\begin{aligned}
+\text{a)}\quad
+f(\bm x)
+&\ge f(\bm z)
+   + \nabla f(\bm z)^{\top}(\bm x-\bm z)
+   + \frac{m}{2}\|\bm x-\bm z\|^2,\\[0.3em]
+\text{b)}\quad
+f(\bm y)
+&\ge f(\bm z)
+   + \nabla f(\bm z)^{\top}(\bm y-\bm z)
+   + \frac{m}{2}\|\bm y-\bm z\|^2.
+\end{aligned}
+\]
+
+Multiply (a) by $(1-\lambda)$ and (b) by $\lambda$, then add:
+\[
+\begin{aligned}
+&(1-\lambda)f(\bm x) + \lambda f(\bm y)\\
+&\ge (1-\lambda)\Bigl[f(\bm z)
+       + \nabla f(\bm z)^{\top}(\bm x-\bm z)\Bigr]
+   + \lambda\Bigl[f(\bm z)
+       + \nabla f(\bm z)^{\top}(\bm y-\bm z)\Bigr]\\
+&\quad
+   + \frac{m}{2}\Bigl[(1-\lambda)\|\bm x-\bm z\|^2
+                     + \lambda\|\bm y-\bm z\|^2\Bigr].
+\end{aligned}
+\]
+
+Note that $(1-\lambda)(\bm x-\bm z)
++ \lambda(\bm y-\bm z) = \0$, and
+\[
+(1-\lambda)\|\bm x-\bm z\|^2
++ \lambda\|\bm y-\bm z\|^2
+= \lambda(1-\lambda)\|\bm x-\bm y\|^2.
+\]
+
+Hence
+\[
+(1-\lambda)f(\bm x) + \lambda f(\bm y)
+\ge f(\bm z)
+ + \frac{m}{2}\lambda(1-\lambda)\|\bm x-\bm y\|^2,
+\]
+which is exactly the strong convexity inequality (1).
+\end{proofbox}
+
+\subsubsection{Second Derivatives and Convexity}
+
+\begin{theorembox}
+Let $f:\R^n\to \R\cup\{\infty\}$ be $\mathcal C^2$ on $\operatorname{dom}(f)$, and assume $\operatorname{dom}(f)$ is open and convex. Then $f$ is strongly convex with modulus $m$ on $\operatorname{dom}(f)$ if and only if
+\[
+\nabla^2 f(\bm x) \succeq m \I,
+\quad \forall \bm x\in \operatorname{dom}(f).
+\]
+
+In particular,
+\[
+f\ \text{convex}
+\;\Longleftrightarrow\;
+\nabla^2 f(\bm x)\ \text{is positive semidefinite for all }\bm x.
+\]
+\end{theorembox}
+
+\begin{proofbox}
+Fix $\bm x\in \operatorname{dom}(f)$ and $\bm u\in\R^n$. Choose $\alpha\ge 0$ small enough that $\bm x+\alpha\bm u\in\operatorname{dom}(f)$. By the second-order Taylor expansion, there exists $\gamma\in[0,1]$ such that
+\begin{equation}
+f(\bm x+\alpha\bm u)
+= f(\bm x)
++ \alpha\,\nabla f(\bm x)^{\top}\bm u
++ \frac12\alpha^2\,\bm u^{\top}
+  \nabla^2 f(\bm x+\gamma\alpha\bm u)\,\bm u.
+\tag{4}
+\end{equation}
+
+\textbf{Forward direction $\Rightarrow$.}  
+Assume $f$ is strongly convex with modulus $m$. Then by the characterization (2),
+\[
+f(\bm x+\alpha\bm u)
+\ge f(\bm x)
++ \alpha\,\nabla f(\bm x)^{\top}\bm u
++ \frac{m}{2}\alpha^2\|\bm u\|^2.
+\]
+
+Subtract (4) and cancel the linear terms:
+\[
+\frac12\alpha^2\,\bm u^{\top}
+  \nabla^2 f(\bm x+\gamma\alpha\bm u)\,\bm u
+\ge \frac{m}{2}\alpha^2\|\bm u\|^2.
+\]
+
+Dividing by $\frac12\alpha^2$,
+\[
+\bm u^{\top}
+\nabla^2 f(\bm x+\gamma\alpha\bm u)\,\bm u
+\ge m\|\bm u\|^2.
+\]
+
+Let $\alpha\downarrow 0$. By continuity of the Hessian,
+\[
+\bm u^{\top}\nabla^2 f(\bm x)\,\bm u
+\ge m\|\bm u\|^2,\quad \forall \bm u,
+\]
+i.e.\ $\nabla^2 f(\bm x) - m \I\succeq 0$ for all $\bm x$.
+
+\medskip
+\textbf{Backward direction $\Leftarrow$.}  
+Assume $\nabla^2 f(\bm x)\succeq m \I$ for all $\bm x$. Then for any $\bm x,\bm z\in\operatorname{dom}(f)$, apply (4) with $\alpha\bm u := \bm z-\bm x$:
+\[
+f(\bm z)
+= f(\bm x)
++ \nabla f(\bm x)^{\top}(\bm z-\bm x)
++ \frac12(\bm z-\bm x)^{\top}
+  \nabla^2 f(\bm x+\gamma(\bm z-\bm x))
+  (\bm z-\bm x).
+\]
+
+Using $\nabla^2 f(\cdot)\succeq m \I$,
+\[
+\frac12(\bm z-\bm x)^{\top}
+  \nabla^2 f(\bm x+\gamma(\bm z-\bm x))
+  (\bm z-\bm x)
+\ge \frac{m}{2}\|\bm z-\bm x\|^2.
+\]
+
+Hence
+\[
+f(\bm z)
+\ge f(\bm x)
++ \nabla f(\bm x)^{\top}(\bm z-\bm x)
++ \frac{m}{2}\|\bm z-\bm x\|^2,
+\]
+which is the strong convexity condition (2). Thus $f$ is strongly convex with modulus $m$.
+\end{proofbox}
+
+\begin{examplebox}
+\begin{itemize}
+\item Quadratic:
+\[
+f(\bm x)
+= \frac12 \bm x^{\top} \bm H \bm x
+  + \bm g^{\top}\bm x + d,\quad
+\nabla f(\bm x) =  \bm H \bm x + \bm g,\quad
+\nabla^2 f(\bm x) =  \bm H.
+\]
+Then
+\[
+f \text{ convex } \Longleftrightarrow  \bm H \succeq \0,
+\quad
+f \text{ strongly convex (modulus $m$) }
+\Longleftrightarrow  \bm H \succeq m \I.
+\]
+
+\item Exponential:
+\[
+f(x) = e^x,\quad f''(x) = e^x > 0
+\;\Rightarrow\; f \text{ convex}.
+\]
+
+\item Reciprocal:
+\[
+f(x) =
+\begin{cases}
+\dfrac{1}{x}, & x>0,\\[0.2em]
+\infty, & x\le 0,
+\end{cases}
+\quad f''(x) = \dfrac{2}{x^3} > 0 \;\Rightarrow\; f \text{ convex}.
+\]
+
+\item Negative log:
+\[
+f(x) =
+\begin{cases}
+-\ln x, & x>0,\\
+\infty, & x\le 0,
+\end{cases}
+\quad f''(x) = \dfrac{1}{x^2} > 0 \;\Rightarrow\; f \text{ convex}.
+\]
+
+\item Non-differentiable example: $f(x)=\|x\|_\square$ is convex, but the second-derivative test does not apply directly.
+\end{itemize}
+\end{examplebox}
+
+\subsubsection{Norm of Matrices}
+
+Given $\bm A\in \R^{m\times n}$, the operator $2$-norm is defined as
+\[
+\|\bm A\|_2
+= \sqrt{\lambda_{\max}(\bm A^{\top} \bm A)}.
+\]
+
+\begin{factbox}
+\begin{itemize}
+\item $\|\bm A\|_2 \le \|\bm A\|_F
+\le \sqrt{\min(m,n)}\,\|\bm A\|_2$, where
+\[
+\|\bm A\|_F
+= \sqrt{\sum_{i=1}^m\sum_{j=1}^n A(i,j)^2}
+\]
+is the Frobenius norm.
+\item For a $\mathcal C^2$ function $f$, $f$ is $L$-smooth if and only if
+\[
+\|\nabla^2 f(\bm x)\|_2 \le L
+\quad\forall \bm x.
+\]
+\item If $\bm A\in\Sbb^n$ (symmetric), then
+\[
+\|\bm A\|_2
+= \max\bigl\{|\lambda_{\min}(\bm A)|,\,
+                |\lambda_{\max}(\bm A)|\bigr\}.
+\]
+\end{itemize}
+\end{factbox}

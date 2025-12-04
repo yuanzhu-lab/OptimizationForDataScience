@@ -1,0 +1,230 @@
+\section{Lec 8}
+
+\subsection{Linear Algebra Facts}
+
+\begin{enumerate}[label=\arabic*., leftmargin=2em]
+\item For a matrix $\bm A$, define the operator $2$-norm:
+\[
+\|\bm A\|_2 := \left(\lambda_{\max}(\bm A^\top \bm A)\right)^{\frac12}.
+\]
+For $\bm A\in \Sbb^n$, 
+\[
+\|\bm A\|_2=\max\big(|\lambda_{\min}(\bm A)|,\,|\lambda_{\max}(\bm A)|\big).
+\]
+For $\bm A\in \Spp$,
+\[
+\|\bm A\|_2=\lambda_{\max}(\bm A).
+\]
+
+\item Recall: eigenvalues of $\bm A-\lambda \I$ are the eigenvalues of $\bm A$ shifted by $-\lambda$.
+
+For $\bm A\in \Sbb^n$,
+\[
+\bm A\succeq t\I \;\Leftrightarrow\; \lambda_i(\bm A)\geq t,\quad \forall i=1,\dots,n,
+\]
+\[
+\bm A\preceq t\I \;\Leftrightarrow\; \lambda_i(\bm A)\leq t,\quad \forall i=1,\dots,n.
+\]
+\end{enumerate}
+
+\subsection{\texorpdfstring{$m$}{m}-strongly Convex Functions}
+
+\subsubsection{Two Lemmas}
+
+Given $f:\R^n\rightarrow \R$, with $f\in \mathcal C^2$,
+\[
+\begin{aligned}
+f \text{ is }L\text{-smooth} &\;\Leftrightarrow\; -L\I\preceq\nabla^2 f(\bm x)\preceq L\I,\quad& \forall \bm x\in \R^n,\\[2pt]
+f \text{ is convex}&\;\Leftrightarrow\; \nabla^2 f(\bm x)\succeq \0,\quad&\forall \bm x\in \R^n,\\[2pt]
+f \text{ is }m\text{-strongly convex}&\;\Leftrightarrow\; \nabla^2 f(\bm x)\succeq m\I,\quad&\forall \bm x\in \R^n,\\[2pt]
+f\text{ is }L\text{-smooth, } m\text{-strongly convex}&\;\Leftrightarrow\; m\I\preceq \nabla^2f(\bm x)\preceq L\I,\quad& \forall \bm x\in \R^n.
+\end{aligned}
+\]
+
+\begin{examplebox}
+\[
+f(\bm x)=\frac12 \bm x^\top \bm H\bm x+\bm g^\top \bm x+d,\qquad \bm H\in \Sbb^n.
+\]
+Then
+\[
+\begin{aligned}
+f\text{ is }L\text{-smooth}&\;\Leftrightarrow\; -L\I\preceq \bm H\preceq L\I,\\
+f\text{ is convex}&\;\Leftrightarrow\; \bm H\succeq \0,\\
+f\text{ is }m\text{-strongly convex}&\;\Leftrightarrow\; \bm H\succeq m\I.
+\end{aligned}
+\]
+\end{examplebox}
+
+\begin{theorembox}[title={Lemma}]
+$f:\R^n\rightarrow \R\cup\{\infty\}$ is $m$-strongly convex $\;\Leftrightarrow\;$
+\(
+g(\bm x):= f(\bm x)-\dfrac{m}{2}\|\bm x\|^2
+\)
+is convex.
+\end{theorembox}
+
+\begin{proofbox}
+Algebra shows $\forall \lambda\in\R,\ \forall \bm x,\bm y\in\R^n$,
+\[
+\begin{aligned}
+&(1-\lambda)g(\bm x)+\lambda g(\bm y)-g\big((1-\lambda)\bm x+\lambda \bm y\big)\\
+=&\ (1-\lambda)f(\bm x)+\lambda f(\bm y)-f\big((1-\lambda)\bm x+\lambda \bm y\big)-\frac{m}{2}\lambda(1-\lambda)\|\bm x-\bm y\|^2.
+\end{aligned}
+\]
+\end{proofbox}
+
+\begin{theorembox}[title={Lemma}]
+If $f:\R^n\rightarrow \R\cup\{\infty\}$ is convex, then $\exists\, \bm a\in \R^n,\ b\in \R$ such that
+\[
+f(\bm x)\geq \underbrace{\bm a^\top \bm x+b}_{\text{Affine Underestimator}},\quad\forall \bm x\in \R^n.
+\]
+\end{theorembox}
+
+\begin{proofbox}
+If $f$ is differentiable, this is an immediate consequence of the subgradient inequality.
+\end{proofbox}
+
+\subsubsection{Two Theorems}
+
+Say $f:\R^n\rightarrow \R$ is \emph{coercive} if
+\[
+\forall s\in \R,\ \exists r\in \R \text{ such that }\|\bm x\|\geq r\Rightarrow f(\bm x)\geq s.
+\]
+Intuitively, $f(\bm x)\to \infty$ as $\|\bm x\|\to \infty$.
+
+\begin{factbox}[title={Facts}]
+\begin{itemize}[leftmargin=1.5em, itemsep=2pt]
+\item If $f,g:\R^n\rightarrow \R$, $f\geq g$, and $g$ is coercive, then $f$ is coercive.
+\item $q(t)=\dfrac12at^2+bt+c:\R\rightarrow \R$ is coercive whenever $a>0$.
+\end{itemize}
+\end{factbox}
+
+\begin{theorembox}
+If $f:\R^n\rightarrow \R$ is continuous and coercive, then $f$ has a minimizer.
+\end{theorembox}
+
+\begin{proofbox}
+Choose $r$ such that $f(\bm x)\geq f(\bm 0)$ whenever $\|\bm x\|\geq r$ (by coercivity). Observe that $f$ restricted to $\Bbar(\bm 0,r)$ has a minimizer by compactness. Call it $\bm x^*$. Then $\bm x^*$ is a minimizer of $f$ over $\R^n$ since for $\bm x\notin\Bbar(\bm 0,r)$,
+\[
+f(\bm x)\geq f(\bm 0)\geq f(\bm x^*).
+\]
+\end{proofbox}
+
+\begin{theorembox}
+If $f:\R^n\rightarrow \R$ is $m$-strongly convex for $m>0$, then $f$ has a unique minimizer.
+\end{theorembox}
+
+\begin{proofbox}
+\textit{Uniqueness.} Suppose $\bm x_1\neq \bm x_2$ are both minimizers. Then
+\[
+f\!\left(\frac{\bm x_1+\bm x_2}{2}\right)\leq \frac12\big(f(\bm x_1)+f(\bm x_2)\big)-\underbrace{\frac18 m\|\bm x_1-\bm x_2\|^2}_{> 0},
+\]
+contradicting minimality of $\bm x_1,\bm x_2$.
+
+\smallskip
+\noindent\textit{Existence.} Let $g(\bm x)=f(\bm x)-\dfrac{m}{2}\|\bm x\|^2$, which is convex by Lemma~1. Let $\bm a^\top \bm x+b$ be an affine underestimate of $g$ by Lemma~2. Define $h(\bm x):=\bm a^\top \bm x+b+\dfrac{m}{2}\|\bm x\|^2$, an underestimate of $f(\bm x)$. We will show the function $h$ is coercive, which implies $f$ is coercive, so $f$ has a minimizer.
+
+Rewrite $h$ by completing the square:
+\[
+\begin{aligned}
+h(\bm x)&=\frac{m}{2}\left\|\bm x+\frac{\bm a}{m}\right\|^2-\frac{1}{2m}\bm a^\top \bm a+b,\\
+h(\bm x)-s&=\frac{m}{2}\left\|\bm x+\frac{\bm a}{m}\right\|^2-\frac1{2m}\bm a^\top \bm a+b-s,\quad \forall s\in \R\\
+&\geq \frac{m}{2}\left(\|\bm x\|-\frac{\|\bm a\|}{m}\right)^2-\frac1{2m}\bm a^\top \bm a+b-s.
+\end{aligned}
+\]
+This is a univariate quadratic in $\|\bm x\|$ with positive leading coefficient, hence coercive. Thus
+\[
+\exists\, r\text{ such that }\|\bm x\|\geq r\quad(r>0)\quad\Rightarrow\quad h(\bm x)\geq s.
+\]
+\end{proofbox}
+
+\subsection{Analysis of \emph{GD}\ for \texorpdfstring{$m$}{m}-strongly Convex Case}
+
+\begin{theorembox}
+Suppose $f:\R^n\rightarrow \R\cup\{\infty\}$ is $m$-strongly convex, $\bm x^*\in\intdom(f)$, $f$ is differentiable at $\bm x^*$, and $\nabla f(\bm x^*)=\0$ (so $\bm x^*$ is a minimizer; we cannot deduce the converse since $f$ may not be differentiable at $\bm x^*$). Then for all $\bm x\in \intdom(f)$ where $\nabla f(\bm x)$ exists,
+\[
+\begin{aligned}
+\text{a)}\quad & f(\bm x)-f(\bm x^*)\leq \dfrac{\|\nabla f(\bm x)\|^2}{2m},\\
+\text{b)}\quad & \|\bm x-\bm x^*\|\leq \dfrac{2}{m}\|\nabla f(\bm x)\|.
+\end{aligned}
+\]
+\end{theorembox}
+
+\begin{proofbox}
+For all $\bm y\in \R^n$,
+\[
+f(\bm y)\geq f(\bm x)+\nabla f(\bm x)^\top (\bm y-\bm x)+\frac{m}{2}\|\bm x-\bm y\|^2.
+\]
+Both sides are functions of $\bm y$ (with $\bm x$ fixed). In general, if $\phi,\psi:\R^n\rightarrow \R\cup\{\infty\}$ satisfy $\phi(\bm y)\geq \psi(\bm y)$ for all $\bm y$, then
+\[
+\inf_{\bm y} \phi (\bm y)\geq \inf_{\bm y} \psi (\bm y).
+\]
+Apply this to the preceding inequality:
+\[
+f(\bm x^*)\geq \min_{\bm y} \left[f(\bm x)+\nabla f(\bm x)^\top(\bm y-\bm x)+\dfrac{m}{2}\|\bm x-\bm y\|^2\right].
+\]
+The RHS is quadratic in $\bm y$, with quadratic coefficient $\dfrac{m}{2}\I$ and linear coefficient $\nabla f(\bm x)-m\bm x$, so its minimizer $\bm y^*$ is
+\[
+\bm y^*=-\dfrac{\nabla f(\bm x)-m\bm x}{m}.
+\]
+(We regard $\bm a^\top \bm x$ as having coefficient $\bm a$, not $\bm a^\top$.)
+
+The minimal value is
+\[
+\min_{\bm y}\mathrm{RHS}= f(\bm x)-\frac{1}{2m}\|\nabla f(\bm x)\|^2,
+\]
+which rearranges to yield (a).
+
+For (b),
+\[
+\begin{aligned}
+f(\bm x^*)\geq&\ f(\bm x)+\nabla f(\bm x)^\top(\bm x^*-\bm x)+\frac{m}{2}\|\bm x^*-\bm x\|^2\\
+\geq&\ f(\bm x)-\|\nabla f(\bm x)\|\cdot\|\bm x^*-\bm x\|+\frac{m}{2}\|\bm x^*-\bm x\|^2 \quad (\text{Cauchy--Schwarz})\\
+0\leq f(\bm x)-f(\bm x^*)\leq&\ \|\nabla f(\bm x)\|\cdot \|\bm x^*-\bm x\|-\frac{m}{2}\|\bm x^*-\bm x\|^2\\
+\frac{m}{2}\|\bm x^*-\bm x\|^2\leq&\ \|\nabla f(\bm x)\|\cdot\|\bm x^*-\bm x\|.
+\end{aligned}
+\]
+Divide by $\|\bm x^*-\bm x\|$ to obtain (b).
+\end{proofbox}
+
+\begin{theorembox}
+Gradient Descent (\emph{GD}) with stepsizes $\alpha_k=\dfrac1L$ applied to $f:\R^n\rightarrow \R$ differentiable and $m$-strongly convex satisfies
+\[
+f(\bm x^k)-f(\bm x^*)\leq\left(1-\frac{m}{L}\right)^k\cdot \big(f(\bm x^0)-f(\bm x^*)\big),\quad \forall k=1,2,\dots
+\]
+\end{theorembox}
+
+\begin{proofbox}
+\[
+\begin{aligned}
+f(\bm x^{k+1})\leq&\ f(\bm x^k)-\frac1{2L}\|\nabla f(\bm x^k)\|^2\\
+\leq&\ f(\bm x^k)-\frac{m}{L}\big(f(\bm x^k)-f(\bm x^*)\big).
+\end{aligned}
+\]
+Subtract $f(\bm x^*)$ from both sides and rearrange:
+\[
+f(\bm x^{k+1})-f(\bm x^*)\leq \left(1-\frac{m}{L}\right)\big(f(\bm x^k)-f(\bm x^*)\big).
+\]
+Induction on $k$ proves the theorem:
+\[
+f(\bm x^k)-f(\bm x^*)\leq \left(1-\frac{m}{L}\right)^k \big(f(\bm x^0)-f(\bm x^*)\big).
+\]
+\end{proofbox}
+
+This is exponential in $k$, called \emph{Linear Convergence}. Compared to the convex (not strongly convex) case:
+\[
+f(\bm x^k)-f(\bm x^*)\leq\dfrac{L\|\bm x^0-\bm x^*\|^2}{2k},
+\]
+which is called \emph{Sublinear Convergence}, worse than for $m$-strongly convex functions.
+
+\subsection{Accelerated Gradient Descent and Momentum}
+
+\emph{GD}\ is a \emph{first-order} method, i.e., each iteration requires first derivatives of the objective.
+
+Nemirovsky and Yudin (1982) found a first-order method such that
+\[
+f(\bm x^k)-f(\bm x^*)\leq \mathcal O\!\left(\frac{1}{k^2}\right).
+\]
+Furthermore, under some assumptions, $\mathcal O\!\left(\dfrac{1}{k^2}\right)$ is the best possible.
+
+The \emph{N--Y algorithm} is difficult to implement. Nesterov (1983) proposed \emph{Accelerated Gradient Descent (AGD)} which attains $\mathcal O\!\left(\dfrac{1}{k^2}\right)$ (\emph{Nesterov's Fast Gradient Method}).

@@ -1,0 +1,136 @@
+\section{Lec 24}
+
+\subsection{Motivation}
+
+A software package to embed high-dimensional data in a lower dimension.
+
+Example usage: if embed into $2$ dimensions, then obtain a visual representation of data.
+
+Premise: realistic high dimensional data actually lies on a lower dimensional manifold (a priori unknown). Goal is to identify the manifold.
+
+If low dimensional manifold is a linear subspace, then can be found via SVD. If it is an affine subspace, then translate data by its mean and apply SVD. Both are called \textbf{Principal Components Analysis (PCA)}.
+
+If manifold is curved, need something like UMAP.
+
+\subsection{UMAP Algorithm}
+
+\begin{theorembox}[title={}]
+
+Given $n$ vectors in $\mathbb R^d$,
+
+\begin{enumerate}
+\item Compute $k$-nearest-neighbor graph on data. For each data item, find its closest neighbor, second-closest neighbor, etc up to $k$. This yields a directed graph with distances on arcs.
+
+\item Assign weights to edges based on distances.
+
+\item Symmetrize the graph (yielding an undirected graph).
+
+\item Use \textbf{Spectral Method} to produce an embedding.
+
+\item \emph{SGD} to improve spectral embedding.
+\end{enumerate}
+
+\end{theorembox}
+
+\subsubsection*{Step 4 Spectral Embedding}
+
+Let $\bm p_i\in\mathbb R^d,\forall i=1:n$. The \textbf{Euclidean Distance Matrix (EDM)} is an $n\times n$ symmetric matrix whose $(i,j)$ entry is $\|\bm p_i-\bm p_j\|^2$.
+
+The \textbf{Gram Matrix} is also $n\times n$ symmetric, $(i,j)$ entry is $\bm p_i^\top \bm p_j$. Given Gram Matrix, it's straightforward to obtain EDM:
+\[
+\|\bm p_i-\bm p_j\|^2=\bm p_i^\top \bm p_i-2\bm p_i^\top \bm p_j+\bm p_j^\top \bm p_j.
+\]
+
+To convert an EDM to a Gram Matrix is more complicated.
+Must assume: $\sum_{i=1}^n \bm p_i=\bm 0$.
+
+Add up one row of EDM, say row $i$:
+\[
+\sum_{j=1}^n \|\bm p_i-\bm p_j\|^2
+= n \bm p_i^\top \bm p_i+\sum_{j=1}^n \bm p_j^\top \bm p_j.
+\]
+
+Sum this over $i$, letting $\displaystyle\rho=\sum_{j=1}^n \bm p_j^\top \bm p_j$, obtain $2n\rho$.
+
+So from sum of EDM entries, we obtain $\rho$. Once $\rho$ is known, we obtain $\bm p_i^\top \bm p_i$ for all $i$, then obtain $\bm p_i^\top \bm p_j$ for all $i,j$ by
+\[
+\|\bm p_i-\bm p_j\|^2=\bm p_i^\top \bm p_i-2\bm p_i^\top \bm p_j+\bm p_j^\top \bm p_j.
+\]
+
+Thus all entries of Gram Matrix are recovered.
+
+From Gram Matrix, we can almost recover $\bm p_i$'s.
+
+Let
+\[
+\bm P=\begin{bmatrix}
+\bm p_1^\top\\ \vdots\\ \bm p_n^\top
+\end{bmatrix}\in\mathbb R^{n\times d},\qquad
+\bm G=\bm P\bm P^\top.
+\]
+
+Observe: $\mathrm{rank}(\bm G)\le d$.
+
+Let $\bm Q\bm D\bm Q^\top$ be eigendecomposition of $\bm G$. At most $d$ entries of $\bm D$ are nonzero, say entries $1:d$.
+\[
+\bm G = \bm Q(:,1\!:\!d)\,\bm D(1\!:\!d,1\!:\!d)\,\bm Q(:,1\!:\!d)^\top = \bar{\bm P}\,\bar{\bm P}^\top,
+\]
+where $\bar{\bm P} := \bm Q(:,1\!:\!d)\,\bm D(1\!:\!d,1\!:\!d)^{1/2}$.
+
+Fact: if $\bm G=\bm P\bm P^\top=\bar{\bm P}\,\bar{\bm P}^\top$ for $\bm P,\bar{\bm P}\in\mathbb R^{n\times d}$, then exists orthogonal $\bm Q\in\mathbb R^{d\times d}$ such that $\bar{\bm P}=\bm P\bm Q$.
+
+So given EDM $\bm E$, recover $\bm P$ via
+\[
+\bm E \xrightarrow{\sum \bm p_i=\bm 0} \bm G \xrightarrow{\text{Eigendecomposition}} \bm P 
+\qquad \text{(up to unknown rotation)}.
+\]
+
+Given a data set with knowledge of pairwise distances:
+
+\begin{enumerate}
+\item Square distances.
+\item Form \emph{Fake EDM}.
+\item Form Gram Matrix.
+\item Form Eigendecomposition.
+\item Keep top $d$ eigenvalues ($d$ is the desired embedding dimension).
+\end{enumerate}
+
+Eigenvectors yield coordinates in $\mathbb R^d$.
+
+\subsubsection*{Step 5 \emph{SGD}}
+
+Say $p,q$ are probability distributions over same set of events. \textbf{Cross-Entropy} of $q$ with respect to $p$ is $-\mathbb E_p[\log q]$.
+
+Example: flipping a coin with true heads probability $p$ but guessed value $q$.
+\[
+\mathrm{CE}(p,q)=-p\log q-(1-p)\log(1-q).
+\]
+
+This is convex in $q$, minimized at $p=q$.
+
+UMAP idea: assume a hidden undirected graph among data points with edge probabilities from Step 3. For embedded points $\bm x_i\in\mathbb R^{\bar d}$,
+\[
+\Pr[(i,j)\text{ edge}] = \frac{1}{1+a\|\bm x_i-\bm x_j\|^{2b}},
+\]
+with hyperparameters $a,b>0$.
+
+UMAP minimizes Cross-Entropy:
+\[
+\min_{\bm x}\; -\sum_{e=(i,j)} \mathbb E_{p_e}[\log q_e].
+\]
+
+UMAP uses a variant of \emph{SGD}: on each iteration pick edge $(i,j)$ with probability proportional to true weight and update $\bm x_i,\bm x_j$ using gradient of
+\[
+-p_{ij}\log\left(\frac{1}{1+a\|\bm x_i-\bm x_j\|^{2b}}\right)
+-(1-p_{ij})\log\left(1-\frac{1}{1+a\|\bm x_i-\bm x_j\|^{2b}}\right).
+\]
+
+Then perform \textbf{Negative Sampling}. Choose random $i,j$ with weight $0$ and update similarly.
+
+Negative sampling originates from \textbf{Word2Vec} by Mikolov et al.
+
+\emph{Does this really minimize Cross-Entropy?}
+
+\emph{Unsure..(similar but not same)}
+
+A pattern in \emph{SGD} for modern machine learning: start with a principled approach, then insert many heuristics (layer normalizations, etc), then keep trying until it works well.

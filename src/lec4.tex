@@ -1,0 +1,373 @@
+\section{Lec 4}
+
+\subsection{Topology Review}
+
+A set $S\subseteq \R^n$ is \textbf{compact} if it is closed and bounded (there is a more general notion of compactness in pure math).
+
+A set $S\subseteq \R^n$ is \textbf{bounded} if $\exists r>0$ such that
+\[
+S \subseteq \mathbb B(\0,r).
+\]
+
+\begin{theorembox}
+If $S\subseteq \R^n$ is compact, nonempty, and $f:S\to \R$ is continuous, then there exist
+$\bm x_1,\bm x_2\in S$ such that
+\[
+f(\bm x_1)\le f(\bm x)\le f(\bm x_2),
+\quad \forall \bm x\in S.
+\]
+(That is, $f$ attains both its minimum and maximum on $S$.)
+\end{theorembox}
+
+\begin{theorembox}
+If $\bm x_1,\bm x_2,\dots$ is an arbitrary infinite sequence in a compact set $S$, then there exists a subsequence
+\[
+\bm x_{k_1}, \bm x_{k_2}, \dots
+\quad\text{with}\quad
+k_1 < k_2 < \cdots
+\]
+that converges to some $\bm x\in S$.
+\end{theorembox}
+
+\subsection{Basics of Continuous Optimization}
+
+\subsubsection{Minimizers}
+
+Let $\Omega\subseteq \R^n$, and let $f:\Omega\to \R$ (we will also write $\operatorname{dom}(f)=\Omega$).
+
+We say $\bm x^*\in \operatorname{dom}(f)$ is a \textbf{local minimizer} of $f$ if
+there exists $r>0$ such that
+\[
+f(\bm x^*) \le f(\bm x),
+\quad \forall \bm x \in \operatorname{dom}(f)\cap \mathbb B(\bm x^*,r).
+\]
+
+We say $\bm x^*$ is a \textbf{global minimizer} if
+\[
+f(\bm x^*) \le f(\bm x),
+\quad \forall \bm x\in \operatorname{dom}(f).
+\]
+
+\begin{examplebox}
+Let $n=1$ and $\operatorname{dom}(f)=[a,b]$. In the picture below, the circled blue points are local minimizers; the third local minimizer is also the global minimizer.
+\end{examplebox}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.6\textwidth]{src/img/localmin.png}
+  \caption*{}
+\end{figure}
+
+We say $\bm x^*\in \Omega$ is a \textbf{strict local minimizer} if there exists $r>0$ such that
+\[
+f(\bm x^*) < f(\bm x),
+\quad
+\forall \bm x \in \bigl(\operatorname{dom}(f)\cap \mathbb B(\bm x^*,r)\bigr)\setminus\{\bm x^*\}.
+\]
+
+\newpage
+
+Remarks:
+\begin{itemize}
+  \item $\Omega(=\operatorname{dom}(f))$ could be all of $\R^n$.
+  \item $\Omega$ could be specified by constraints.
+  \item $\Omega$ could be the set where $f$ is naturally defined (for example, if $f(x)=x-\ln x$, then $\operatorname{dom}(f)=\{x : x>0\}$).
+\end{itemize}
+
+\subsubsection{Derivatives}
+
+Let $f:\Omega\to \R$, $\Omega\subseteq \R^n$, and let $\bm x\in \Omega$.
+
+We say $f$ is \textbf{differentiable} at $\bm x$ if:
+\begin{enumerate}[label=\alph*)]
+  \item $\bm x\in \operatorname{int}(\Omega)$, i.e., there exists $r>0$ such that $\mathbb B(\bm x,r)\subseteq \Omega$, and
+  \item there exists $\bm g\in \R^n$ (the \emph{gradient} or \emph{derivative} of $f$ at $\bm x$) such that
+  \[
+  \lim_{\bm h\to \bm0,\ \bm h\ne \bm0}
+  \dfrac{f(\bm x+\bm h) - f(\bm x) - \bm g^{\top}\bm h}
+       {\|\bm h\|}
+  = 0.
+  \]
+\end{enumerate}
+
+Equivalently, differentiability means that there exists a function $\Phi_{\bm x}(\bm h)$ such that
+\[
+f(\bm x+\bm h)
+= f(\bm x) + \bm g^{\top}\bm h + \Phi_{\bm x}(\bm h),
+\]
+with
+\[
+\lim_{\bm h\to \bm0,\ \bm h\ne \bm0}
+\dfrac{\Phi_{\bm x}(\bm h)}{\|\bm h\|} = 0.
+\]
+
+\begin{factbox}
+If $f$ is differentiable at $\bm x$, then the derivative is uniquely determined; we denote it by $\nabla f(\bm x)$.
+\end{factbox}
+
+Given $\bm x\in \operatorname{int}(\Omega)$, the \textbf{partial derivatives} are defined by
+\[
+\dfrac{\partial f}{\partial x_i}(\bm x)
+= \lim_{h\to 0,\ h\ne 0}
+\dfrac{f(\bm x + h\bm e_i) - f(\bm x)}{h},
+\quad i=1,\dots,n.
+\]
+
+We say $f:\Omega\to \R$ is $\mathcal C^1$ or \textbf{continuously differentiable} at $\bm x$ 
+if all partial derivatives
+\[
+\dfrac{\partial f}{\partial x_i}(\bm y)
+\]
+exist and are continuous
+\[
+\forall i=1,\dots,n,\quad \forall \bm y\in \mathbb B(\bm x,r)\text{ for some }r>0.
+\]
+
+A similar correction applies to the definition of $\mathcal C^2$.
+
+\begin{theorembox}
+If $f$ is $\mathcal C^1$ at $\bm x$, then
+\[
+\nabla f(\bm x) =
+\begin{pmatrix}
+\dfrac{\partial f}{\partial x_1}(\bm x)\\
+\vdots\\
+\dfrac{\partial f}{\partial x_n}(\bm x)
+\end{pmatrix}.
+\]
+\end{theorembox}
+
+\begin{examplebox}
+\textbf{(Quadratic.)}
+\[
+f(\bm x)
+= \dfrac12 \bm x^{\top}\bm H\bm x
+  + \bm g^{\top}\bm x
+  + d,
+\]
+where $\bm H\in \Sbb^n$, \ $\bm g\in \R^n$, \ $d\in \R$.
+
+Equivalently,
+\[
+f(\bm x)
+= \dfrac12 \sum_{i=1}^n \sum_{j=1}^n H(i,j)\,x(i)\,x(j)
+  + \sum_{i=1}^n g(i)\,x(i)
+  + d,
+\]
+so
+\[
+\dfrac{\partial f}{\partial x_i}(\bm x)
+= \sum_{k=1}^n H(i,k)\,x(k) + g(i),
+\]
+and
+\[
+\nabla f(\bm x)
+=
+\begin{pmatrix}
+\dfrac{\partial f}{\partial x_1}(\bm x)\\
+\vdots\\
+\dfrac{\partial f}{\partial x_n}(\bm x)
+\end{pmatrix}
+=
+\begin{pmatrix}
+H(1,:)\bm x + g(1)\\
+\vdots\\
+H(n,:)\bm x + g(n)
+\end{pmatrix}
+= \bm H\bm x + \bm g.
+\]
+\end{examplebox}
+
+\subsubsection{Second Derivatives and Hessian}
+
+Given $\Omega\subseteq \R^n$, we say $f$ is \textbf{twice differentiable} at $\bm x\in \R^n$ if:
+\begin{enumerate}[label=\alph*)]
+  \item $\bm x\in \operatorname{int}(\Omega)$ (the interior condition ensures that $\bm h$ can come from every direction), and
+  \item there exist $\bm g\in \R^n$ (the gradient) and $\bm H\in \R^{n\times n}$ (the \textbf{Hessian} or \textbf{second derivative}) such that
+  \[
+  f(\bm x+\bm h)
+  = f(\bm x)
+    + \bm g^{\top}\bm h
+    + \dfrac12 \bm h^{\top}\bm H\bm h
+    + \psi_{\bm x}(\bm h),
+  \]
+  where
+  \[
+  \lim_{\bm h\to \bm0,\ \bm h\ne \bm0}
+  \dfrac{\psi_{\bm x}(\bm h)}{\|\bm h\|^2} = 0.
+  \]
+\end{enumerate}
+
+If $\bm H$ exists, it is uniquely determined; we denote it by $\nabla^2 f(\bm x)$.
+
+We say $f$ is $\mathcal C^2$ at $\bm x$ if $\nabla^2 f(\bm y)$ is continuous for $\bm y$ in some open ball around $\bm x$.
+
+\begin{theorembox}
+If $f$ is $\mathcal C^2$ at $\bm x$, then
+\[
+\nabla^2 f(\bm x)
+=
+\begin{pmatrix}
+\dfrac{\partial^2 f}{\partial x_1\partial x_1}(\bm x) & \cdots &
+\dfrac{\partial^2 f}{\partial x_1\partial x_n}(\bm x)\\
+\vdots & \ddots & \vdots\\
+\dfrac{\partial^2 f}{\partial x_n\partial x_1}(\bm x) & \cdots &
+\dfrac{\partial^2 f}{\partial x_n\partial x_n}(\bm x)
+\end{pmatrix},
+\]
+and this matrix is symmetric:
+\[
+\dfrac{\partial^2 f}{\partial x_i\partial x_j}(\bm x)
+=
+\dfrac{\partial^2 f}{\partial x_j\partial x_i}(\bm x),
+\quad \forall i,j=1,\dots,n.
+\]
+\end{theorembox}
+
+\begin{examplebox}
+\textbf{(Quadratic, Hessian.)}
+\[
+f(\bm x)
+= \dfrac12 \bm x^{\top}\bm H\bm x
+  + \bm g^{\top}\bm x
+  + d.
+\]
+Then
+\[
+\nabla f(\bm x) = \bm H\bm x + \bm g,
+\qquad
+\nabla^2 f(\bm x) = \bm H.
+\]
+\end{examplebox}
+
+\subsubsection{Taylor's Theorem Variants}
+
+Let $f:\Omega\to \R$ be $\mathcal C^1$, and let $\bm x\in \operatorname{int}(\Omega)$. By the \textbf{Fundamental Theorem of Calculus},
+\[
+f(\bm x+\bm p)
+=
+f(\bm x)
++ \int_0^1 \nabla f(\bm x + \gamma \bm p)^{\top} \bm p \,\mathrm d\gamma.
+\]
+
+Applying the \textbf{Mean Value Theorem for integrals}, we obtain
+\[
+f(\bm x+\bm p)
+=
+f(\bm x)
++ \nabla f(\bm x + \gamma \bm p)^{\top} \bm p
+\]
+for some $\gamma\in [0,1]$.
+
+(Here we are implicitly assuming that
+$\bm x\in \operatorname{int}(\Omega)$,
+$\bm x+\bm p\in \operatorname{int}(\Omega)$,
+and $\bm x+\gamma \bm p\in \operatorname{int}(\Omega)$ for all $\gamma\in [0,1]$.)
+
+These results require that $\bm x$, $\bm x+\bm p$, and $\bm x+\gamma \bm p$ all lie in $\operatorname{int}(\Omega)$ for every $\gamma\in[0,1]$.
+
+\subsubsection{Convexity}
+
+A set $C\subseteq \R^n$ is \textbf{convex} if
+\[
+\forall \bm x\in C,\ \forall \bm p \text{ with } \bm x+\bm p\in C,
+\ \text{we also have } \bm x+\gamma \bm p\in C\quad \forall \gamma\in [0,1].
+\]
+Equivalently, $C$ is convex if and only if
+\[
+\forall \bm x,\bm y\in C,\ \forall \gamma\in [0,1],\quad
+(1-\gamma)\bm x + \gamma \bm y \in C.
+\]
+
+\begin{examplebox}
+\begin{enumerate}
+  \item Some trivial examples: $\varnothing$, $\{\bm x_0\}$, $\R^n$.
+  \item \textbf{Affine set.} Given $\bm A\in \R^{m\times n}$ and $\bm b\in \R^m$,
+        \[
+        C = \{\bm x\in \R^n : \bm A\bm x = \bm b\}
+        \]
+        is an affine set.
+
+        An equivalent definition: $C$ is \textbf{affine} if and only if
+        \[
+        \forall \bm x,\bm y\in C,\ \forall \gamma\in \R,\quad
+        (1-\gamma)\bm x + \gamma \bm y \in C,
+        \]
+        where $\gamma$ is allowed to be any real number (not just in $[0,1]$).
+
+        Note: Affine sets are always convex.
+  \item Open or closed ball in any norm:
+  \[
+  \mathbb B_\square(\bm x,r)
+  = \{\bm y\in \R^n : \|\bm y-\bm x\|_\square < r\},
+  \quad
+  \overline{\mathbb B}_\square(\bm x,r)
+  = \{\bm y\in \R^n : \|\bm y-\bm x\|_\square \le r\}.
+  \]
+  \item \textbf{Halfspace.} Given $\bm A\in \R^n$ and $b\in \R$,
+  \[
+  H = \{\bm x\in \R^n : \bm A^{\top}\bm x \le b\}.
+  \]
+  \item \textbf{Polyhedron.} A polyhedron is the intersection of a finite number of halfspaces.
+
+  Given $\bm A_1,\dots,\bm A_m\in \R^n$ and $b_1,\dots,b_m\in \R$, define
+  \[
+  C = \{\bm x\in \R^n :
+         \bm A_1^{\top}\bm x \le b_1,\dots,
+         \bm A_m^{\top}\bm x \le b_m\}.
+  \]
+  Let
+  \[
+  \bm A =
+  \begin{pmatrix}
+  \bm A_1^{\top}\\
+  \vdots\\
+  \bm A_m^{\top}
+  \end{pmatrix},
+  \quad
+  \bm b =
+  \begin{pmatrix}
+  b_1\\
+  \vdots\\
+  b_m
+  \end{pmatrix}.
+  \]
+  Then equivalently,
+  \[
+  C = \{\bm x\in \R^n : \bm A\bm x \le \bm b\},
+  \]
+  where the inequality is interpreted componentwise.
+\end{enumerate}
+\end{examplebox}
+
+Note: For $\bm u,\bm v\in \R^m$, we write $\bm u\le \bm v$ if
+\[
+u(i)\le v(i),\quad \forall i=1,\dots,m.
+\]
+The same componentwise interpretation holds for $<$, $>$, and $\ge$.
+
+Note: Affine sets are a special case of polyhedra. Given $\bm A\in \R^{m\times n}$ and $\bm b\in \R^m$,
+\[
+\bm A\bm x = \bm b
+\Longleftrightarrow
+\begin{pmatrix}
+\bm A\\
+-\bm A
+\end{pmatrix}
+\bm x
+\le
+\begin{pmatrix}
+\bm b\\
+-\bm b
+\end{pmatrix}.
+\]
+
+\subsubsection{Lipschitz Continuity}
+
+Let $\bm f:\Omega\to \R^m$, $\Omega\subseteq \R^n$. We say $\bm f$ is
+\textbf{Lipschitz continuous} with modulus $L$ if
+\[
+\|\bm f(\bm x) - \bm f(\bm y)\|
+\le L \|\bm x - \bm y\|,
+\quad \forall \bm x,\bm y\in \Omega.
+\]
