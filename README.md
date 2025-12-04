@@ -6,4 +6,4 @@
 
 ---
 
-This repository provides a bundled PDF containing all 24 lecture notes for the University of Waterloo course **CO 673 / CS 794 – Optimization for Data Science**.
+A bundled PDF containing all 24 lecture notes for the University of Waterloo course CO 673 / CS 794.
