@@ -1,28 +1,29 @@
 <!DOCTYPE html>
-<html style="height:100%; margin:0; padding:0;">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>PDF Viewer</title>
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-        .pdf-container {
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-        }
-        embed {
-            width: 100%;
-            height: 100%;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Optimization for Data Science</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+    .pdf-container {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .pdf-container embed {
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      display: block;
+    }
+  </style>
 </head>
 <body>
-    <div class="pdf-container">
-        <embed src="main.pdf" type="application/pdf">
-    </div>
+  <div class="pdf-container">
+    <embed src="OptimizationForDataScience.pdf" type="application/pdf">
+  </div>
 </body>
 </html>
